@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+
+import GachaMachine.DiamondSquareGacha;
 import arkanoid.Sound;
 import arkanoid.ButtonManager;
 
