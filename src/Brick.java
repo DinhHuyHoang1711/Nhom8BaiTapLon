@@ -125,8 +125,9 @@ public class Brick extends GameObject {
         }
     }
 
-    public void takeHit() {
-        if (hitPoints > 0) hitPoints--;
+    public void takeHit(int damage) {
+        //if (hitPoints > 0) hitPoints--;
+        hitPoints = Math.max(hitPoints - damage, 0);
     }
 
     public boolean isDestroyed() {

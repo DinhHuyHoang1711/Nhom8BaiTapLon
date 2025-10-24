@@ -5,7 +5,7 @@ import java.awt.Rectangle;
 import java.util.*;
 import arkanoid.GameObject;
 
-public class Ball extends GameObject {
+public class Ball extends GameObject{
     // Kích thước bóng
     private static final int BALL_SIZE = 60;
 
@@ -27,9 +27,19 @@ public class Ball extends GameObject {
         setElementFromName("normal");
     }
 
+    public Ball(int x, int y, int size, int dx, int dy, String imgPath, int damage) {
+        super(x, y, size, size, dx, dy, imgPath);
+        setElementFromName("normal", damage);
+    }
+
     public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName(element);
+    }
+
+    public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath, int damage) {
+        super(x, y, size, size, dx, dy, imgPath);
+        setElementFromName(element, damage);
     }
 
     public Ball(int x, int y, int size, String imgPath) {
@@ -105,23 +115,31 @@ public class Ball extends GameObject {
         Rectangle ba = new Rectangle(getX(), getY(), getWidth(), getHeight());
 
         if (!ba.intersects(br)) return false;
+        else {
 
-        int overlapLeft   = ba.x + ba.width - br.x;
-        int overlapRight  = br.x + br.width - ba.x;
-        int overlapTop    = ba.y + ba.height - br.y;
-        int overlapBottom = br.y + br.height - ba.y;
+            int overlapLeft = ba.x + ba.width - br.x;
+            int overlapRight = br.x + br.width - ba.x;
+            int overlapTop = ba.y + ba.height - br.y;
+            int overlapBottom = br.y + br.height - ba.y;
 
-        int minHoriz = Math.min(overlapLeft, overlapRight);
-        int minVert  = Math.min(overlapTop, overlapBottom);
+            int minHoriz = Math.min(overlapLeft, overlapRight);
+            int minVert = Math.min(overlapTop, overlapBottom);
 
-        if (minHoriz < minVert) {
-            setDx(-getDx());
-        } else {
-            setDy(-getDy());
+            if (minHoriz < minVert) {
+                setDx(-getDx());
+            } else {
+                setDy(-getDy());
+            }
+
+            if(this.element.equals("normal")) {
+                b.takeHit(this.getBaseDamage());
+            }
+            else {
+                b.takeHit(this.element.equals(b.getElement()) ? this.getBaseDamage() *  2 :
+                this.getBaseDamage());
+            }
         }
-
-        b.takeHit();
-        return true;
+            return true;
     }
 
     public void collideWithPaddle(Paddle paddle) {
@@ -130,13 +148,33 @@ public class Ball extends GameObject {
         if (!paddleRect.intersects(ballRect)) {
             return;
         } else {
-            this.setDy(-Math.abs(this.getDy()));
-            this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(7 - 5) + 5));
+            if(paddle.isMovingLeft()) {
+                //Paddle di sang trai thi bong di sang trai
+                this.setDy(-Math.abs(rand.nextInt(1) + Math.abs(this.getDy())));
+                this.setDx(-1 * Math.abs((rand.nextInt(1) + Math.abs(this.getDx()))));
+            } else {
+                //Paddle di sang phai thi bong di sang phai
+                if(paddle.isMovingRight()) {
+                    this.setDy(-Math.abs(rand.nextInt(1) + Math.abs(this.getDy())));
+                    this.setDx(Math.abs((rand.nextInt(1) + Math.abs(this.getDx()))));
+                } else {
+                    //Paddle dung yen thi bong tiep tuc di theo huong ban dau
+                    this.setDy(-Math.abs(rand.nextInt(1) + Math.abs(this.getDy())));
+                    this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(1) + Math.abs(this.getDx())));
+                }
+            }
+            //this.setDy(-Math.abs(rand.nextInt(2) + this.getDy()));
+            //this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(2) + this.getDx()));
         }
     }
 
     private void setElementFromName(String element) {
         this.element = (element.isEmpty() ? "normal" : element);
         this.baseDamage = this.element.equals("normal") ? 50 : 100;
+    }
+
+    private void setElementFromName(String element, int damage) {
+        this.element = element;
+        this.baseDamage = damage;
     }
 }

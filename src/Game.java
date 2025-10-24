@@ -11,11 +11,12 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     public static final int GAME_HEIGHT = 700;
     private static final int TICK_MS = 16;
 
-    private final Paddle paddle = new Paddle(500, 500, 120, 40,
-            10, 0, "img/paddle/paddlevip.png");
+    private final Paddle paddle = new Paddle(500, 500, 120, 20,
+            15, 0, "img/paddle/paddlevip.png");
 
     private final Ball ball;
-
+    private final int initDx;
+    private final int initDy;
     private final List<Brick> bricks = new ArrayList<>();
 
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
@@ -47,7 +48,10 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         String BALL_IMG = "img/ball/bongnguhanh.png";
         String BRICK_IMG = "img/brick/red_brick_cropped.png";
 
-        ball = new Ball(GAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 41, 6, -8, BALL_IMG);
+        ball = new Ball(GAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 31, 6, -8, BALL_IMG, 25);
+        initDx = ball.getDx();
+        initDy = ball.getDy();
+
         paddlePrinter.setGameObject(paddle);
         ballPrinter.setGameObject(ball);
 
@@ -67,7 +71,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
             for (int c = 0; c < cols; c++) {
                 int x = startX + c * (brickW + gap);
                 int y = startY + r * (brickH + gap);
-                Brick b = new Brick(x, y, brickW, brickH, 1, BRICK_IMG);
+                Brick b = new Brick(x, y, brickW, brickH, 50, BRICK_IMG);
                 bricks.add(b);
 
                 ObjectPrinter bp = new ObjectPrinter();
@@ -104,9 +108,14 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     public void actionPerformed(ActionEvent e) {
         if (leftPressed) {
             paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
-        }
-        if (rightPressed) {
-            paddle.setX(Math.min(paddle.getX() + paddle.getDx(), GAME_WIDTH - paddle.getWidth()));
+            paddle.setMovingLeft();
+        } else {
+            if (rightPressed) {
+                paddle.setX(Math.min(paddle.getX() + paddle.getDx(), GAME_WIDTH - paddle.getWidth()));
+                paddle.setMovingRight();
+            } else {
+                paddle.setDefaultMoving();
+            }
         }
 
         ball.step(new Rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT));
@@ -115,8 +124,8 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         if (ball.getY() > GAME_HEIGHT) {
             ball.setX(GAME_WIDTH / 2 - ball.getWidth() / 2);
             ball.setY(GAME_HEIGHT - 120);
-            ball.setDx(6);
-            ball.setDy(-8);
+            ball.setDx(initDx);
+            ball.setDy(initDy);
         }
 
         List<Brick> removed = new ArrayList<>();
@@ -141,9 +150,10 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         ballPrinter.setGameObject(ball);
     }
 
+    /*
     @Override
     public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = true;
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {leftPressed = true;
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = true;
     }
 
@@ -163,4 +173,41 @@ public class Game extends JFrame implements ActionListener, KeyListener {
             paddle.setX(Math.min(paddle.getX() + paddle.getDx(), GAME_WIDTH - paddle.getWidth()));
         }
     }
+     */
+    //Tranh truong hop an cung luc ca left ca right, chi 1 trong 2 cai dc true
+    @Override
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            leftPressed = true;
+            rightPressed = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            rightPressed = true;
+            leftPressed = false;
+        }
+    }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                leftPressed = false;
+                rightPressed = false;
+            }
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                rightPressed = false;
+                leftPressed = false;
+            }
+        }
+
+        @Override
+        public void keyTyped(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+                leftPressed = true;
+                rightPressed = false;
+            }
+            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+                rightPressed = true;
+                leftPressed = false;
+            }
+        }
 }
