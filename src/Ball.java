@@ -6,17 +6,78 @@ import java.util.*;
 import arkanoid.GameObject;
 
 public class Ball extends GameObject {
+    // Kích thước bóng
+    private static final int BALL_SIZE = 60;
+
+    // Thuộc tính
+    private String element;
+    private int baseDamage;
     private Random rand = new Random();
+
+    // Ảnh
+    private static final String NORMAL_BALL_IMG = "img/ball/normal.png";
+    private static final String FIRE_BALL_IMG   = "img/ball/fire.png";
+    private static final String WATER_BALL_IMG  = "img/ball/water.png";
+    private static final String WIND_BALL_IMG   = "img/ball/wind.png";
+    private static final String EARTH_BALL_IMG  = "img/ball/earth.png";
+
+    // ==== CONSTRUCTOR ==== //
     public Ball(int x, int y, int size, int dx, int dy, String imgPath) {
         super(x, y, size, size, dx, dy, imgPath);
+        setElementFromName("normal");
+    }
+
+    public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath) {
+        super(x, y, size, size, dx, dy, imgPath);
+        setElementFromName(element);
     }
 
     public Ball(int x, int y, int size, String imgPath) {
         super(x, y, size, size, 0, 0, imgPath);
+        setElementFromName("normal");
     }
 
     public Ball(int x, int y, int width, int height, int dx, int dy, String imgPath) {
         super(x, y, width, height, dx, dy, imgPath);
+        setElementFromName("normal");
+    }
+
+    // ==== TYPE BALL ==== //
+    public static Ball normalBall(int x, int y) {
+        return new Ball(x, y, BALL_SIZE, 0, 0, "normal", NORMAL_BALL_IMG);
+    }
+
+    public static Ball fireBall(int x, int y) {
+        return new Ball(x, y, BALL_SIZE, 0, 0, "fire", FIRE_BALL_IMG);
+    }
+
+    public static Ball waterBall(int x, int y) {
+        return new Ball(x, y, BALL_SIZE, 0, 0, "water", WATER_BALL_IMG);
+    }
+
+    public static Ball windBall(int x, int y) {
+        return new Ball(x, y, BALL_SIZE, 0, 0, "wind", WIND_BALL_IMG);
+    }
+
+    public static Ball earthBall(int x, int y) {
+        return new Ball(x, y, BALL_SIZE, 0, 0, "earth", EARTH_BALL_IMG);
+    }
+
+    // ==== GETTER/SETTER ==== //
+    public String getElement() {
+        return element;
+    }
+
+    public void setElement(String element) {
+        setElementFromName(element);
+    }
+
+    public int getBaseDamage() {
+        return baseDamage;
+    }
+
+    public void setBaseDamage(int baseDamage) {
+        this.baseDamage = baseDamage;
     }
 
     public void step(Rectangle bounds) {
@@ -72,5 +133,10 @@ public class Ball extends GameObject {
             this.setDy(-Math.abs(this.getDy()));
             this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(7 - 5) + 5));
         }
+    }
+
+    private void setElementFromName(String element) {
+        this.element = (element.isEmpty() ? "normal" : element);
+        this.baseDamage = this.element.equals("normal") ? 50 : 100;
     }
 }
