@@ -56,7 +56,8 @@ public class SpinAnimation {
 
     private void showResult(Item item) {
         inventory.addItem(item);
-        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(panel), "Kết quả", true);
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(panel)
+                , "Kết quả", true);
         dialog.setSize(200, 200);
         dialog.setLayout(new BorderLayout());
         dialog.setLocationRelativeTo(panel);
@@ -64,7 +65,9 @@ public class SpinAnimation {
         JLabel nameLabel = new JLabel(item.getName(), SwingConstants.CENTER);
         nameLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        JLabel icon = new JLabel(new ImageIcon(item.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH)), SwingConstants.CENTER);
+        JLabel icon = new JLabel(
+                new ImageIcon(item.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH))
+                , SwingConstants.CENTER);
 
         JButton ok = new JButton("Đóng");
         ok.addActionListener(e -> dialog.dispose());
