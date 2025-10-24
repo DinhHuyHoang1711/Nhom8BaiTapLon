@@ -33,7 +33,7 @@ public class DiamondSquareGacha extends JPanel {
         // Nút quay
         spinButton = new JButton("QUAY");
         spinButton.setFont(new Font("Arial", Font.BOLD, 18));
-        spinButton.setBounds(240, 500, 120, 40);
+        spinButton.setBounds(240, 520, 120, 40);
         add(spinButton);
 
         // Nút túi đồ
@@ -61,8 +61,8 @@ public class DiamondSquareGacha extends JPanel {
                 {0,-3},{-1,-2},{-2,-1}
         };
         for (int i = 0; i < NUM_TILES; i++) {
-            double dx = offsets[i][0] * d / 1.4;
-            double dy = offsets[i][1] * d / 1.4;
+            double dx = offsets[i][0] * d / 1.4 ;
+            double dy = offsets[i][1] * d / 1.4 ;
             positions[i] = new Point((int)(CENTER_X + dx), (int)(CENTER_Y + dy));
         }
     }
