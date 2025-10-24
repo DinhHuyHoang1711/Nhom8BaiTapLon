@@ -11,18 +11,27 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     public static final int GAME_HEIGHT = 700;
     private static final int TICK_MS = 16;
 
-    private final Paddle paddle = new Paddle(500, 500, 120, 20,
-            15, 0, "img/paddle/paddlevip.png");
+    //private final Paddle paddle = new Paddle(500, 500, 120, 20,
+    //        15, 0, "img/paddle/paddlevip.png");
 
+    //paddle
+    private final Paddle paddle;
+
+    //ball
     private final Ball ball;
+
+    //dx, dy mac dinh cua ball
     private final int initDx;
     private final int initDy;
+
+    //bricks
     private final List<Brick> bricks = new ArrayList<>();
 
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
     private final ObjectPrinter ballPrinter = new ObjectPrinter();
     private final JLayeredPane layers = new JLayeredPane();
     private final Map<Brick, ObjectPrinter> brickPrinters = new HashMap<>();
+    private final String gameScene;
 
     private final javax.swing.Timer timer = new javax.swing.Timer(TICK_MS, this);
 
@@ -30,7 +39,8 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     private boolean leftPressed = false;
     private boolean rightPressed = false;
 
-    public Game() {
+    public Game(Paddle currentPaddle, Ball currentBall, ArrayList <Brick> currentBricks,
+                String currentGameScene) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(GAME_WIDTH, GAME_HEIGHT);
@@ -45,10 +55,14 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         configurePrinter(paddlePrinter);
         configurePrinter(ballPrinter);
 
-        String BALL_IMG = "img/ball/bongnguhanh.png";
-        String BRICK_IMG = "img/brick/red_brick_cropped.png";
+        //String BALL_IMG = "img/ball/bongnguhanh.png";
+        //String BRICK_IMG = "img/brick/red_brick_cropped.png";
 
-        ball = new Ball(GAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 31, 6, -8, BALL_IMG, 25);
+        //paddle
+        paddle = currentPaddle;
+
+        //ball
+        ball = currentBall;
         initDx = ball.getDx();
         initDy = ball.getDy();
 
@@ -58,7 +72,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         layers.add(paddlePrinter, Integer.valueOf(9));
         layers.add(ballPrinter, Integer.valueOf(10));
 
-        int rows = 6;
+        /*int rows = 6;
         int cols = 10;
         int brickW = 90;
         int brickH = 50;
@@ -81,10 +95,28 @@ public class Game extends JFrame implements ActionListener, KeyListener {
                 layers.add(bp, Integer.valueOf(5));
             }
         }
+         */
+
+        //bricks
+        for(int i = 0; i < currentBricks.size(); i++) {
+
+            Brick b = new Brick();
+            b = currentBricks.get(i);
+            bricks.add(b);
+
+            ObjectPrinter bp = new ObjectPrinter();
+            configurePrinter(bp);
+            bp.setGameObject(b);
+            brickPrinters.put(b, bp);
+            layers.add(bp, Integer.valueOf(5));
+        }
 
         setContentPane(layers);
 
-        ImageIcon icon = new ImageIcon("img/Beach.jpg");
+        //game scene
+        gameScene = currentGameScene;
+
+        ImageIcon icon = new ImageIcon(gameScene);
         Image scaled = icon.getImage().getScaledInstance(GAME_WIDTH, GAME_HEIGHT, Image.SCALE_SMOOTH);
         JLabel bg = new JLabel(new ImageIcon(scaled));
         bg.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);

@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
 import GachaMachine.DiamondSquareGacha;
 import arkanoid.Sound;
@@ -13,7 +14,40 @@ public class MapMenu extends JFrame {
     private Sound click;
     private Image mapImage;
 
+    private Paddle currentPaddle = new Paddle(500, 500, 120, 20,
+            15, 0, "img/paddle/paddlevip.png");
+
+    private Ball currentBall = new Ball(GAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 31, 6,
+            -8, "img/ball/bongnguhanh.png", 25);
+
+
+    private String currentGameScene = "img/Beach.jpg";
+
+    //chuan bi bircks
+    private ArrayList <Brick> lv1Bricks = new ArrayList<>();
+    int rows = 6;
+    int cols = 10;
+    int brickW = 90;
+    int brickH = 50;
+    int marginY = 40;
+    int gap = 2;
+    int startX = (GAME_WIDTH - (cols * brickW + (cols - 1) * gap)) / 2;
+    int startY = marginY;
+
+
     public MapMenu() {
+
+        //chuan bi bricks
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                int x = startX + c * (brickW + gap);
+                int y = startY + r * (brickH + gap);
+                Brick b = new Brick(x, y, brickW, brickH, 50, "img/brick/red_brick_cropped.png");
+                lv1Bricks.add(b);
+
+            }
+        }
+
         setTitle("SELECT MAP");
         setSize(GAME_WIDTH, GAME_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -72,7 +106,8 @@ public class MapMenu extends JFrame {
     }
 
     private void openLevel(int level) {
-        new Game();
+        new Game(currentPaddle, currentBall, lv1Bricks,
+                currentGameScene);
     }
 
     public static void main(String[] args) {

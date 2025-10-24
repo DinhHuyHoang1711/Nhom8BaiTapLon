@@ -10,6 +10,12 @@ public class Brick extends GameObject {
     private String element;
 
     // ==== Constructor ==== //
+    public Brick() {
+        super();
+        this.hitPoints = 0;
+        this.element = "";
+    }
+
     public Brick(int x, int y, int width, int height, int hp, String imgPath) {
         super(x, y, width, height, 0, 0, imgPath);
         this.hitPoints = Math.max(0, hp);
