@@ -7,7 +7,7 @@ import arkanoid.GameObject;
 
 public class Ball extends GameObject{
     // Kích thước bóng
-    private static final int BALL_SIZE = 60;
+    private static final int BALL_SIZE = 31;
 
     // Thuộc tính
     private String element;

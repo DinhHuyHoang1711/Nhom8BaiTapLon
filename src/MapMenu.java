@@ -6,18 +6,17 @@ import GachaMachine.DiamondSquareGacha;
 import arkanoid.Sound;
 import arkanoid.ButtonManager;
 
-import static arkanoid.GameObject.GAME_HEIGHT;
-import static arkanoid.GameObject.GAME_WIDTH;
+import static arkanoid.GameObject.*;
 
 public class MapMenu extends JFrame {
 
     private Sound click;
     private Image mapImage;
 
-    private Paddle currentPaddle = new Paddle(500, 500, 120, 20,
+    private Paddle currentPaddle = new Paddle(PLAYFRAME_WIDTH / 2 - 60, 600, 120, 20,
             15, 0, "img/paddle/paddlevip.png");
 
-    private Ball currentBall = new Ball(GAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 31, 6,
+    private Ball currentBall = new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 31, 6,
             -8, "img/ball/bongnguhanh.png", 25);
 
 
@@ -25,13 +24,13 @@ public class MapMenu extends JFrame {
 
     //chuan bi bircks
     private ArrayList <Brick> lv1Bricks = new ArrayList<>();
-    int rows = 6;
-    int cols = 10;
-    int brickW = 90;
-    int brickH = 50;
+    int rows = 3;
+    int cols = 6;
+    int brickW = 80;
+    int brickH = 30;
     int marginY = 40;
     int gap = 2;
-    int startX = (GAME_WIDTH - (cols * brickW + (cols - 1) * gap)) / 2;
+    int startX = (PLAYFRAME_WIDTH - (cols * brickW + (cols - 1) * gap)) / 2;
     int startY = marginY;
 
 

@@ -2,8 +2,8 @@ import arkanoid.GameObject;
 
 public class Brick extends GameObject {
     // Kích thước gạch
-    private static final int BRICK_WIDTH = 90;
-    private static final int BRICK_HEIGHT = 50;
+    private static final int BRICK_WIDTH = 80;
+    private static final int BRICK_HEIGHT = 30;
 
     // Thuộc tính
     private int hitPoints;
