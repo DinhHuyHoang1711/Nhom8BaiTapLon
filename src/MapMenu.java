@@ -46,7 +46,10 @@ public class MapMenu extends JFrame {
 
             }
         }
-
+        /*
+        lv1Bricks.clear();
+        lv1Bricks.addAll(Brick.buildLevel2Bricks());
+        */
         setTitle("SELECT MAP");
         setSize(GAME_WIDTH, GAME_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
