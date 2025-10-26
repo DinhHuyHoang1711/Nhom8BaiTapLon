@@ -150,6 +150,7 @@ public class DiamondSquareGacha extends JPanel {
         frame.getContentPane().add(new DiamondSquareGacha());
         frame.pack();
         frame.setLocationRelativeTo(null);
+        frame.setResizable(false);
         frame.setVisible(true);
     }
 }
