@@ -54,7 +54,7 @@ public class BaloUI extends JFrame {
 
     private void openBallList() {
         this.dispose();
-  //      new BallUI(ownedManager, ownedManager.getBalls());
+        new BallUI(ownedManager, ownedManager.getBalls());
     }
 
     private void openArtifactList() {
