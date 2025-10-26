@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import GachaMachine.DiamondSquareGacha;
 import arkanoid.Sound;
 import arkanoid.ButtonManager;
+import arkanoid.Paddle;
+import arkanoid.Ball;
+import arkanoid.Brick;
 
 import static arkanoid.GameObject.*;
 
