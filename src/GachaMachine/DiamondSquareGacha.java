@@ -8,7 +8,6 @@ import java.awt.geom.AffineTransform;
 
 /**
  * 🎮 Game Vòng Quay 12 Ô - Hình Thoi
- * Viết lại theo phong cách "code tay" — dễ đọc, rõ ràng, gọn gàng.
  */
 public class DiamondSquareGacha extends JPanel {
     // Kích thước & cấu hình
