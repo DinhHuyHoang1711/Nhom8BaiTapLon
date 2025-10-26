@@ -10,6 +10,7 @@ import arkanoid.Ball;
 
 public class Game extends JFrame implements ActionListener, KeyListener {
 
+    //Thong so khung hinh
     public static final int GAME_WIDTH = 1200;
     public static final int GAME_HEIGHT = 700;
     public static final int PLAYFRAME_WIDTH = 800;
@@ -58,7 +59,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     private JLabel ballDyLabel;
     private JLabel ballDamageLabel;
 
-    // stat artiface
+    // stat artifact
     private JLabel artifactTitle;
 
 
@@ -95,32 +96,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         layers.add(paddlePrinter, Integer.valueOf(9));
         layers.add(ballPrinter, Integer.valueOf(10));
 
-        /*int rows = 6;
-        int cols = 10;
-        int brickW = 90;
-        int brickH = 50;
-        int marginY = 40;
-        int gap = 2;
-        int startX = (GAME_WIDTH - (cols * brickW + (cols - 1) * gap)) / 2;
-        int startY = marginY;
-
-        for (int r = 0; r < rows; r++) {
-            for (int c = 0; c < cols; c++) {
-                int x = startX + c * (brickW + gap);
-                int y = startY + r * (brickH + gap);
-                Brick b = new Brick(x, y, brickW, brickH, 50, BRICK_IMG);
-                bricks.add(b);
-
-                ObjectPrinter bp = new ObjectPrinter();
-                configurePrinter(bp);
-                bp.setGameObject(b);
-                brickPrinters.put(b, bp);
-                layers.add(bp, Integer.valueOf(5));
-            }
-        }
-         */
-
-        //bricks
+          //bricks
         for(int i = 0; i < currentBricks.size(); i++) {
 
             Brick b = new Brick();
@@ -129,6 +105,13 @@ public class Game extends JFrame implements ActionListener, KeyListener {
 
             ObjectPrinter bp = new ObjectPrinter();
             configurePrinter(bp);
+
+            /*
+            ObjectPrinter bp = new ObjectPrinter();
+            bp.setOpaque(false);
+            // Đặt bounds của ObjectPrinter bằng Vị trí và Kích thước của Brick
+            bp.setBounds(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+             */
             bp.setGameObject(b);
             brickPrinters.put(b, bp);
             layers.add(bp, Integer.valueOf(8));
@@ -155,63 +138,6 @@ public class Game extends JFrame implements ActionListener, KeyListener {
 
 
         //ve cac thong so tren stat bar
-
-        /*
-        JLabel text = new JLabel("Paddle");
-        text.setBounds(840, 175, 200, 25); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 1, 25));
-        text.setForeground(java.awt.Color.YELLOW); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Width: " + paddle.getWidth());
-        text.setBounds(840, 205, 200, 15); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 0, 15));
-        text.setForeground(java.awt.Color.WHITE); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Dx: " + paddle.getDx());
-        text.setBounds(840, 225, 200, 15); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 0, 15));
-        text.setForeground(java.awt.Color.WHITE); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Ball");
-        text.setBounds(840, 260, 200, 25); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 1, 25));
-        text.setForeground(java.awt.Color.YELLOW); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Element: " + ball.getElement());
-        text.setBounds(840, 290, 200, 15); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 0, 15));
-        text.setForeground(java.awt.Color.WHITE); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Dx: " + ball.getDx());
-        text.setBounds(840, 310, 200, 15); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 0, 15));
-        text.setForeground(java.awt.Color.WHITE); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Dy: " + ball.getDy());
-        text.setBounds(840, 330, 200, 15); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 0, 15));
-        text.setForeground(java.awt.Color.WHITE); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Damage: " + ball.getBaseDamage());
-        text.setBounds(840, 350, 200, 15); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 0, 15));
-        text.setForeground(java.awt.Color.WHITE); // mau
-        layers.add(text, Integer.valueOf(2));
-
-        text = new JLabel("Artifact");
-        text.setBounds(840, 385, 200, 25); // vi tri va kich thuoc
-        text.setFont(new java.awt.Font("Arial", 1, 25));
-        text.setForeground(java.awt.Color.YELLOW); // mau
-        layers.add(text, Integer.valueOf(2));
-
-         */
 
         // --- PADDLE INFO ---
         paddleTitle = new JLabel("Paddle");
@@ -340,30 +266,6 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         ballDamageLabel.setText("Damage: " + ball.getBaseDamage());
     }
 
-    /*
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {leftPressed = true;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = true;
-    }
-
-    @Override
-    public void keyReleased(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) leftPressed = false;
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) rightPressed = false;
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-            //player.x -= player.dx;
-            paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
-        }
-        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-            paddle.setX(Math.min(paddle.getX() + paddle.getDx(), GAME_WIDTH - paddle.getWidth()));
-        }
-    }
-     */
     //Tranh truong hop an cung luc ca left ca right, chi 1 trong 2 cai dc true
     @Override
     public void keyPressed(KeyEvent e) {

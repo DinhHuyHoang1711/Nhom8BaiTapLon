@@ -10,6 +10,7 @@ import arkanoid.GameObject;
 public class ObjectPrinter extends JPanel {
 
     private BufferedImage image;   // lưu ảnh trong bộ nhớ
+    private Image scaledImage; //Anh co the khong fit voi khung hcn nen can scale
     private String imagePath;      // đường dẫn file ảnh
     private int x, y, width, height; //cac thong so de ve 1 object;
 
@@ -34,17 +35,62 @@ public class ObjectPrinter extends JPanel {
     private void loadImage() {
         try {
             image = ImageIO.read(new File(imagePath));
+
+            // 🧩 Xác định vùng có nội dung thực (bỏ nền trắng / trong suốt)
+            Rectangle cropRect = getNonTransparentArea(image);
+
+            // ✂️ Cắt ảnh theo vùng đó
+            BufferedImage cropped = image.getSubimage(cropRect.x, cropRect.y,
+                    cropRect.width, cropRect.height);
+
+            scaledImage = cropped.getScaledInstance(width, height, Image.SCALE_SMOOTH);
+
         } catch (IOException e) {
             System.err.println("Không thể tải ảnh: " + imagePath);
             image = null;
         }
     }
 
+    // ===== Xác định vùng không trong suốt / không trắng =====
+    private Rectangle getNonTransparentArea(BufferedImage image) {
+        int w = image.getWidth();
+        int h = image.getHeight();
+
+        int minX = w, minY = h, maxX = 0, maxY = 0;
+        boolean found = false;
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int pixel = image.getRGB(x, y);
+                int alpha = (pixel >> 24) & 0xff;
+                int r = (pixel >> 16) & 0xff;
+                int g = (pixel >> 8) & 0xff;
+                int b = (pixel) & 0xff;
+
+                // Ngưỡng bỏ qua pixel trắng hoặc trong suốt
+                if (alpha > 0 && !(r > 240 && g > 240 && b > 240)) {
+                    found = true;
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+
+        if (!found) {
+            // Nếu ảnh toàn trắng hoặc trong suốt
+            return new Rectangle(0, 0, w, h);
+        }
+
+        return new Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1);
+    }
+
     // ✅ Hàm vẽ ảnh (Swing tự gọi khi cần)
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(image, this.x, this.y, this.width, this.height, null);
+        g.drawImage(scaledImage, this.x, this.y, null);
     }
 
     // Setter đổi ảnh khác (tự load và vẽ lại)
