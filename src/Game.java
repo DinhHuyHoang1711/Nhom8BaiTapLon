@@ -236,6 +236,9 @@ public class Game extends JFrame implements ActionListener, KeyListener {
                     ObjectPrinter p = brickPrinters.get(b);
                     if (p != null) p.startFlash();
                 }
+                //bóng chỉ va chạm 1 gạch 1 lần
+                // từ từ nhé, chỗ này sẽ phải bỏ, nếu nhận được buff đi xuyên.
+                break;
             }
         }
 
