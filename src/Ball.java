@@ -1,9 +1,13 @@
+package arkanoid;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Rectangle;
 import java.util.*;
 import arkanoid.GameObject;
+import arkanoid.Brick;
+import arkanoid.Paddle;
 
 public class Ball extends GameObject {
     // Kích thước bóng

@@ -1,3 +1,5 @@
+package arkanoid;
+
 import arkanoid.GameObject;
 
 public class Brick extends GameObject {

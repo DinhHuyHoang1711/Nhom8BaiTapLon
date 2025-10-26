@@ -45,7 +45,7 @@ public class MapMenu extends JFrame {
         // Nút Back
         JButton back = ButtonManager.createImageButton(
                 "img/back_button.png", null,
-                0, 570, click, e -> {
+                0, 550, click, e -> {
                     this.dispose();
                     new Menu();
                 });
@@ -66,6 +66,16 @@ public class MapMenu extends JFrame {
                 }
         );
         panel.add(gacha);
+
+        // Nút Balo
+        JButton balo = ButtonManager.createImageButton(
+                "img/balo_button.png", null,
+                975, 550, click, e -> {
+                    JFrame frame = new JFrame("Đồ đang sở hữu");
+                    new BaloUI(new arkanoid.OwnedManager());
+                }
+        );
+        panel.add(balo);
 
         setContentPane(panel);
         setVisible(true);
