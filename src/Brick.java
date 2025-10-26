@@ -2,16 +2,24 @@ package arkanoid;
 
 import arkanoid.GameObject;
 
+import java.util.ArrayList;
+
 public class Brick extends GameObject {
     // Kích thước gạch
-    private static final int BRICK_WIDTH = 90;
-    private static final int BRICK_HEIGHT = 50;
+    private static final int BRICK_WIDTH = 80;
+    private static final int BRICK_HEIGHT = 30;
 
     // Thuộc tính
     private int hitPoints;
     private String element;
 
     // ==== Constructor ==== //
+    public Brick() {
+        super();
+        this.hitPoints = 0;
+        this.element = "";
+    }
+
     public Brick(int x, int y, int width, int height, int hp, String imgPath) {
         super(x, y, width, height, 0, 0, imgPath);
         this.hitPoints = Math.max(0, hp);
@@ -106,6 +114,131 @@ public class Brick extends GameObject {
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "earth", "img/brick/ELEMENTAL/đất/đất 3.png");
     }
 
+    public static ArrayList<Brick> buildLevel1Bricks() {
+        ArrayList<Brick> list = new ArrayList<>();
+        list.add(Brick.lightOrangeBrick(155, 40));
+        list.add(Brick.lightOrangeBrick(237, 40));
+        list.add(Brick.lightOrangeBrick(319, 40));
+        list.add(Brick.lightOrangeBrick(401, 40));
+        list.add(Brick.lightOrangeBrick(483, 40));
+        list.add(Brick.lightOrangeBrick(565, 40));
+
+        list.add(Brick.orangeBrick(155, 72));
+        list.add(Brick.orangeBrick(237, 72));
+        list.add(Brick.orangeBrick(319, 72));
+        list.add(Brick.orangeBrick(401, 72));
+        list.add(Brick.orangeBrick(483, 72));
+        list.add(Brick.orangeBrick(565, 72));
+
+        list.add(Brick.redBrick(155, 104));
+        list.add(Brick.redBrick(237, 104));
+        list.add(Brick.redBrick(319, 104));
+        list.add(Brick.redBrick(401, 104));
+        list.add(Brick.redBrick(483, 104));
+        list.add(Brick.redBrick(565, 104));
+        return list;
+    }
+
+    public static ArrayList<Brick> buildLevel2Bricks() {
+        ArrayList<Brick> list = new ArrayList<>();
+        list.add(Brick.fireBrick3(155, 40));
+        list.add(Brick.fireBrick3(237, 40));
+        list.add(Brick.fireBrick3(319, 40));
+        list.add(Brick.fireBrick3(401, 40));
+        list.add(Brick.fireBrick3(483, 40));
+        list.add(Brick.fireBrick3(565, 40));
+
+        list.add(Brick.fireBrick2(155, 72));
+        list.add(Brick.fireBrick2(237, 72));
+        list.add(Brick.fireBrick2(319, 72));
+        list.add(Brick.fireBrick2(401, 72));
+        list.add(Brick.fireBrick2(483, 72));
+        list.add(Brick.fireBrick2(565, 72));
+
+        list.add(Brick.fireBrick1(155, 104));
+        list.add(Brick.fireBrick1(237, 104));
+        list.add(Brick.fireBrick1(319, 104));
+        list.add(Brick.fireBrick1(401, 104));
+        list.add(Brick.fireBrick1(483, 104));
+        list.add(Brick.fireBrick1(565, 104));
+        return list;
+    }
+
+    public static ArrayList<Brick> buildLevel3Bricks() {
+        ArrayList<Brick> list = new ArrayList<>();
+        list.add(Brick.windBrick3(155, 40));
+        list.add(Brick.windBrick3(237, 40));
+        list.add(Brick.windBrick3(319, 40));
+        list.add(Brick.windBrick3(401, 40));
+        list.add(Brick.windBrick3(483, 40));
+        list.add(Brick.windBrick3(565, 40));
+
+        list.add(Brick.windBrick2(155, 72));
+        list.add(Brick.windBrick2(237, 72));
+        list.add(Brick.windBrick2(319, 72));
+        list.add(Brick.windBrick2(401, 72));
+        list.add(Brick.windBrick2(483, 72));
+        list.add(Brick.windBrick2(565, 72));
+
+        list.add(Brick.windBrick1(155, 104));
+        list.add(Brick.windBrick1(237, 104));
+        list.add(Brick.windBrick1(319, 104));
+        list.add(Brick.windBrick1(401, 104));
+        list.add(Brick.windBrick1(483, 104));
+        list.add(Brick.windBrick1(565, 104));
+        return list;
+    }
+
+    public static ArrayList<Brick> buildLevel4Bricks() {
+        ArrayList<Brick> list = new ArrayList<>();
+        list.add(Brick.waterBrick3(155, 40));
+        list.add(Brick.waterBrick3(237, 40));
+        list.add(Brick.waterBrick3(319, 40));
+        list.add(Brick.waterBrick3(401, 40));
+        list.add(Brick.waterBrick3(483, 40));
+        list.add(Brick.waterBrick3(565, 40));
+
+        list.add(Brick.waterBrick2(155, 72));
+        list.add(Brick.waterBrick2(237, 72));
+        list.add(Brick.waterBrick2(319, 72));
+        list.add(Brick.waterBrick2(401, 72));
+        list.add(Brick.waterBrick2(483, 72));
+        list.add(Brick.waterBrick2(565, 72));
+
+        list.add(Brick.waterBrick1(155, 104));
+        list.add(Brick.waterBrick1(237, 104));
+        list.add(Brick.waterBrick1(319, 104));
+        list.add(Brick.waterBrick1(401, 104));
+        list.add(Brick.waterBrick1(483, 104));
+        list.add(Brick.waterBrick1(565, 104));
+        return list;
+    }
+
+    public static ArrayList<Brick> buildLevel5Bricks() {
+        ArrayList<Brick> list = new ArrayList<>();
+        list.add(Brick.earthBrick3(155, 40));
+        list.add(Brick.earthBrick3(237, 40));
+        list.add(Brick.earthBrick3(319, 40));
+        list.add(Brick.earthBrick3(401, 40));
+        list.add(Brick.earthBrick3(483, 40));
+        list.add(Brick.earthBrick3(565, 40));
+
+        list.add(Brick.earthBrick2(155, 72));
+        list.add(Brick.earthBrick2(237, 72));
+        list.add(Brick.earthBrick2(319, 72));
+        list.add(Brick.earthBrick2(401, 72));
+        list.add(Brick.earthBrick2(483, 72));
+        list.add(Brick.earthBrick2(565, 72));
+
+        list.add(Brick.earthBrick1(155, 104));
+        list.add(Brick.earthBrick1(237, 104));
+        list.add(Brick.earthBrick1(319, 104));
+        list.add(Brick.earthBrick1(401, 104));
+        list.add(Brick.earthBrick1(483, 104));
+        list.add(Brick.earthBrick1(565, 104));
+        return list;
+    }
+
     // ==== GETTER/SETTER ==== //
     public void setHitPoints(int hp) {
         this.hitPoints = Math.max(0, hp);
@@ -127,8 +260,9 @@ public class Brick extends GameObject {
         }
     }
 
-    public void takeHit() {
-        if (hitPoints > 0) hitPoints--;
+    public void takeHit(int damage) {
+        //if (hitPoints > 0) hitPoints--;
+        hitPoints = Math.max(hitPoints - damage, 0);
     }
 
     public boolean isDestroyed() {
