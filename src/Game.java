@@ -79,8 +79,6 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         configurePrinter(paddlePrinter);
         configurePrinter(ballPrinter);
 
-        //String BALL_IMG = "img/ball/bongnguhanh.png";
-        //String BRICK_IMG = "img/brick/red_brick_cropped.png";
 
         //paddle
         paddle = currentPaddle;
@@ -106,12 +104,6 @@ public class Game extends JFrame implements ActionListener, KeyListener {
             ObjectPrinter bp = new ObjectPrinter();
             configurePrinter(bp);
 
-            /*
-            ObjectPrinter bp = new ObjectPrinter();
-            bp.setOpaque(false);
-            // Đặt bounds của ObjectPrinter bằng Vị trí và Kích thước của Brick
-            bp.setBounds(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-             */
             bp.setGameObject(b);
             brickPrinters.put(b, bp);
             layers.add(bp, Integer.valueOf(8));
@@ -237,8 +229,13 @@ public class Game extends JFrame implements ActionListener, KeyListener {
 
         List<Brick> removed = new ArrayList<>();
         for (Brick b : bricks) {
-            if (ball.collide(b) && b.isDestroyed()) {
-                removed.add(b);
+            if (ball.collide(b)) {
+                if (b.isDestroyed()) {
+                    removed.add(b);
+                } else {
+                    ObjectPrinter p = brickPrinters.get(b);
+                    if (p != null) p.startFlash();
+                }
             }
         }
 

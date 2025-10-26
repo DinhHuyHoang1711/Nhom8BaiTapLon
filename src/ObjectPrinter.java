@@ -14,6 +14,11 @@ public class ObjectPrinter extends JPanel {
     private String imagePath;      // đường dẫn file ảnh
     private int x, y, width, height; //cac thong so de ve 1 object;
 
+    //nháy đỏ
+    private boolean flashRed = false;
+    private long flashStart = 0;
+
+
     //Constructor
     public ObjectPrinter() {
         this.x = 0;
@@ -90,7 +95,20 @@ public class ObjectPrinter extends JPanel {
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        g.drawImage(scaledImage, this.x, this.y, null);
+
+        updateFlash();
+
+        if (flashRed) {
+            //vẽ ảnh hơi đỏ tức là đang nháy đỏ đấy
+            Graphics2D g2 = (Graphics2D) g.create();
+            g2.drawImage(scaledImage, this.x, this.y, null);
+            g2.setColor(new Color(255, 0, 0, 100)); // lớp phủ đỏ mờ
+            g2.fillRect(this.x, this.y, width, height);
+            g2.dispose();
+        } else {
+            //binh thuong thi ve binh thuong
+            g.drawImage(scaledImage, this.x, this.y, null);
+        }
     }
 
     // Setter đổi ảnh khác (tự load và vẽ lại)
@@ -122,4 +140,16 @@ public class ObjectPrinter extends JPanel {
         this.height = obj.getHeight();
         loadImage();
     }
-}
+
+    //cho 1 vat nhay mau do
+    public void startFlash() {
+        flashRed = true;
+        flashStart = System.currentTimeMillis();
+    }
+
+    private void updateFlash() {
+        if (flashRed && System.currentTimeMillis() - flashStart > 100) {
+            flashRed = false;
+        }
+    }
+ }
