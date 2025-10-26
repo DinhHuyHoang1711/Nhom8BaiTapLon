@@ -67,16 +67,6 @@ public class MapMenu extends JFrame {
         );
         panel.add(gacha);
 
-        // Nút Balo
-        JButton balo = ButtonManager.createImageButton(
-                "img/balo_button.png", null,
-                975, 550, click, e -> {
-                    JFrame frame = new JFrame("Đồ đang sở hữu");
-                    new BaloUI(new arkanoid.OwnedManager());
-                }
-        );
-        panel.add(balo);
-
         setContentPane(panel);
         setVisible(true);
     }
