@@ -4,6 +4,8 @@ import MoneyCollected.Coin;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 
 /**
@@ -24,60 +26,93 @@ public class DiamondSquareGacha extends JPanel {
     private SpinAnimation spinAnim;
     private Coin currentMoney;
 
-    // Âm thanh & nút
-    private arkanoid.Sound spinSound;
+    // Giao diện & nút
     private JLabel moneyLabel;
     private JPanel moneyPanel;
     private JButton spinBtn, bagBtn;
 
     public DiamondSquareGacha() {
-        // Ảnh nền
-        background = new ImageIcon("images/background.jpg").getImage();
+        setupBackground();
+        setupMoneyPanel();
+        setupItemsAndInventory();
+        setupPanel();
+        setupButtons();
+        setupSpinAnimation();
+    }
 
-        // Load tiền hiện có ở trên đầu
+    /** Ảnh nền */
+    private void setupBackground() {
+        background = new ImageIcon("images/background.jpg").getImage();
+    }
+
+    /** Khung hiển thị tiền */
+    private void setupMoneyPanel() {
         currentMoney = new Coin();
         moneyPanel = new JPanel();
         moneyPanel.setLayout(null);
-        moneyPanel.setBounds(380, 10,100,40);
-        moneyPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE,2));
-        moneyLabel = new JLabel( "" + currentMoney.getAmount(), SwingConstants.CENTER);
+        moneyPanel.setBounds(380, 10, 100, 40);
+        moneyPanel.setBorder(BorderFactory.createLineBorder(Color.ORANGE, 2));
+
+        moneyLabel = new JLabel("" + currentMoney.getAmount(), SwingConstants.CENTER);
         moneyLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        moneyLabel.setForeground(new Color(180, 120,0));
-        moneyLabel.setBounds(0,0,100,40);
+        moneyLabel.setForeground(new Color(180, 120, 0));
+        moneyLabel.setBounds(0, 0, 100, 40);
+
         moneyPanel.add(moneyLabel);
         this.add(moneyPanel);
+    }
 
-        // Load vật phẩm & túi đồ
+    /** Load vật phẩm và túi đồ */
+    private void setupItemsAndInventory() {
         items = Item.loadItems(NUM_TILES);
         inventory = new Inventory(items);
+        makeTilePositions();
+    }
 
-        // Cấu hình panel
+    /** Cấu hình panel chính */
+    private void setupPanel() {
         setPreferredSize(new Dimension(600, 600));
         setLayout(null);
+    }
 
-        // Nút quay
+    /** Thiết lập các nút bấm */
+    private void setupButtons() {
+        // 🔹 Nút QUAY
         spinBtn = new JButton("QUAY");
         spinBtn.setFont(new Font("Arial", Font.BOLD, 18));
         spinBtn.setBounds(240, 520, 120, 40);
+        spinBtn.addActionListener(new SpinButtonListener());
         add(spinBtn);
 
-        // Nút túi đồ
+        // 🔹 Nút TÚI ĐỒ
         bagBtn = new JButton(new ImageIcon("images/bag.png"));
         bagBtn.setBounds(400, 400, 200, 200);
         bagBtn.setToolTipText("Túi đồ");
         bagBtn.setContentAreaFilled(false);
         bagBtn.setBorderPainted(false);
-        bagBtn.addActionListener(e -> inventory.showInventory(this));
+        bagBtn.addActionListener(new BagButtonListener());
         add(bagBtn);
+    }
 
-        // Tạo vị trí 12 ô
-        makeTilePositions();
-
-        // Khởi tạo vòng quay
+    /** Thiết lập hoạt ảnh quay */
+    private void setupSpinAnimation() {
         spinAnim = new SpinAnimation(this, NUM_TILES, items, inventory);
+    }
 
-        // Khi nhấn nút “QUAY”
-        spinBtn.addActionListener(e -> spinAnim.startSpin());
+    /** khi nhấn nút QUAY */
+    private class SpinButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            spinAnim.startSpin();
+        }
+    }
+
+    /**  khi nhấn nút TÚI ĐỒ */
+    private class BagButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            inventory.showInventory(DiamondSquareGacha.this);
+        }
     }
 
     /** Tính toán vị trí 12 ô hình thoi quanh tâm */
@@ -103,7 +138,6 @@ public class DiamondSquareGacha extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        // Nền
         if (background != null)
             g.drawImage(background, 0, 0, getWidth(), getHeight(), this);
 
@@ -112,7 +146,6 @@ public class DiamondSquareGacha extends JPanel {
 
         int highlightIndex = spinAnim.getHighlightIndex();
 
-        // Vẽ từng ô vật phẩm
         for (int i = 0; i < NUM_TILES; i++) {
             Point p = tilePositions[i];
             AffineTransform old = g2.getTransform();
@@ -120,11 +153,9 @@ public class DiamondSquareGacha extends JPanel {
             g2.translate(p.x, p.y);
             g2.rotate(Math.toRadians(45));
 
-            // Nền ô
             g2.setColor(new Color(0, 0, 100, 100));
             g2.fillRect(-TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
 
-            // Ảnh vật phẩm
             Image img = items[i].getImage();
             AffineTransform at = new AffineTransform();
             at.translate(-TILE_SIZE / 2.0, -TILE_SIZE / 2.0);
@@ -133,7 +164,6 @@ public class DiamondSquareGacha extends JPanel {
                     (double) TILE_SIZE / img.getHeight(null));
             g2.drawImage(img, at, null);
 
-            // Ô được highlight
             if (i == highlightIndex) {
                 g2.setColor(new Color(255, 215, 0, 120));
                 g2.fillRect(-TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
