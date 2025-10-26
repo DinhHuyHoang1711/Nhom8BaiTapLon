@@ -94,7 +94,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         layers.add(paddlePrinter, Integer.valueOf(9));
         layers.add(ballPrinter, Integer.valueOf(10));
 
-          //bricks
+        //bricks
         for(int i = 0; i < currentBricks.size(); i++) {
 
             Brick b = new Brick();
@@ -279,27 +279,27 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         }
     }
 
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                leftPressed = false;
-                rightPressed = false;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                rightPressed = false;
-                leftPressed = false;
-            }
+    @Override
+    public void keyReleased(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            leftPressed = false;
+            rightPressed = false;
         }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            rightPressed = false;
+            leftPressed = false;
+        }
+    }
 
-        @Override
-        public void keyTyped(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_LEFT) {
-                leftPressed = true;
-                rightPressed = false;
-            }
-            if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
-                rightPressed = true;
-                leftPressed = false;
-            }
+    @Override
+    public void keyTyped(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_LEFT) {
+            leftPressed = true;
+            rightPressed = false;
         }
+        if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
+            rightPressed = true;
+            leftPressed = false;
+        }
+    }
 }

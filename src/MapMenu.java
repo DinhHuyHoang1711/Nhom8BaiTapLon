@@ -19,7 +19,7 @@ public class MapMenu extends JFrame {
     private Paddle currentPaddle = new Paddle(PLAYFRAME_WIDTH / 2 - 60, 600, 120, 20,
             15, 0, "img/paddle/paddlevip.png");
 
-    private Ball currentBall = new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, 31, 6,
+    private Ball currentBall = new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, Ball.BALL_SIZE, 6,
             -8, "img/ball/bongnguhanh.png", 25);
 
 

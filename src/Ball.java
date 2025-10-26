@@ -11,12 +11,14 @@ import arkanoid.Paddle;
 
 public class Ball extends GameObject{
     // Kích thước bóng
-    private static final int BALL_SIZE = 31;
+    public static final int BALL_SIZE = 21;
 
     // Thuộc tính
     private String element;
     private int baseDamage;
     private Random rand = new Random();
+    private int baseDx;
+    private int baseDy;
 
     // Ảnh
     private static final String NORMAL_BALL_IMG = "img/ball/normal.png";
@@ -29,21 +31,29 @@ public class Ball extends GameObject{
     public Ball(int x, int y, int size, int dx, int dy, String imgPath) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName("normal");
+        this.baseDx = dx;
+        this.baseDy = dy;
     }
 
     public Ball(int x, int y, int size, int dx, int dy, String imgPath, int damage) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName("normal", damage);
+        this.baseDx = dx;
+        this.baseDy = dy;
     }
 
     public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName(element);
+        this.baseDx = dx;
+        this.baseDy = dy;
     }
 
     public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath, int damage) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName(element, damage);
+        this.baseDx = dx;
+        this.baseDy = dy;
     }
 
     public Ball(int x, int y, int size, String imgPath) {
@@ -54,6 +64,8 @@ public class Ball extends GameObject{
     public Ball(int x, int y, int width, int height, int dx, int dy, String imgPath) {
         super(x, y, width, height, dx, dy, imgPath);
         setElementFromName("normal");
+        this.baseDx = dx;
+        this.baseDy = dy;
     }
 
     // ==== TYPE BALL ==== //
@@ -112,6 +124,7 @@ public class Ball extends GameObject{
         }
     }
 
+    //Xu li va cham voi gach sao cho muot
     public boolean collide(Brick b) {
         if (b == null || b.isDestroyed()) return false;
 
@@ -120,7 +133,6 @@ public class Ball extends GameObject{
 
         if (!ba.intersects(br)) return false;
         else {
-
             int overlapLeft = ba.x + ba.width - br.x;
             int overlapRight = br.x + br.width - ba.x;
             int overlapTop = ba.y + ba.height - br.y;
@@ -130,20 +142,32 @@ public class Ball extends GameObject{
             int minVert = Math.min(overlapTop, overlapBottom);
 
             if (minHoriz < minVert) {
+                // Va chạm trái hoặc phải
+                if (overlapLeft < overlapRight) {
+                    setX(getX() - overlapLeft - 1); // Đẩy bóng sang trái
+                } else {
+                    setX(getX() + overlapRight + 1); // Đẩy bóng sang phải
+                }
                 setDx(-getDx());
             } else {
+                // Va chạm trên hoặc dưới
+                if (overlapTop < overlapBottom) {
+                    setY(getY() - overlapTop - 1); // Đẩy bóng lên
+                } else {
+                    setY(getY() + overlapBottom + 1); // Đẩy bóng xuống
+                }
                 setDy(-getDy());
             }
 
-            if(this.element.equals("normal")) {
+            // Gây sát thương
+            if (this.element.equals("normal")) {
                 b.takeHit(this.getBaseDamage());
+            } else {
+                b.takeHit(this.element.equals(b.getElement()) ? this.getBaseDamage() * 2 : this.getBaseDamage());
             }
-            else {
-                b.takeHit(this.element.equals(b.getElement()) ? this.getBaseDamage() *  2 :
-                this.getBaseDamage());
-            }
-        }
+
             return true;
+        }
     }
 
     public void collideWithPaddle(Paddle paddle) {
@@ -154,17 +178,17 @@ public class Ball extends GameObject{
         } else {
             if(paddle.isMovingLeft()) {
                 //Paddle di sang trai thi bong di sang trai
-                this.setDy(-Math.abs(rand.nextInt(1) + Math.abs(this.getDy())));
-                this.setDx(-1 * Math.abs((rand.nextInt(1) + Math.abs(this.getDx()))));
+                this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
+                this.setDx(-1 * Math.abs((rand.nextInt(4) + Math.abs(this.baseDx))));
             } else {
                 //Paddle di sang phai thi bong di sang phai
                 if(paddle.isMovingRight()) {
-                    this.setDy(-Math.abs(rand.nextInt(1) + Math.abs(this.getDy())));
-                    this.setDx(Math.abs((rand.nextInt(1) + Math.abs(this.getDx()))));
+                    this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
+                    this.setDx(Math.abs((rand.nextInt(4) + Math.abs(this.baseDx))));
                 } else {
                     //Paddle dung yen thi bong tiep tuc di theo huong ban dau
-                    this.setDy(-Math.abs(rand.nextInt(1) + Math.abs(this.getDy())));
-                    this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(1) + Math.abs(this.getDx())));
+                    this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
+                    this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(4) + Math.abs(this.baseDx)));
                 }
             }
             //this.setDy(-Math.abs(rand.nextInt(2) + this.getDy()));
