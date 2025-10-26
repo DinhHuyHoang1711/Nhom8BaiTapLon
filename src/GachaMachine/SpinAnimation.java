@@ -26,27 +26,32 @@ public class SpinAnimation {
         this.inventory = inventory;
     }
 
+    public void highlightNext(){
+        highlightIndex = (highlightIndex + 1)% numTiles;
+        panel.repaint();
+    }
+
+    public boolean isStopPosition(){
+        return highlightIndex == stopIndex;
+    }
+
+    public void stopSpin(){
+        timer.stop();
+        spinning = false;
+        showResult(items[stopIndex]);
+    }
+
+    public int getNumTiles(){
+        return numTiles;
+    }
+
     public void startSpin() {
         if (spinning) return;
+
         spinning = true;
         stopIndex = random.nextInt(numTiles);
 
-        timer = new Timer(40, new ActionListener() {
-            int counter = 0;
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                highlightIndex = (highlightIndex + 1) % numTiles;
-                panel.repaint();
-                counter++;
-
-                if (counter > numTiles * 5 && highlightIndex == stopIndex) {
-                    timer.stop();
-                    spinning = false;
-                    showResult(items[stopIndex]);
-                }
-            }
-        });
+        timer = new Timer(40, new MyTimerListener(this));
         timer.start();
     }
 
