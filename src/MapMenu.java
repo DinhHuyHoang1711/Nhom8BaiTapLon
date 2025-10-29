@@ -101,7 +101,7 @@ public class MapMenu extends JFrame {
     }
 
     private void openLevel(int level) {
-        new Game(currentPaddle, currentBall, lv1Bricks,
+        new Game(currentPaddle, currentBall, "levels/level1.txt" ,
                 currentGameScene);
     }
 

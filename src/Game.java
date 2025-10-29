@@ -17,8 +17,9 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     public static final int PLAYFRAME_HEIGHT = 700;
     private static final int TICK_MS = 16;
 
-    //private final Paddle paddle = new Paddle(500, 500, 120, 20,
-    //        15, 0, "img/paddle/paddlevip.png");
+    //heart
+    private int currentHeart;
+    private ArrayList <JLabel> heart = new ArrayList<>();
 
     //paddle
     private final Paddle paddle;
@@ -26,26 +27,28 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     //ball
     private final Ball ball;
 
-    //brick
+    //dx, dy mac dinh cua ball
+    private final int initDx;
+    private final int initDy;
+
+    //bricks
+    private int totalBrick; // so gach 1 man choi
+    private final List<Brick> bricks = new ArrayList<>();
+    private final List<Brick> removed = new ArrayList<>();
     private static final int BRICK_W = 80;
     private static final int BRICK_H = 30;
     private static final int STEP_X  = 80;
     private static final int STEP_Y  = 30;
     private static final int PLAY_LEFT = 0;
 
-    //dx, dy mac dinh cua ball
-    private final int initDx;
-    private final int initDy;
 
-    //bricks
-    private final List<Brick> bricks = new ArrayList<>();
-
+    //cong cu ho tro in hinh anh
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
     private final ObjectPrinter ballPrinter = new ObjectPrinter();
     private final JLayeredPane layers = new JLayeredPane();
     private final Map<Brick, ObjectPrinter> brickPrinters = new HashMap<>();
     private final String gameScene;
-
+    //timer
     private final javax.swing.Timer timer = new javax.swing.Timer(TICK_MS, this);
 
     // trang thai (fix delay)
@@ -70,7 +73,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     private JLabel artifactTitle;
 
 
-    public Game(Paddle currentPaddle, Ball currentBall, ArrayList <Brick> currentBricks,
+    public Game(Paddle currentPaddle, Ball currentBall, String level,
                 String currentGameScene) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -82,10 +85,23 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         layers.setLayout(null);
         layers.setOpaque(true);
         layers.setBackground(Color.BLACK);
+        setContentPane(layers);
 
         configurePrinter(paddlePrinter);
         configurePrinter(ballPrinter);
 
+        //set currentheart
+        currentHeart = 3;
+
+        ImageIcon icon = new ImageIcon("img/heart/redheart.png");
+        Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+
+        for (int i = 0; i < 3; i++) {
+            JLabel heartLabel = new JLabel(new ImageIcon(scaled));
+            heartLabel.setBounds(840 + i * 45, 120, 40, 40);
+            this.heart.add(heartLabel);
+            layers.add(heartLabel, Integer.valueOf(3));
+        }
 
         //paddle
         paddle = currentPaddle;
@@ -119,7 +135,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
          */
         int[][] grid;
         try {
-            grid = arkanoid.Brick.readGrid("levels/level2.txt");
+            grid = arkanoid.Brick.readGrid(level);
         } catch (java.io.IOException e) {
             throw new RuntimeException("load grid fail", e);
         }
@@ -145,8 +161,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
                 layers.add(bp, Integer.valueOf(8));
             }
         }
-
-        setContentPane(layers);
+        totalBrick = bricks.size();
 
         //game scene
         gameScene = currentGameScene;
@@ -242,65 +257,87 @@ public class Game extends JFrame implements ActionListener, KeyListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (leftPressed) {
-            paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
-            paddle.setMovingLeft();
+        if (removed.size() == totalBrick) { // tuc la thang roi
+            timer.stop();
+            JOptionPane.showMessageDialog(this, "Yee thang roi");
+            this.dispose();
         } else {
-            if (rightPressed) {
-                paddle.setX(Math.min(paddle.getX() + paddle.getDx(), PLAYFRAME_WIDTH - paddle.getWidth()));
-                paddle.setMovingRight();
-            } else {
-                paddle.setDefaultMoving();
-            }
-        }
-
-        ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
-        ball.collideWithPaddle(paddle);
-
-        if (ball.getY() > GAME_HEIGHT) {
-            ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
-            ball.setY(GAME_HEIGHT - 120);
-            ball.setDx(initDx);
-            ball.setDy(initDy);
-        }
-
-        List<Brick> removed = new ArrayList<>();
-        for (Brick b : bricks) {
-            if (ball.collide(b)) {
-                if (b.isDestroyed()) {
-                    removed.add(b);
+            if (currentHeart > 0) {//tuc la chua thua
+                if (leftPressed) {
+                    paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
+                    paddle.setMovingLeft();
                 } else {
-                    ObjectPrinter p = brickPrinters.get(b);
-                    if (p != null) p.startFlash();
+                    if (rightPressed) {
+                        paddle.setX(Math.min(paddle.getX() + paddle.getDx(), PLAYFRAME_WIDTH - paddle.getWidth()));
+                        paddle.setMovingRight();
+                    } else {
+                        paddle.setDefaultMoving();
+                    }
                 }
-                //bóng chỉ va chạm 1 gạch 1 lần
-                // từ từ nhé, chỗ này sẽ phải bỏ, nếu nhận được buff đi xuyên.
-                break;
+
+                ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
+                ball.collideWithPaddle(paddle);
+
+                if (ball.getY() > GAME_HEIGHT) {
+                    //giam 1 heart
+                    currentHeart--;
+
+                    //dua bong ve lai vi tri ban dau
+                    ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
+                    ball.setY(GAME_HEIGHT - 120);
+                    ball.setDx(initDx);
+                    ball.setDy(initDy);
+
+                    //sua hien thi tim
+                    ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
+                    Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                    ImageIcon grayHeart = new ImageIcon(scaled);
+                    heart.get(currentHeart).setIcon(grayHeart);
+                }
+
+
+                for (Brick b : bricks) {
+                    if (ball.collide(b)) {
+                        if (b.isDestroyed()) {
+                            removed.add(b);
+                        } else {
+                            ObjectPrinter p = brickPrinters.get(b);
+                            if (p != null) p.startFlash();
+                        }
+                        //bóng chỉ va chạm 1 gạch 1 lần
+                        // từ từ nhé, chỗ này sẽ phải bỏ, nếu nhận được buff đi xuyên.
+                        break;
+                    }
+                }
+
+                if (!removed.isEmpty()) {
+                    for (Brick b : removed) {
+                        bricks.remove(b);
+                        ObjectPrinter p = brickPrinters.remove(b);
+                        if (p != null) layers.remove(p);
+                    }
+                }
+
+                paddlePrinter.setGameObject(paddle);
+                ballPrinter.setGameObject(ball);
+
+                // update stat bar
+                paddleWidthLabel.setText("Width: " + paddle.getWidth());
+                paddleDxLabel.setText("Speed: " + paddle.getDx());
+
+                ballElementLabel.setText("Element: " + ball.getElement());
+                ballDxLabel.setText("Dx: " + ball.getDx());
+                ballDyLabel.setText("Dy: " + ball.getDy());
+                ballDamageLabel.setText("Damage: " + ball.getBaseDamage());
+
+                layers.revalidate();
+                layers.repaint();
+            } else {
+                timer.stop();
+                JOptionPane.showMessageDialog(this, "Game over!, qua ngu");
+                this.dispose();
             }
         }
-
-        if (!removed.isEmpty()) {
-            for (Brick b : removed) {
-                bricks.remove(b);
-                ObjectPrinter p = brickPrinters.remove(b);
-                if (p != null) layers.remove(p);
-            }
-
-            layers.revalidate();
-            layers.repaint();
-        }
-
-        paddlePrinter.setGameObject(paddle);
-        ballPrinter.setGameObject(ball);
-
-        // update stat bar
-        paddleWidthLabel.setText("Width: " + paddle.getWidth());
-        paddleDxLabel.setText("Speed: " + paddle.getDx());
-
-        ballElementLabel.setText("Element: " + ball.getElement());
-        ballDxLabel.setText("Dx: " + ball.getDx());
-        ballDyLabel.setText("Dy: " + ball.getDy());
-        ballDamageLabel.setText("Damage: " + ball.getBaseDamage());
     }
 
     //Tranh truong hop an cung luc ca left ca right, chi 1 trong 2 cai dc true
