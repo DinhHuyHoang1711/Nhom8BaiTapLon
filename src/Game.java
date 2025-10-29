@@ -26,6 +26,13 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     //ball
     private final Ball ball;
 
+    //brick
+    private static final int BRICK_W = 80;
+    private static final int BRICK_H = 30;
+    private static final int STEP_X  = 80;
+    private static final int STEP_Y  = 30;
+    private static final int PLAY_LEFT = 0;
+
     //dx, dy mac dinh cua ball
     private final int initDx;
     private final int initDy;
@@ -95,6 +102,7 @@ public class Game extends JFrame implements ActionListener, KeyListener {
         layers.add(ballPrinter, Integer.valueOf(10));
 
         //bricks
+        /*
         for(int i = 0; i < currentBricks.size(); i++) {
 
             Brick b = new Brick();
@@ -107,6 +115,35 @@ public class Game extends JFrame implements ActionListener, KeyListener {
             bp.setGameObject(b);
             brickPrinters.put(b, bp);
             layers.add(bp, Integer.valueOf(8));
+        }
+         */
+        int[][] grid;
+        try {
+            grid = arkanoid.Brick.readGrid("levels/level2.txt");
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("load grid fail", e);
+        }
+        int rows = grid.length;
+        int cols = grid[0].length;
+        int totalW  = BRICK_W + (cols - 1) * STEP_X;
+        int originX = PLAY_LEFT + (PLAYFRAME_WIDTH - totalW) / 2;
+        int originY = 80;
+
+        for (int r = 0; r < rows; r++) {
+            for (int c = 0; c < cols; c++) {
+                int id = grid[r][c];
+                if (id == 0) continue;
+                int x = originX + c * STEP_X;
+                int y = originY + r * STEP_Y;
+                Brick b = arkanoid.Brick.createBrickFromId(id, x, y);
+                if (b == null) continue;
+                bricks.add(b);
+                arkanoid.ObjectPrinter bp = new arkanoid.ObjectPrinter();
+                configurePrinter(bp);
+                bp.setGameObject(b);
+                brickPrinters.put(b, bp);
+                layers.add(bp, Integer.valueOf(8));
+            }
         }
 
         setContentPane(layers);

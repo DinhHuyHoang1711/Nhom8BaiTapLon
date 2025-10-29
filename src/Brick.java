@@ -239,6 +239,59 @@ public class Brick extends GameObject {
         return list;
     }
 
+    public static int[][] readGrid(String path) throws java.io.IOException {
+        java.util.List<int[]> rows = new java.util.ArrayList<>();
+        int cols = -1, ln = 0;
+
+        try (java.io.BufferedReader br = java.nio.file.Files.newBufferedReader(
+                java.nio.file.Paths.get(path), java.nio.charset.StandardCharsets.UTF_8)) {
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                ln++;
+                line = line.trim();
+                if (line.isEmpty() || line.startsWith("#")) continue;
+
+                String[] t = line.split("\\s+");
+                if (cols < 0) cols = t.length;
+                if (t.length != cols) throw new IllegalArgumentException("line " + ln + ": expected " + cols + " cols");
+
+                int[] row = new int[cols];
+                for (int i = 0; i < cols; i++) row[i] = Integer.parseInt(t[i]);
+                rows.add(row);
+            }
+        }
+
+        if (rows.isEmpty()) throw new IllegalStateException("empty map: " + path);
+        return rows.toArray(new int[0][]);
+    }
+
+    public static Brick createBrickFromId(int id, int x, int y) {
+        switch (id) {
+            case 11: return Brick.lightOrangeBrick(x, y);
+            case 12: return Brick.orangeBrick(x, y);
+            case 13: return Brick.redBrick(x, y);
+
+            case 21: return Brick.fireBrick3(x, y);
+            case 22: return Brick.fireBrick2(x, y);
+            case 23: return Brick.fireBrick1(x, y);
+
+            case 31: return Brick.waterBrick3(x, y);
+            case 32: return Brick.waterBrick2(x, y);
+            case 33: return Brick.waterBrick1(x, y);
+
+            case 41: return Brick.windBrick3(x, y);
+            case 42: return Brick.windBrick2(x, y);
+            case 43: return Brick.windBrick1(x, y);
+
+            case 51: return Brick.earthBrick3(x, y);
+            case 52: return Brick.earthBrick2(x, y);
+            case 53: return Brick.earthBrick1(x, y);
+
+            default: return null;
+        }
+    }
+
     // ==== GETTER/SETTER ==== //
     public void setHitPoints(int hp) {
         this.hitPoints = Math.max(0, hp);
