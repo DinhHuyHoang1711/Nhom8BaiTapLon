@@ -19,6 +19,8 @@ public class DiamondSquareGacha extends JPanel {
     private static final int CENTER_Y = 250;
 
     // Dữ liệu chính
+    private double tileX[];
+    private double tileY[];
     private Point[] tilePositions;
     private Image background;
     private Item[] items;
@@ -40,12 +42,16 @@ public class DiamondSquareGacha extends JPanel {
         setupSpinAnimation();
     }
 
-    /** Ảnh nền */
+    /**
+     * Ảnh nền
+     */
     private void setupBackground() {
         background = new ImageIcon("images/background.jpg").getImage();
     }
 
-    /** Khung hiển thị tiền */
+    /**
+     * Khung hiển thị tiền
+     */
     private void setupMoneyPanel() {
         currentMoney = new Coin();
         moneyPanel = new JPanel();
@@ -62,20 +68,26 @@ public class DiamondSquareGacha extends JPanel {
         this.add(moneyPanel);
     }
 
-    /** Load vật phẩm và túi đồ */
+    /**
+     * Load vật phẩm và túi đồ
+     */
     private void setupItemsAndInventory() {
         items = Item.loadItems(NUM_TILES);
         inventory = new Inventory(items);
         makeTilePositions();
     }
 
-    /** Cấu hình panel chính */
+    /**
+     * Cấu hình panel chính
+     */
     private void setupPanel() {
         setPreferredSize(new Dimension(600, 600));
         setLayout(null);
     }
 
-    /** Thiết lập các nút bấm */
+    /**
+     * Thiết lập các nút bấm
+     */
     private void setupButtons() {
         // 🔹 Nút QUAY
         spinBtn = new JButton("QUAY");
@@ -94,12 +106,16 @@ public class DiamondSquareGacha extends JPanel {
         add(bagBtn);
     }
 
-    /** Thiết lập hoạt ảnh quay */
+    /**
+     * Thiết lập hoạt ảnh quay
+     */
     private void setupSpinAnimation() {
         spinAnim = new SpinAnimation(this, NUM_TILES, items, inventory);
     }
 
-    /** khi nhấn nút QUAY */
+    /**
+     * khi nhấn nút QUAY
+     */
     private class SpinButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -107,7 +123,9 @@ public class DiamondSquareGacha extends JPanel {
         }
     }
 
-    /**  khi nhấn nút TÚI ĐỒ */
+    /**
+     * khi nhấn nút TÚI ĐỒ
+     */
     private class BagButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -115,25 +133,31 @@ public class DiamondSquareGacha extends JPanel {
         }
     }
 
-    /** Tính toán vị trí 12 ô hình thoi quanh tâm */
+    /**
+     * Tính toán vị trí 12 ô hình thoi quanh tâm
+     */
     private void makeTilePositions() {
-        tilePositions = new Point[NUM_TILES];
+        tileX = new double[NUM_TILES];
+        tileY = new double[NUM_TILES];
         int gap = 90;
         int[][] offsets = {
-                {-3,0},{-2,1},{-1,2},
-                {0,3},{1,2},{2,1},
-                {3,0},{2,-1},{1,-2},
-                {0,-3},{-1,-2},{-2,-1}
+                {-3, 0}, {-2, 1}, {-1, 2},
+                {0, 3}, {1, 2}, {2, 1},
+                {3, 0}, {2, -1}, {1, -2},
+                {0, -3}, {-1, -2}, {-2, -1}
         };
 
         for (int i = 0; i < NUM_TILES; i++) {
-            double dx = offsets[i][0] * gap / 1.4;
-            double dy = offsets[i][1] * gap / 1.4;
-            tilePositions[i] = new Point((int)(CENTER_X + dx), (int)(CENTER_Y + dy));
+            double dx = offsets[i][0] * gap / 1.59;
+            double dy = offsets[i][1] * gap / 1.59;
+            tileX[i] = CENTER_X + dx;
+            tileY[i] = CENTER_Y + dy;
         }
     }
 
-    /** Vẽ giao diện chính */
+    /**
+     * Vẽ giao diện chính
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -147,10 +171,9 @@ public class DiamondSquareGacha extends JPanel {
         int highlightIndex = spinAnim.getHighlightIndex();
 
         for (int i = 0; i < NUM_TILES; i++) {
-            Point p = tilePositions[i];
             AffineTransform old = g2.getTransform();
 
-            g2.translate(p.x, p.y);
+            g2.translate(tileX[i], tileY[i]);
             g2.rotate(Math.toRadians(45));
 
             g2.setColor(new Color(0, 0, 100, 100));
@@ -173,7 +196,9 @@ public class DiamondSquareGacha extends JPanel {
         }
     }
 
-    /** Chạy chương trình */
+    /**
+     * Chạy chương trình
+     */
     public static void main(String[] args) {
         JFrame frame = new JFrame("🎮 Vòng Quay 12 Ô - Hình Thoi");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

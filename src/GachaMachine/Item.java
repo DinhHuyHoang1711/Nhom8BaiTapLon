@@ -15,16 +15,21 @@ public class Item {
         this.image = new ImageIcon(imagePath).getImage();
     }
 
-    public String getName() { return name; }
-    public Image getImage() { return image; }
+    public String getName() {
+        return name;
+    }
+
+    public Image getImage() {
+        return image;
+    }
 
     // Tạo danh sách item mẫu
     public static Item[] loadItems(int count) {
         String[] names = {
-                "Kiếm Rồng", "Khiên Gió", "Vòng Lửa", "Mũ Phù Thủy",
-                "Áo Giáp Bạc", "Dây Chuyền Sấm Sét", "Nhẫn Băng",
-                "Gậy Phép", "Giày Bay", "Cánh Thiên Thần",
-                "Vương Miện", "Mắt Rồng"
+                "Heart", "Sword", "Bow", "Boom", "Helmet",
+                "Diamond", "Fire", "Clock",
+                "Treasure Chest", "Lightning", "Brick",
+                "Meat"
         };
         Item[] arr = new Item[count];
         for (int i = 0; i < count; i++) {

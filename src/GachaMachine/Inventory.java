@@ -13,12 +13,16 @@ class Inventory {
         this.allItems = allItems;
     }
 
-    /** Thêm vật phẩm vừa trúng vào túi */
+    /**
+     * Thêm vật phẩm vừa trúng vào túi
+     */
     public void addItem(Item item) {
         ownedItems.add(item);
     }
 
-    /** Hiển thị giao diện túi đồ */
+    /**
+     * Hiển thị giao diện túi đồ
+     */
     public void showInventory(Component parent) {
         JFrame frame = new JFrame("Túi đồ");
         frame.setSize(500, 500);
@@ -33,8 +37,7 @@ class Inventory {
             label.setForeground(Color.GRAY);
             label.setBounds(0, 200, 500, 50);
             frame.add(label);
-        }
-        else {
+        } else {
             // Tạo vùng hiển thị danh sách vật phẩm
             JPanel listPanel = new JPanel();
             listPanel.setLayout(null);
