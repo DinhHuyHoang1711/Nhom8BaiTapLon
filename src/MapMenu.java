@@ -13,12 +13,17 @@ import static arkanoid.GameObject.*;
 
 public class MapMenu extends JFrame {
 
+    //nhac nen mac dinh
+    public static final Sound backgroundMusic = new Sound("sound/backgroundMusic.wav");
+
     private Sound click;
     private Image mapImage;
 
+    //paddle hien tai dang trang bi
     private Paddle currentPaddle = new Paddle(PLAYFRAME_WIDTH / 2 - 60, 600, 120, 20,
             15, 0, "img/paddle/paddlevip.png");
 
+    //bong hien tai dang trang bi
     private Ball currentBall = new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, Ball.BALL_SIZE, 6,
             -8, "img/ball/bongnguhanh.png", 25);
 
@@ -39,7 +44,11 @@ public class MapMenu extends JFrame {
         setLocationRelativeTo(null);
         setResizable(false);
 
+        //khoi tao am thanh
         click = new Sound("sound/click.wav");
+        //phat nhac nen
+        backgroundMusic.loop();
+        //khoi tao ban do the gioi
         mapImage = new ImageIcon("img/background.jpg").getImage();
 
         JPanel panel = new JPanel() {
@@ -101,8 +110,13 @@ public class MapMenu extends JFrame {
     }
 
     private void openLevel(int level) {
+        //vao man choi thi tat bgm di
+        backgroundMusic.stop();
         new Game(currentPaddle, currentBall, "levels/level1.txt" ,
                 currentGameScene);
+        //thoat khoi man choi thi bat
+        //Game da implement window listener roi nen khi dong game, bgm tu phat lai
+        //backgroundMusic.loop();
     }
 
     public static void main(String[] args) {

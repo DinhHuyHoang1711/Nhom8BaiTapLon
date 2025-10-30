@@ -7,8 +7,9 @@ import arkanoid.ObjectPrinter;
 import arkanoid.Brick;
 import arkanoid.Paddle;
 import arkanoid.Ball;
+import arkanoid.Sound;
 
-public class Game extends JFrame implements ActionListener, KeyListener {
+public class Game extends JFrame implements ActionListener, KeyListener, WindowListener {
 
     //Thong so khung hinh
     public static final int GAME_WIDTH = 1200;
@@ -17,6 +18,8 @@ public class Game extends JFrame implements ActionListener, KeyListener {
     public static final int PLAYFRAME_HEIGHT = 700;
     private static final int TICK_MS = 16;
 
+    //Am thanh man choi
+    private Sound bgm = new Sound("sound/CombatSound.wav");
     //heart
     private int currentHeart;
     private ArrayList <JLabel> heart = new ArrayList<>();
@@ -89,6 +92,9 @@ public class Game extends JFrame implements ActionListener, KeyListener {
 
         configurePrinter(paddlePrinter);
         configurePrinter(ballPrinter);
+
+        //phat nhac
+        bgm.loop();
 
         //set currentheart
         currentHeart = 3;
@@ -243,9 +249,13 @@ public class Game extends JFrame implements ActionListener, KeyListener {
 
         setVisible(true);
 
+        //them keylistender
         addKeyListener(this);
         setFocusable(true);
         requestFocusInWindow();
+
+        //them windowlistener
+        addWindowListener(this);
 
         timer.start();
     }
@@ -375,5 +385,43 @@ public class Game extends JFrame implements ActionListener, KeyListener {
             rightPressed = true;
             leftPressed = false;
         }
+    }
+
+    //implements cac phuong thuoc cua interface windowlistener
+    //tat man cua so game thi bat bgm
+    @Override
+    public void windowClosed(WindowEvent e) {
+        bgm.close();
+        MapMenu.backgroundMusic.loop(); // bật lại nhạc menu
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
+
     }
 }

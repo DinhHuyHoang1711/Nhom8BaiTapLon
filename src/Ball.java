@@ -8,10 +8,20 @@ import java.util.*;
 import arkanoid.GameObject;
 import arkanoid.Brick;
 import arkanoid.Paddle;
+import arkanoid.Sound;
 
 public class Ball extends GameObject{
     // Kích thước bóng
     public static final int BALL_SIZE = 21;
+
+    //am thanh bong va vao cac vat the
+    public final Sound wallHit = new Sound("sound/wallHit.wav");
+    public final Sound paddleHit = new Sound("sound/paddleHit.wav");
+    public final Sound normalbrickHit = new Sound("sound/normalbrickHit.wav");
+    public final Sound firebirckHit = new Sound("sound/firebrickHit.wav");
+    public final Sound waterbrickHit = new Sound("sound/waterbrickHit.wav");
+    public final Sound earthbrickHit = new Sound("sound/earthbrickHit.wav");
+    public final Sound windbrickHit = new Sound("sound/windbrickHit.wav");
 
     // Thuộc tính
     private String element;
@@ -111,14 +121,17 @@ public class Ball extends GameObject{
         setY(getY() + getDy());
 
         if (getX() < 0) {
+            wallHit.play();
             setX(0);
             setDx(-getDx());
         } else if (getX() + getWidth() > bounds.width) {
+            wallHit.play();
             setX(Math.max(0, bounds.width - getWidth()));
             setDx(-getDx());
         }
 
         if (getY() < 0) {
+            wallHit.play();
             setY(0);
             setDy(-getDy());
         }
@@ -161,9 +174,14 @@ public class Ball extends GameObject{
 
             // Gây sát thương
             if (this.element.equals("normal")) {
+                normalbrickHit.play();
                 b.takeHit(this.getBaseDamage());
             } else {
                 b.takeHit(this.element.equals(b.getElement()) ? this.getBaseDamage() * 2 : this.getBaseDamage());
+                if(b.getElement().equals("fire")) firebirckHit.play();
+                if(b.getElement().equals("water")) waterbrickHit.play();
+                if(b.getElement().equals("earth")) earthbrickHit.play();
+                if(b.getElement().equals("wind")) windbrickHit.play();
             }
 
             return true;
@@ -176,6 +194,7 @@ public class Ball extends GameObject{
         if (!paddleRect.intersects(ballRect)) {
             return;
         } else {
+            paddleHit.play();
             if(paddle.isMovingLeft()) {
                 //Paddle di sang trai thi bong di sang trai
                 this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));

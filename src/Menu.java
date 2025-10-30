@@ -10,7 +10,7 @@ import static arkanoid.GameObject.GAME_WIDTH;
 public class Menu extends JFrame {
 
     private Sound clickSound;
-    private Sound backgroundMusic;
+    //private Sound backgroundMusic;
 
     public Menu() {
         setTitle("ARKANOID");
@@ -22,8 +22,8 @@ public class Menu extends JFrame {
 
         // Âm thanh
         clickSound = new Sound("sound/click.wav");
-        backgroundMusic = new Sound("sound/backgroundMusic.wav");
-        backgroundMusic.loop();
+        //backgroundMusic = new Sound("sound/backgroundMusic.wav");
+        //backgroundMusic.loop();
 
         // Ảnh nền
         GameObject backgroundImg = new GameObject(0, 0, GAME_WIDTH, GAME_HEIGHT,
