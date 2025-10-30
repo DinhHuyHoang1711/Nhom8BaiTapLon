@@ -12,13 +12,16 @@ public class BaloUI extends JFrame {
     private Sound clickSound;
     private Image baloImg;
     private OwnedManager ownedManager;
+    private MapMenu parentMenu;
 
-    public BaloUI(OwnedManager ownedManager) {
+    public BaloUI(MapMenu parentMenu, OwnedManager ownedManager) {
+
+        this.parentMenu = parentMenu;
         this.ownedManager = ownedManager;
 
         setTitle("Vật phầm đang sở hữu");
         setSize(GAME_WIDTH, GAME_HEIGHT);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -44,7 +47,7 @@ public class BaloUI extends JFrame {
                 "img/back_button.png", "img/back_hover.png",
                 10, 550, clickSound, e -> {
                     this.dispose();
-                    new MapMenu();
+                    parentMenu.setVisible(true);
                 });
         panel.add(back);
 
@@ -52,9 +55,13 @@ public class BaloUI extends JFrame {
         setVisible(true);
     }
 
+    public BaloUI(OwnedManager ownedManager) {
+        this(null, ownedManager);
+    }
+
     private void openBallList() {
         this.dispose();
-        new BallUI(ownedManager, ownedManager.getBalls());
+        new BallUI(this, ownedManager, ownedManager.getBalls());
     }
 
     private void openArtifactList() {

@@ -14,10 +14,13 @@ public class BallUI extends JFrame {
     private Sound clickSound;
     private Image ballListImg;
     private final List<Ball> ballList;
+    private JLabel currentBallLabel;
+    private BaloUI parentBalo;
 
     private static final int BALL_SIZE = 100;
 
-    public BallUI(OwnedManager ownedManager, List<Ball> ballList) {
+    public BallUI(BaloUI parentBalo, OwnedManager ownedManager, List<Ball> ballList) {
+        this.parentBalo = parentBalo;
         this.ownedManager = ownedManager;
         this.ballList = ballList;
         initUI();
@@ -26,7 +29,7 @@ public class BallUI extends JFrame {
     private void initUI() {
         setTitle("Bộ Sưu Tập Bóng");
         setSize(GAME_WIDTH, GAME_HEIGHT);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -47,7 +50,7 @@ public class BallUI extends JFrame {
                 "img/back_button.png", "img/back_hover.png",
                 10, 550, clickSound, e -> {
                     this.dispose();
-                    new BaloUI(ownedManager);
+                    parentBalo.setVisible(true);
                 });
         panel.add(back);
 
@@ -63,7 +66,7 @@ public class BallUI extends JFrame {
         ImageIcon icon = new ImageIcon(currentBall.getImagePath());
         Image currentBallImg = icon.getImage().getScaledInstance(BALL_SIZE * 2, BALL_SIZE * 2, Image.SCALE_SMOOTH);
 
-        JLabel currentBallLabel = new JLabel(new ImageIcon(currentBallImg));
+        currentBallLabel = new JLabel(new ImageIcon(currentBallImg));
         currentBallLabel.setBounds(GAME_WIDTH / 2 - BALL_SIZE, 250, BALL_SIZE * 2, BALL_SIZE * 2);
         panel.add(currentBallLabel);
     }
@@ -91,7 +94,21 @@ public class BallUI extends JFrame {
 
             ballButton.addActionListener(e -> {
                 clickSound.play();
-                new ConfirmDialog(ownedManager, ball);
+                int choice = JOptionPane.showConfirmDialog(this,
+                        "Trang bị bóng này?",
+                        "Xác nhận",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    ownedManager.setCurrentBall(ball);
+                    JOptionPane.showMessageDialog(this, "Đã trang bị bóng mới!");
+
+                    //cap nhat hinh anh qua bong moi
+                    ImageIcon newIcon = new ImageIcon(ball.getImagePath());
+                    Image newImg = newIcon.getImage().getScaledInstance(BALL_SIZE * 2, BALL_SIZE * 2, Image.SCALE_SMOOTH);
+                    currentBallLabel.setIcon(new ImageIcon(newImg));
+                    panel.repaint();
+                }
             });
 
             panel.add(ballButton);
@@ -103,6 +120,6 @@ public class BallUI extends JFrame {
 
     public static void main(String[] args) {
         OwnedManager ownedManager = new OwnedManager();
-        new BallUI(ownedManager, ownedManager.getBalls());
+        new BallUI(null, ownedManager, ownedManager.getBalls());
     }
 }

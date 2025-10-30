@@ -17,14 +17,14 @@ public class MapMenu extends JFrame {
     private Sound click;
     private Image mapImage;
 
+    //Nhung gi nguoi choi so huu se nam trong lop nay
+    private OwnedManager ownedManager = new OwnedManager();
+
     //paddle hien tai dang trang bi
     private Paddle currentPaddle = new Paddle(PLAYFRAME_WIDTH / 2 - 60, 600, 120, 20,
             15, 0, "img/paddle/paddlevip.png");
 
-    //bong hien tai dang trang bi
-    private Ball currentBall = new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, Ball.BALL_SIZE, 6,
-            -8, "img/ball/bongnguhanh.png", 25);
-
+    //bong hien tai dang bi chinh la ownedManager.getcurrentball()
 
     private String currentGameScene = "img/Beach.jpg";
 
@@ -110,7 +110,8 @@ public class MapMenu extends JFrame {
                 "img/balo_button.png", "img/balo_hover.png",
                 975, 550, click, e -> {
                     JFrame frame = new JFrame("Đồ đang sở hữu");
-                    new BaloUI(new arkanoid.OwnedManager());
+                    this.setVisible(false);
+                    new BaloUI(this, ownedManager);
                 }
         );
         panel.add(balo);
@@ -125,7 +126,7 @@ public class MapMenu extends JFrame {
 
         //copy current ball va paddle de chung no khong bi thay doi sau game()
         Paddle paddleCopy = new Paddle(currentPaddle);
-        Ball ballCopy = new Ball(currentBall);
+        Ball ballCopy = new Ball(ownedManager.getCurrentBall());
 
         new Game(paddleCopy, ballCopy, "levels/level1.txt" ,
                 currentGameScene);

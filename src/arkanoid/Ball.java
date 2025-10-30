@@ -10,6 +10,9 @@ import arkanoid.Brick;
 import arkanoid.Paddle;
 import arkanoid.Sound;
 
+import static arkanoid.Game.GAME_HEIGHT;
+import static arkanoid.Game.PLAYFRAME_WIDTH;
+
 public class Ball extends GameObject{
     // Kích thước bóng
     public static final int BALL_SIZE = 21;
@@ -108,6 +111,37 @@ public class Ball extends GameObject{
 
     public static Ball earthBall(int x, int y) {
         return new Ball(x, y, BALL_SIZE, 0, 0, "earth", EARTH_BALL_IMG);
+    }
+
+    public static Ball normalBall() {
+        return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, BALL_SIZE, 6,
+                -8, "normal", NORMAL_BALL_IMG, 50);
+    }
+
+    public static Ball fireBall() {
+        return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, BALL_SIZE, 6,
+                -8, "fire", FIRE_BALL_IMG, 100);
+    }
+
+    public static Ball waterBall() {
+        return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, BALL_SIZE, 6,
+                -8, "water", WATER_BALL_IMG, 100);
+    }
+
+    public static Ball windBall() {
+        return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, BALL_SIZE, 6,
+                -8, "wind", WIND_BALL_IMG, 100);
+    }
+
+    public static Ball earthBall()
+    {
+        return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, BALL_SIZE, 6,
+                -8, "earth", EARTH_BALL_IMG, 100);
+    }
+
+    public static Ball bongnguhanh() {
+        return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, Ball.BALL_SIZE, 6,
+                -8, "img/ball/bongnguhanh.png", 50);
     }
 
     // ==== GETTER/SETTER ==== //

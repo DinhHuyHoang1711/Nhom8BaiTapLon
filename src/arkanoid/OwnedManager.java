@@ -13,7 +13,7 @@ public class OwnedManager {
     private Artifact currentArtifact;
 
     public  OwnedManager() {
-        this.currentBall = Ball.normalBall(0, 0);
+        this.currentBall = Ball.bongnguhanh();
         this.currentArtifact = null;
         loadBalls();
     }
@@ -72,10 +72,10 @@ public class OwnedManager {
     }
 
     private void loadBalls() {
-        balls.add(Ball.normalBall(0, 0));
-        balls.add(Ball.fireBall(0, 0));
-        balls.add(Ball.earthBall(0, 0));
-        balls.add(Ball.waterBall(0, 0));
-        balls.add(Ball.windBall(0, 0));
+        balls.add(Ball.normalBall());
+        balls.add(Ball.fireBall());
+        balls.add(Ball.earthBall());
+        balls.add(Ball.waterBall());
+        balls.add(Ball.windBall());
     }
 }
