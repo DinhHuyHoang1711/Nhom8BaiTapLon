@@ -19,6 +19,8 @@ public class DiamondSquareGacha extends JPanel {
     private static final int CENTER_Y = 250;
 
     // Dữ liệu chính
+    private double tileX[];
+    private double tileY[];
     private Point[] tilePositions;
     private Image background;
     private Item[] items;
@@ -117,7 +119,8 @@ public class DiamondSquareGacha extends JPanel {
 
     /** Tính toán vị trí 12 ô hình thoi quanh tâm */
     private void makeTilePositions() {
-        tilePositions = new Point[NUM_TILES];
+        tileX = new double[NUM_TILES];
+        tileY = new double[NUM_TILES];
         int gap = 90;
         int[][] offsets = {
                 {-3,0},{-2,1},{-1,2},
@@ -127,9 +130,10 @@ public class DiamondSquareGacha extends JPanel {
         };
 
         for (int i = 0; i < NUM_TILES; i++) {
-            double dx = offsets[i][0] * gap / 1.4;
-            double dy = offsets[i][1] * gap / 1.4;
-            tilePositions[i] = new Point((int)(CENTER_X + dx), (int)(CENTER_Y + dy));
+            double dx = offsets[i][0] * gap / 1.59;
+            double dy = offsets[i][1] * gap / 1.59;
+            tileX[i] = CENTER_X + dx;
+            tileY[i] = CENTER_Y + dy;
         }
     }
 
@@ -147,10 +151,9 @@ public class DiamondSquareGacha extends JPanel {
         int highlightIndex = spinAnim.getHighlightIndex();
 
         for (int i = 0; i < NUM_TILES; i++) {
-            Point p = tilePositions[i];
             AffineTransform old = g2.getTransform();
 
-            g2.translate(p.x, p.y);
+            g2.translate(tileX[i],tileY[i] );
             g2.rotate(Math.toRadians(45));
 
             g2.setColor(new Color(0, 0, 100, 100));
