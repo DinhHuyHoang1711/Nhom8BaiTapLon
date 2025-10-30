@@ -85,12 +85,24 @@ public class MapMenu extends JFrame {
                 1075, 550, click, e -> {
                     //JOptionPane.showMessageDialog(this, "Comming soon");
                     //this.dispose();
+                    backgroundMusic.stop();
+                    Sound gachaBgm = new Sound("sound/gachaBgm.wav");
+                    gachaBgm.loop();
                     JFrame frame = new JFrame("Vòng Quay 12 Ô - Hình Thoi");
                     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                     frame.getContentPane().add(new DiamondSquareGacha());
                     frame.pack();
                     frame.setLocationRelativeTo(null);
                     frame.setVisible(true);
+
+                    //sau khi tat gacha nhac nen se duoc bat lai
+                    frame.addWindowListener(new java.awt.event.WindowAdapter() {
+                        @Override
+                        public void windowClosed(java.awt.event.WindowEvent e) {
+                            gachaBgm.close();
+                            backgroundMusic.play();
+                        }
+                    });
                 }
         );
         panel.add(gacha);
