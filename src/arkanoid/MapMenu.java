@@ -1,15 +1,13 @@
+package arkanoid;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 
 import GachaMachine.DiamondSquareGacha;
-import arkanoid.Sound;
-import arkanoid.ButtonManager;
-import arkanoid.Paddle;
-import arkanoid.Ball;
-import arkanoid.Brick;
+import arkanoid.*;
 
-import static arkanoid.GameObject.*;
+import static arkanoid.Game.*;
 
 public class MapMenu extends JFrame {
 

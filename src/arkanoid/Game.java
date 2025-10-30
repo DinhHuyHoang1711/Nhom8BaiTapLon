@@ -1,13 +1,11 @@
+package arkanoid;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
-import arkanoid.ObjectPrinter;
-import arkanoid.Brick;
-import arkanoid.Paddle;
-import arkanoid.Ball;
-import arkanoid.Sound;
+import arkanoid.*;
 
 public class Game extends JFrame implements ActionListener, KeyListener, WindowListener {
 

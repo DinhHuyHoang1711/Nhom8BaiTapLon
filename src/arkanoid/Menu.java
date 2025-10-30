@@ -1,9 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
-import arkanoid.Sound;
-import arkanoid.ButtonManager;
-import arkanoid.GameObject;
-import arkanoid.ObjectPrinter;
+import arkanoid.*;
 import static arkanoid.GameObject.GAME_HEIGHT;
 import static arkanoid.GameObject.GAME_WIDTH;
 

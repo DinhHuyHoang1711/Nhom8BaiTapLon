@@ -1,11 +1,9 @@
+package arkanoid;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
-import arkanoid.Sound;
-import arkanoid.ButtonManager;
-import arkanoid.Ball;
-import arkanoid.OwnedManager;
-import arkanoid.ConfirmDialog;
+import arkanoid.*;
 
 import static arkanoid.GameObject.GAME_HEIGHT;
 import static arkanoid.GameObject.GAME_WIDTH;
