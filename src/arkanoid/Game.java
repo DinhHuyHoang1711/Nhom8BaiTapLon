@@ -18,9 +18,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     //Am thanh man choi
     private Sound bgm = new Sound("sound/CombatSound.wav");
-    //heart
+
+    //heart, so mau trong tro choi
     private int currentHeart;
     private ArrayList <JLabel> heart = new ArrayList<>();
+
+    //Trang thai pause hay chua
+    private boolean isPause = false;
+    private JButton pauseButton;
+    //
+    //Nut dau hang
+    private JButton surrenderButton;
 
     //paddle
     private final Paddle paddle;
@@ -93,6 +101,30 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         //phat nhac
         bgm.loop();
+
+        //set pausebutton
+        pauseButton = new JButton(new ImageIcon(new ImageIcon("img/pauseButton.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+        pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+        pauseButton.setBounds(1080, 10, 40, 40);
+        pauseButton.setBorderPainted(false);
+        pauseButton.setContentAreaFilled(false);
+        pauseButton.setFocusPainted(false);
+        pauseButton.setOpaque(false);
+
+        pauseButton.addActionListener(e -> togglePause());
+        layers.add(pauseButton, Integer.valueOf(5));
+
+        //set nut dau hang
+        surrenderButton = new JButton(new ImageIcon(new ImageIcon("img/whiteFlag.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+        surrenderButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/whiteFlagHover.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+        surrenderButton.setBounds(1130, 10, 40, 40);
+        surrenderButton.setBorderPainted(false);
+        surrenderButton.setContentAreaFilled(false);
+        surrenderButton.setFocusPainted(false);
+        surrenderButton.setOpaque(false);
+
+        surrenderButton.addActionListener(e -> surrender());
+        layers.add(surrenderButton, Integer.valueOf(5));
 
         //set currentheart
         currentHeart = 3;
@@ -190,57 +222,57 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         // --- PADDLE INFO ---
         paddleTitle = new JLabel("Paddle");
         paddleTitle.setBounds(840, 175, 200, 25);
-        paddleTitle.setFont(new Font("Arial", Font.BOLD, 25));
+        paddleTitle.setFont(new Font("Adobe Garamond Pro", Font.BOLD, 25));
         paddleTitle.setForeground(Color.YELLOW);
         layers.add(paddleTitle, Integer.valueOf(2));
 
         paddleWidthLabel = new JLabel("Width: " + paddle.getWidth());
         paddleWidthLabel.setBounds(840, 205, 200, 15);
-        paddleWidthLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        paddleWidthLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
         paddleWidthLabel.setForeground(Color.WHITE);
         layers.add(paddleWidthLabel, Integer.valueOf(2));
 
         paddleDxLabel = new JLabel("Speed: " + paddle.getDx());
         paddleDxLabel.setBounds(840, 225, 200, 15);
-        paddleDxLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        paddleDxLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
         paddleDxLabel.setForeground(Color.WHITE);
         layers.add(paddleDxLabel, Integer.valueOf(2));
 
         // --- BALL INFO ---
         ballTitle = new JLabel("Ball");
         ballTitle.setBounds(840, 260, 200, 25);
-        ballTitle.setFont(new Font("Arial", Font.BOLD, 25));
+        ballTitle.setFont(new Font("Adobe Garamond Pro", Font.BOLD, 25));
         ballTitle.setForeground(Color.YELLOW);
         layers.add(ballTitle, Integer.valueOf(2));
 
         ballElementLabel = new JLabel("Element: " + ball.getElement());
         ballElementLabel.setBounds(840, 290, 200, 15);
-        ballElementLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        ballElementLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
         ballElementLabel.setForeground(Color.WHITE);
         layers.add(ballElementLabel, Integer.valueOf(2));
 
         ballDxLabel = new JLabel("Dx: " + ball.getDx());
         ballDxLabel.setBounds(840, 310, 200, 15);
-        ballDxLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        ballDxLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
         ballDxLabel.setForeground(Color.WHITE);
         layers.add(ballDxLabel, Integer.valueOf(2));
 
         ballDyLabel = new JLabel("Dy: " + ball.getDy());
         ballDyLabel.setBounds(840, 330, 200, 15);
-        ballDyLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        ballDyLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
         ballDyLabel.setForeground(Color.WHITE);
         layers.add(ballDyLabel, Integer.valueOf(2));
 
         ballDamageLabel = new JLabel("Damage: " + ball.getBaseDamage());
         ballDamageLabel.setBounds(840, 350, 200, 15);
-        ballDamageLabel.setFont(new Font("Arial", Font.PLAIN, 15));
+        ballDamageLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
         ballDamageLabel.setForeground(Color.WHITE);
         layers.add(ballDamageLabel, Integer.valueOf(2));
 
         // --- ARTIFACT INFO ---
         artifactTitle = new JLabel("Artifact");
         artifactTitle.setBounds(840, 385, 200, 25); // vi tri va kich thuoc
-        artifactTitle.setFont(new java.awt.Font("Arial", 1, 25));
+        artifactTitle.setFont(new java.awt.Font("Adobe Garamond Pro", 1, 25));
         artifactTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(artifactTitle, Integer.valueOf(2));
 
@@ -256,6 +288,29 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         addWindowListener(this);
 
         timer.start();
+    }
+
+    private void togglePause() {
+        if (isPause) {
+            // luc nay dang pause, an vao de tiep tuc game
+            pauseButton.setIcon(new ImageIcon(new ImageIcon("img/pauseButton.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+            pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+            timer.start();
+            isPause = false;
+            this.requestFocusInWindow();
+        } else {
+            // game dang dien ra thi tam dung
+            pauseButton.setIcon(new ImageIcon(new ImageIcon("img/pauseButton1.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+            pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover1.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
+            timer.stop();
+            isPause = true;
+        }
+    }
+
+    private void surrender() {
+        timer.stop();
+        JOptionPane.showMessageDialog(this, "Chua j da dau hang roi ga vcl");
+        this.dispose();
     }
 
     private void configurePrinter(ObjectPrinter p) {
