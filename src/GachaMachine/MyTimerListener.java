@@ -9,7 +9,7 @@ import javax.swing.*;
 public class MyTimerListener implements ActionListener {
     private int counter = 0;
     private SpinAnimation spinAnimation;
-    private Sound spinsound = new Sound("sound/click.wav");
+    private Sound spinsound = new Sound("sound/gachaSound.wav");
 
     public MyTimerListener(SpinAnimation spinAnimation) {
         this.spinAnimation = spinAnimation;

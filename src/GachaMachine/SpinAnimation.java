@@ -26,22 +26,22 @@ public class SpinAnimation {
         this.inventory = inventory;
     }
 
-    public void highlightNext(){
-        highlightIndex = (highlightIndex + 1)% numTiles;
+    public void highlightNext() {
+        highlightIndex = (highlightIndex + 1) % numTiles;
         panel.repaint();
     }
 
-    public boolean isStopPosition(){
+    public boolean isStopPosition() {
         return highlightIndex == stopIndex;
     }
 
-    public void stopSpin(){
+    public void stopSpin() {
         timer.stop();
         spinning = false;
         showResult(items[stopIndex]);
     }
 
-    public int getNumTiles(){
+    public int getNumTiles() {
         return numTiles;
     }
 
