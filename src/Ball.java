@@ -78,6 +78,17 @@ public class Ball extends GameObject{
         this.baseDy = dy;
     }
 
+    //constructor copy
+    public Ball(Ball other) {
+        super(other.getX(), other.getY(), other.getWidth(), other.getHeight(),
+                other.getDx(), other.getDy(), other.getImagePath());
+
+        this.element = other.element;
+        this.baseDamage = other.baseDamage;
+        this.baseDx = other.baseDx;
+        this.baseDy = other.baseDy;
+    }
+
     // ==== TYPE BALL ==== //
     public static Ball normalBall(int x, int y) {
         return new Ball(x, y, BALL_SIZE, 0, 0, "normal", NORMAL_BALL_IMG);

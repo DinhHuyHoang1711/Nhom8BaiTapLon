@@ -14,6 +14,13 @@ public class Paddle extends GameObject {
         this.movingLeft = false;
         this.movingRight = false;
     }
+    //constructor copy
+    public Paddle(Paddle other) {
+        super(other.getX(), other.getY(), other.getWidth(), other.getHeight(),
+                other.getDx(), other.getDy(), other.getImagePath());
+        this.movingLeft = other.movingLeft;
+        this.movingRight = other.movingRight;
+    }
 
     public boolean isMovingLeft() {
         return this.movingLeft;

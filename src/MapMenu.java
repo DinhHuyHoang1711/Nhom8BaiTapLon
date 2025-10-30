@@ -112,11 +112,15 @@ public class MapMenu extends JFrame {
     private void openLevel(int level) {
         //vao man choi thi tat bgm di
         backgroundMusic.stop();
-        new Game(currentPaddle, currentBall, "levels/level1.txt" ,
+
+        //copy current ball va paddle de chung no khong bi thay doi sau game()
+        Paddle paddleCopy = new Paddle(currentPaddle);
+        Ball ballCopy = new Ball(currentBall);
+
+        new Game(paddleCopy, ballCopy, "levels/level1.txt" ,
                 currentGameScene);
         //thoat khoi man choi thi bat
         //Game da implement window listener roi nen khi dong game, bgm tu phat lai
-        //backgroundMusic.loop();
     }
 
     public static void main(String[] args) {
