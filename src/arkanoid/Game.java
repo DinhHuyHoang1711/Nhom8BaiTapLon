@@ -1,6 +1,7 @@
 package arkanoid;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
@@ -84,6 +85,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     // stat artifact
     private JLabel artifactTitle;
+    private boolean isAddAHeardCoolindDown = false;
+    private boolean isAddRandomHeardCoolingDown = false;
+    private boolean isExpandPaddleCoolingDown = false;
 
     // PowerUp
     private final PowerUpManager powerUpManager;
@@ -321,6 +325,104 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private void configurePrinter(ObjectPrinter p) {
         p.setOpaque(false);
         p.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    }
+
+    // Cập nhật giao diện tim dựa vào currentHeart
+    private void updateHeartDisplay() {
+        for (int i = 0; i < heart.size(); i++) {
+            String path = (i < currentHeart)
+                    ? "img/heart/redheart.png"   // có máu
+                    : "img/heart/grayheart.png"; // hết máu
+            ImageIcon icon = new ImageIcon(path);
+            Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+            heart.get(i).setIcon(new ImageIcon(scaled));
+        }
+        layers.repaint();
+    }
+
+
+    //Khi kích hoạt hiệu ứng tim sẽ +1 tim và hồi trong khoảng 30s
+    public void powerUpAdd1Heart(){
+        if(isAddAHeardCoolindDown) {
+            return ;
+        }
+
+        if(currentHeart == 3) {
+            return;
+        }
+
+        isAddAHeardCoolindDown = true;
+
+        ++currentHeart;
+        updateHeartDisplay();
+
+        Timer coolDown = new Timer(30000, e ->{
+            isAddAHeardCoolindDown = false;
+            ((Timer)e.getSource()).stop();
+        });
+        coolDown.setRepeats(false);
+        coolDown.start();
+    }
+
+    // Khi kích hoạt sẽ nhận được 1 -> 3 trái tym mới , hồi chiêu 60s
+    public void powerUpAddRandomHeart() {
+        if(isAddRandomHeardCoolingDown) {
+            return ;
+        }
+
+        if(currentHeart == 3) {
+            return ;
+        }
+
+        isAddRandomHeardCoolingDown = true;
+
+        currentHeart += (int)(Math.random() * 3) + 1;
+        if(currentHeart > 3) {
+            currentHeart = 3;
+        }
+        updateHeartDisplay();
+
+        Timer coolDown = new Timer(60000, e-> {
+            isAddRandomHeardCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        coolDown.setRepeats(false);
+        coolDown.start();
+    }
+
+    // khi kích hoạt sẽ tăng kích thước của paddle lên 20 hồi chiêu trong 40s
+    public void powerUpExpandPaddle() {
+        if(isExpandPaddleCoolingDown) {
+            return;
+        }
+
+        isExpandPaddleCoolingDown = true;
+
+        int oldWidth = paddle.getWidth();
+        int oldHeight = paddle.getHeight();
+        paddle.setWidth(paddle.getWidth() + 20);
+        paddle.setHeight(paddle.getHeight() + 20);
+        paddlePrinter.setGameObject(paddle);
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(30000, e ->{
+            paddle.setWidth(oldWidth);
+            paddle.setHeight(oldHeight);
+            paddlePrinter.setGameObject(paddle);
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(40000, e->{
+            isExpandPaddleCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
     }
 
     @Override

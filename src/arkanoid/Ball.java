@@ -1,6 +1,7 @@
 package arkanoid;
 
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.Rectangle;
@@ -32,6 +33,9 @@ public class Ball extends GameObject{
     private Random rand = new Random();
     private int baseDx;
     private int baseDy;
+    private Timer powerUpTimer;
+    private boolean isSwordCoolDown = false;
+    private boolean isBowCoolDown = false;
 
     // Ảnh
     private static final String NORMAL_BALL_IMG = "img/ball/normal.png";
@@ -142,6 +146,68 @@ public class Ball extends GameObject{
     public static Ball bongnguhanh() {
         return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, Ball.BALL_SIZE, 6,
                 -8, "img/ball/bongnguhanh.png", 50);
+    }
+
+    // Hàm khi bật hiệu ứng thanh kiếm lên tăng 100 damage và trong 5s;
+    public void powerUpEffectSword(int extraDamage, int durationMs) {
+        if(isSwordCoolDown) {
+            return;
+        }
+
+        isSwordCoolDown = true;
+        // tăng damage tạm thời
+        int oldDamage = baseDamage;
+        baseDamage += extraDamage;
+
+        // nếu đã có timer trước đó, dừng nó
+        if (powerUpTimer != null && powerUpTimer.isRunning()) {
+            powerUpTimer.stop();
+        }
+
+        // tạo timer để sau durationMs thì trả về damage cũ
+        powerUpTimer = new Timer(durationMs, e -> {
+            baseDamage = oldDamage;
+            ((Timer)e.getSource()).stop();
+        });
+        powerUpTimer.setRepeats(false);
+        powerUpTimer.start();
+
+        Timer cooldown = new Timer(20000, e -> {
+            isSwordCoolDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // Hàm khi bật hiệu ứng cung lên tăng 50 damage trong 3s
+    public void powerUpEffectBow(int extraDamage, int durationMs) {
+        if(isBowCoolDown) {
+            return;
+        }
+
+        isBowCoolDown = true;
+        int oldDamage = baseDamage;
+        baseDamage += extraDamage;
+
+        if(powerUpTimer != null && powerUpTimer.isRunning()){
+            powerUpTimer.stop();
+        }
+
+        powerUpTimer = new Timer(durationMs, e -> {
+            baseDamage = oldDamage;
+            ((Timer) e.getSource()).stop();
+        });
+
+        powerUpTimer.setRepeats(false);
+        powerUpTimer.start();
+
+        Timer cooldown = new Timer(10000, e -> {
+            isBowCoolDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
     }
 
     // ==== GETTER/SETTER ==== //
