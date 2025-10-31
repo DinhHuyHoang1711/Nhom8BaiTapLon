@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.List;
 import arkanoid.*;
 
+import PowerUp.*;
+
 public class Game extends JFrame implements ActionListener, KeyListener, WindowListener {
 
     //Thong so khung hinh
@@ -20,8 +22,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private Sound bgm = new Sound("sound/CombatSound.wav");
 
     //heart, so mau trong tro choi
-    private int currentHeart;
-    private ArrayList <JLabel> heart = new ArrayList<>();
+    public int currentHeart;
+    public ArrayList<JLabel> heart = new ArrayList<>();
 
     //Trang thai pause hay chua
     private boolean isPause = false;
@@ -46,10 +48,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final List<Brick> removed = new ArrayList<>();
     private static final int BRICK_W = 80;
     private static final int BRICK_H = 30;
-    private static final int STEP_X  = 80;
-    private static final int STEP_Y  = 30;
+    private static final int STEP_X = 80;
+    private static final int STEP_Y = 30;
     private static final int PLAY_LEFT = 0;
-
 
     //cong cu ho tro in hinh anh
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
@@ -63,6 +64,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     // trang thai (fix delay)
     private boolean leftPressed = false;
     private boolean rightPressed = false;
+
+    private final Rectangle tempPuRect = new Rectangle();
+    private final Rectangle tempPaddleRect = new Rectangle();
 
     //Info hien thi tren stat bar
 
@@ -81,9 +85,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     // stat artifact
     private JLabel artifactTitle;
 
+    // PowerUp
+    private final PowerUpManager powerUpManager;
+    private final List<PowerUp> powerUps = new ArrayList<>();
+    private final Map<PowerUp, ObjectPrinter> powerUpPrinters = new HashMap<>();
 
-    public Game(Paddle currentPaddle, Ball currentBall, String level,
-                String currentGameScene) {
+    public Game(Paddle currentPaddle, Ball currentBall, String level, String currentGameScene) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(GAME_WIDTH, GAME_HEIGHT);
@@ -110,7 +117,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         pauseButton.setContentAreaFilled(false);
         pauseButton.setFocusPainted(false);
         pauseButton.setOpaque(false);
-
         pauseButton.addActionListener(e -> togglePause());
         layers.add(pauseButton, Integer.valueOf(5));
 
@@ -122,7 +128,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         surrenderButton.setContentAreaFilled(false);
         surrenderButton.setFocusPainted(false);
         surrenderButton.setOpaque(false);
-
         surrenderButton.addActionListener(e -> surrender());
         layers.add(surrenderButton, Integer.valueOf(5));
 
@@ -150,6 +155,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         paddlePrinter.setGameObject(paddle);
         ballPrinter.setGameObject(ball);
 
+        powerUpManager = new PowerUpManager(this);
+
         layers.add(paddlePrinter, Integer.valueOf(9));
         layers.add(ballPrinter, Integer.valueOf(10));
 
@@ -171,13 +178,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
          */
         int[][] grid;
         try {
-            grid = arkanoid.Brick.readGrid(level);
+            grid = Brick.readGrid(level);
         } catch (java.io.IOException e) {
             throw new RuntimeException("load grid fail", e);
         }
         int rows = grid.length;
         int cols = grid[0].length;
-        int totalW  = BRICK_W + (cols - 1) * STEP_X;
+        int totalW = BRICK_W + (cols - 1) * STEP_X;
         int originX = PLAY_LEFT + (PLAYFRAME_WIDTH - totalW) / 2;
         int originY = 80;
 
@@ -187,10 +194,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 if (id == 0) continue;
                 int x = originX + c * STEP_X;
                 int y = originY + r * STEP_Y;
-                Brick b = arkanoid.Brick.createBrickFromId(id, x, y);
+                Brick b = Brick.createBrickFromId(id, x, y);
                 if (b == null) continue;
                 bricks.add(b);
-                arkanoid.ObjectPrinter bp = new arkanoid.ObjectPrinter();
+                ObjectPrinter bp = new ObjectPrinter();
                 configurePrinter(bp);
                 bp.setGameObject(b);
                 brickPrinters.put(b, bp);
@@ -215,7 +222,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         JLabel bg2 = new JLabel(new ImageIcon(scaled2));
         bg2.setBounds(800, 0, 400, 700);
         layers.add(bg2, Integer.valueOf(1));
-
 
         //ve cac thong so tren stat bar
 
@@ -276,7 +282,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         artifactTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(artifactTitle, Integer.valueOf(2));
 
-
         setVisible(true);
 
         //them keylistender
@@ -320,12 +325,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if (removed.size() == totalBrick) { // tuc la thang roi
+        if (bricks.isEmpty()) {
             timer.stop();
             JOptionPane.showMessageDialog(this, "Yee thang roi");
             this.dispose();
         } else {
-            if (currentHeart > 0) {//tuc la chua thua
+            if (currentHeart > 0) { //tuc la chua thua
                 if (leftPressed) {
                     paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
                     paddle.setMovingLeft();
@@ -338,56 +343,87 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     }
                 }
 
+                // Cập nhật bóng
                 ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
                 ball.collideWithPaddle(paddle);
 
+                // Mất mạng
                 if (ball.getY() > GAME_HEIGHT) {
-                    //giam 1 heart
                     currentHeart--;
-
-                    //dua bong ve lai vi tri ban dau
                     ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
                     ball.setY(GAME_HEIGHT - 120);
                     ball.setDx(initDx);
                     ball.setDy(initDy);
 
-                    //sua hien thi tim
-                    ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
-                    Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                    ImageIcon grayHeart = new ImageIcon(scaled);
-                    heart.get(currentHeart).setIcon(grayHeart);
+                    if (currentHeart >= 0) {
+                        ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
+                        Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                        heart.get(currentHeart).setIcon(new ImageIcon(scaled));
+                    }
                 }
 
-
+                // Va chạm với gạch
                 for (Brick b : bricks) {
                     if (ball.collide(b)) {
                         if (b.isDestroyed()) {
                             removed.add(b);
+
+                            // 30% chance drop PowerUp
+                            if (Math.random() < 0.3) {
+                                PowerUp pu = Math.random() < 0.5
+                                        ? new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball))
+                                        : new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
+
+                                powerUps.add(pu);
+                                ObjectPrinter pup = new ObjectPrinter();
+                                configurePrinter(pup);
+                                pup.setGameObject(pu);
+                                powerUpPrinters.put(pu, pup);
+                                layers.add(pup, Integer.valueOf(7));
+                            }
                         } else {
                             ObjectPrinter p = brickPrinters.get(b);
                             if (p != null) p.startFlash();
                         }
-                        //bóng chỉ va chạm 1 gạch 1 lần
-                        // từ từ nhé, chỗ này sẽ phải bỏ, nếu nhận được buff đi xuyên.
-                        break;
+                        break; // Chỉ va chạm 1 gạch/lần
                     }
                 }
 
-                if (!removed.isEmpty()) {
-                    for (Brick b : removed) {
-                        bricks.remove(b);
-                        ObjectPrinter p = brickPrinters.remove(b);
-                        if (p != null) layers.remove(p);
+                // Xóa gạch bị phá
+                for (Brick b : removed) {
+                    bricks.remove(b);
+                    ObjectPrinter p = brickPrinters.remove(b);
+                    if (p != null) layers.remove(p);
+                }
+                removed.clear();
+
+                // Cập nhật PowerUp
+                for (int i = powerUps.size() - 1; i >= 0; i--) {
+                    PowerUp pu = powerUps.get(i);
+                    pu.setY(pu.getY() + 3);
+
+                    tempPuRect.setBounds(pu.getX(), pu.getY(), pu.getWidth(), pu.getHeight());
+                    tempPaddleRect.setBounds(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
+
+                    if (tempPuRect.intersects(tempPaddleRect)) {
+                        powerUpManager.apply(pu);
+                        removePowerUp(pu);
+                        powerUps.remove(i);
+                    } else if (pu.isOutOfBounds()) {
+                        removePowerUp(pu);
+                        powerUps.remove(i);
+                    } else {
+                        ObjectPrinter p = powerUpPrinters.get(pu);
+                        if (p != null) p.setGameObject(pu);
                     }
                 }
 
+                // Cập nhật hiển thị
                 paddlePrinter.setGameObject(paddle);
                 ballPrinter.setGameObject(ball);
 
-                // update stat bar
                 paddleWidthLabel.setText("Width: " + paddle.getWidth());
                 paddleDxLabel.setText("Speed: " + paddle.getDx());
-
                 ballElementLabel.setText("Element: " + ball.getElement());
                 ballDxLabel.setText("Dx: " + ball.getDx());
                 ballDyLabel.setText("Dy: " + ball.getDy());
@@ -402,6 +438,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             }
         }
     }
+
+    private void removePowerUp(PowerUp pu) {
+        ObjectPrinter printer = powerUpPrinters.remove(pu);
+        if (printer != null) layers.remove(printer);
+    }
+
 
     //Tranh truong hop an cung luc ca left ca right, chi 1 trong 2 cai dc true
     @Override
@@ -478,3 +520,4 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     }
 }
+

@@ -1,7 +1,6 @@
 package PowerUp;
 
-import arkanoid.OwnedManager;
-import arkanoid.Ball;
+import arkanoid.*;
 
 public class PowerUpIncreaseDamage extends PowerUp {
     private final OwnedManager ownedManager;

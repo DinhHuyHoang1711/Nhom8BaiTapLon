@@ -4,7 +4,7 @@ import arkanoid.Sound;
 import javax.swing.Timer;
 import java.util.HashMap;
 import java.util.Map;
-import arkanoid.Game;
+import arkanoid.*;
 
 public class PowerUpManager {
     private final Game game;

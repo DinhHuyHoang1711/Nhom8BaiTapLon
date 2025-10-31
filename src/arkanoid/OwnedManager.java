@@ -18,6 +18,12 @@ public class OwnedManager {
         loadBalls();
     }
 
+    public OwnedManager(Ball currentBall) {
+        this.currentBall = currentBall;
+        this.currentArtifact = null;
+        loadBalls();
+    }
+
     public OwnedManager(Ball currentBall, Artifact currentArtifact) {
         this.currentBall = currentBall;
         this.currentArtifact = currentArtifact;
