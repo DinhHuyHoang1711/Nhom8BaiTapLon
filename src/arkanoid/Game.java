@@ -94,6 +94,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private JLabel artifactTitle;
     private boolean isCoolingDown = false;
     private boolean unbreakable = false;
+    private Coin coin = new Coin();
+    private int slowX = 2;
+    private int slowY = 2;
 
     //stat coin
     private JLabel coinTitle;
@@ -587,7 +590,50 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
+    // Nhận random tiền 1-300 , cooldown 120s
+    public void chest() {
+        if(isCoolingDown) {
+            return;
+        }
+        isCoolingDown = true;
+        coin.add((int)(Math.random() * 300) + 1);
 
+        Timer cooldown = new Timer(120000, e->{
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // Tăng giảm tốc độ của bóng
+    public void clock() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        isCoolingDown = true;
+        int oldDx = ball.getDx();
+        int oldDy = ball.getDy();
+
+        ball.setDx(Math.abs(oldDx - slowX));
+        ball.setDy(Math.abs(oldDy - slowY));
+
+        Timer durationMs = new Timer(50000, e -> {
+            ball.setDx(oldDx);
+            ball.setDy(oldDy);
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer timer = new Timer(30000, e ->{
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
 
     @Override
     public void actionPerformed(ActionEvent e) {
