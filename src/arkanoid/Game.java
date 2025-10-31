@@ -85,9 +85,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     // stat artifact
     private JLabel artifactTitle;
-    private boolean isAddAHeardCoolindDown = false;
-    private boolean isAddRandomHeardCoolingDown = false;
-    private boolean isExpandPaddleCoolingDown = false;
+    private boolean isCoolingDown = false;
+    private boolean unbreakable = false;
 
     // PowerUp
     private final PowerUpManager powerUpManager;
@@ -374,8 +373,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
 
     //Khi kích hoạt hiệu ứng tim sẽ +1 tim và hồi trong khoảng 30s
-    public void powerUpAdd1Heart(){
-        if(isAddAHeardCoolindDown) {
+    public void Heart(){
+        if(isCoolingDown) {
             return ;
         }
 
@@ -383,13 +382,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             return;
         }
 
-        isAddAHeardCoolindDown = true;
+        isCoolingDown = true;
 
         ++currentHeart;
         updateHeartDisplay();
 
         Timer coolDown = new Timer(30000, e ->{
-            isAddAHeardCoolindDown = false;
+            isCoolingDown = false;
             ((Timer)e.getSource()).stop();
         });
         coolDown.setRepeats(false);
@@ -397,8 +396,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     }
 
     // Khi kích hoạt sẽ nhận được 1 -> 3 trái tym mới , hồi chiêu 60s
-    public void powerUpAddRandomHeart() {
-        if(isAddRandomHeardCoolingDown) {
+    public void RandomHeart() {
+        if(isCoolingDown) {
             return ;
         }
 
@@ -406,7 +405,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             return ;
         }
 
-        isAddRandomHeardCoolingDown = true;
+        isCoolingDown = true;
 
         currentHeart += (int)(Math.random() * 3) + 1;
         if(currentHeart > 3) {
@@ -415,7 +414,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         updateHeartDisplay();
 
         Timer coolDown = new Timer(60000, e-> {
-            isAddRandomHeardCoolingDown = false;
+            isCoolingDown = false;
             ((Timer) e.getSource()).stop();
         });
         coolDown.setRepeats(false);
@@ -423,12 +422,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     }
 
     // khi kích hoạt sẽ tăng kích thước của paddle lên 20 hồi chiêu trong 40s
-    public void powerUpExpandPaddle() {
-        if(isExpandPaddleCoolingDown) {
+    public void ExpandPaddle() {
+        if(isCoolingDown) {
             return;
         }
 
-        isExpandPaddleCoolingDown = true;
+        isCoolingDown = true;
 
         int oldWidth = paddle.getWidth();
         int oldHeight = paddle.getHeight();
@@ -450,12 +449,121 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         durationMs.start();
 
         Timer cooldown = new Timer(40000, e->{
-            isExpandPaddleCoolingDown = false;
+            isCoolingDown = false;
             ((Timer) e.getSource()).stop();
         });
         cooldown.setRepeats(false);
         cooldown.start();
     }
+
+    // khi kích hoạt sẽ gây 100 sát thương cho toàn bộ gạch, cooldown 60s
+    public void Boom() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        isCoolingDown = true;
+
+        for(Brick b : bricks) {
+            b.takeHit(100);
+        }
+
+        Timer cooldown = new Timer(60000, e->{
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt -1 máu, +300 sát thương trong 10 giây, cooldown 90s
+    public void Fire() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        isCoolingDown = true;
+
+        int oldDamage = ball.getBaseDamage();
+        ball.setBaseDamage(oldDamage + 300);
+        currentHeart--;
+        ballPrinter.setGameObject(ball);
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(10000, e ->{
+            ball.setBaseDamage(oldDamage);
+            ballPrinter.setGameObject(ball);
+
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(90000, e->{
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt miễn nhiễm sát thương trong 5s, cooldown 70s
+    public void Helmet() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        isCoolingDown = true;
+
+        unbreakable = true;
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(5000, e ->{
+            unbreakable = false;
+
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(70000, e->{
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt tăng vĩnh viễn 50 sát thương, 60s hồi chiêu
+    public void Diamond() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        isCoolingDown = true;
+
+        ball.setBaseDamage(ball.getBaseDamage() + 50);
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer cooldown = new Timer(60, e->{
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+
 
     @Override
     public void actionPerformed(ActionEvent e) {
@@ -537,17 +645,14 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     if (Math.random() < 0.3) {
                         PowerUp pu;
 
-                        if(Math.random() < 0.25) {
+                        if(Math.random() < 0.3) {
                             pu = new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball));
                         }
-                        else if(Math.random() < 0.5) {
+                        else if(Math.random() < 0.4) {
                             pu = new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
                         }
-                        else if(Math.random() < 0.75){
-                            pu = new PowerUpExpandPaddle(b.getX() + 20, b.getY() + 10, paddle);
-                        }
                         else {
-                            pu = new PowerUpSlowPaddle(b.getX() + 20, b.getY() + 10, paddle);
+                            pu = new PowerUpExpandPaddle(b.getX() + 20, b.getY() + 10, paddle);
                         }
 
                         powerUps.add(pu);
