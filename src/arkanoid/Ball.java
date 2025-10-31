@@ -326,6 +326,54 @@ public class Ball extends GameObject{
         }
     }
 
+    public boolean collideWithBoss(Boss boss) {
+        if (boss == null || boss.isDead()) return false;
+
+        Rectangle br = new Rectangle(boss.getX(), boss.getY(), boss.getWidth(), boss.getHeight());
+        Rectangle ba = new Rectangle(getX(), getY(), getWidth(), getHeight());
+
+        if (!ba.intersects(br)) return false;
+
+        // --- MTV: chọn hướng đẩy ra ít nhất ---
+        int overlapLeft   = ba.x + ba.width  - br.x;
+        int overlapRight  = br.x + br.width  - ba.x;
+        int overlapTop    = ba.y + ba.height - br.y;
+        int overlapBottom = br.y + br.height - ba.y;
+
+        int minHoriz = Math.min(overlapLeft, overlapRight);
+        int minVert  = Math.min(overlapTop, overlapBottom);
+
+        if (minHoriz < minVert) {
+            // Va chạm trái/phải
+            if (overlapLeft < overlapRight) {
+                setX(getX() - overlapLeft - 1);    // đẩy sang trái
+                setDx(-Math.abs(getDx()));         // đảo hướng X
+            } else {
+                setX(getX() + overlapRight + 1);   // đẩy sang phải
+                setDx(Math.abs(getDx()));
+            }
+        } else {
+            // Va chạm trên/dưới
+            if (overlapTop < overlapBottom) {
+                setY(getY() - overlapTop - 1);     // đẩy lên
+                setDy(-Math.abs(getDy()));         // đảo hướng Y
+            } else {
+                setY(getY() + overlapBottom + 1);  // đẩy xuống
+                setDy(Math.abs(getDy()));
+            }
+        }
+
+        // --- Gây sát thương lên boss ---
+        int dmg = this.getBaseDamage();
+        if (!"normal".equals(this.element)) {
+            // Nếu bạn muốn tương tác nguyên tố (ví dụ trùng nguyên tố x2):
+            dmg = this.element.equalsIgnoreCase(boss.getElement()) ? dmg * 2 : dmg;
+        }
+        boolean dead = boss.takeDamage(Math.max(1, dmg));
+
+        return true; // đã va
+    }
+
     private void setElementFromName(String element) {
         this.element = (element.isEmpty() ? "normal" : element);
         this.baseDamage = this.element.equals("normal") ? 50 : 100;

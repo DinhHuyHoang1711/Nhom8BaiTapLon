@@ -8,7 +8,7 @@ public class GameObject {
     public static final int PLAYFRAME_WIDTH = 800;
     public static final int PLAYFRAME_HEIGHT = 700;
 
-    private int x, y;
+    protected int x, y;
     private int width, height;
 
     /* Dong nay co the xoa neu tao 2 lop extend GameObject

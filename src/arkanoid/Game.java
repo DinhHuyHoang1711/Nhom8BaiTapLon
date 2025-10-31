@@ -94,7 +94,21 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final List<PowerUp> powerUps = new ArrayList<>();
     private final Map<PowerUp, ObjectPrinter> powerUpPrinters = new HashMap<>();
 
-    public Game(Paddle currentPaddle, Ball currentBall, String level, String currentGameScene) {
+    // ===== Boss + Fire Rain =====
+    private Boss boss = null;                         // chỉ spawn 1 lần ở cuối màn
+    private boolean bossSpawned = false;
+    private final ObjectPrinter1 bossPrinter = new ObjectPrinter1();
+    private final arkanoid.FireballLayer fireballLayer;              // 1 layer vẽ tất cả fireball
+    private final Rectangle tmpR2 = new Rectangle();
+    private int bossSpawnGrace = 0; // số tick miễn va chạm ngay sau khi spawn
+
+    // ==== Levels ====
+    private final int currentLevel;
+    private final java.util.List<Boolean> levelStatus;
+    private final Boss bossForLevel; // null = level này không có boss
+
+    public Game(Paddle currentPaddle, Ball currentBall, String level, String currentGameScene,
+                int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(GAME_WIDTH, GAME_HEIGHT);
@@ -147,6 +161,11 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             this.heart.add(heartLabel);
             layers.add(heartLabel, Integer.valueOf(3));
         }
+
+        //level
+        this.currentLevel = currentLevel;
+        this.levelStatus = levelStatus;
+        this.bossForLevel = bossForLevel;
 
         //paddle
         paddle = currentPaddle;
@@ -286,6 +305,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         artifactTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(artifactTitle, Integer.valueOf(2));
 
+        // --- FIRE BALL ---
+        fireballLayer = new FireballLayer(PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT);
+        layers.add(fireballLayer, Integer.valueOf(7));
+
         setVisible(true);
 
         //them keylistender
@@ -325,6 +348,15 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private void configurePrinter(ObjectPrinter p) {
         p.setOpaque(false);
         p.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    }
+
+    private void configurePrinter1(ObjectPrinter1 p) {
+        p.setOpaque(false);
+        p.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
+    }
+
+    private boolean isBossDead() {
+        return boss == null;
     }
 
     // Cập nhật giao diện tim dựa vào currentHeart
@@ -428,118 +460,235 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     @Override
     public void actionPerformed(ActionEvent e) {
         if (bricks.isEmpty()) {
+            if (bossForLevel == null) {
+                timer.stop();
+                JOptionPane.showMessageDialog(this, "Yee thang roi");
+                this.dispose();
+                return;
+            }
+            if (!bossSpawned) {
+                boss = bossForLevel;                 // dùng bossForLevel
+                boss.setX(PLAYFRAME_WIDTH / 2 - boss.getWidth() / 2);
+                boss.setY(120);
+                boss.setDx(3);
+                boss.setDy(0);
+
+                configurePrinter1(bossPrinter);
+                bossPrinter.setGameObject(boss);
+                layers.add(bossPrinter, Integer.valueOf(11));
+                bossSpawned = true;
+                bossSpawnGrace = 12;
+
+                boss.activateFireRain();             // kích hoạt skill một lần
+            } else if (isBossDead()) {
+                timer.stop();
+                JOptionPane.showMessageDialog(this, "Yee thang roi");
+                this.dispose();
+                return;
+            }
+        }
+
+        if (currentHeart <= 0) {
             timer.stop();
-            JOptionPane.showMessageDialog(this, "Yee thang roi");
+            JOptionPane.showMessageDialog(this, "Game over!, qua ngu");
             this.dispose();
+            return;
+        }
+
+        //tuc la chua thua
+        if (leftPressed) {
+            paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
+            paddle.setMovingLeft();
         } else {
-            if (currentHeart > 0) { //tuc la chua thua
-                if (leftPressed) {
-                    paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
-                    paddle.setMovingLeft();
+            if (rightPressed) {
+                paddle.setX(Math.min(paddle.getX() + paddle.getDx(), PLAYFRAME_WIDTH - paddle.getWidth()));
+                paddle.setMovingRight();
+            } else {
+                paddle.setDefaultMoving();
+            }
+        }
+
+        // Cập nhật bóng
+        ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
+        ball.collideWithPaddle(paddle);
+
+        // Mất mạng
+        if (ball.getY() > GAME_HEIGHT) {
+            currentHeart--;
+            ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
+            ball.setY(GAME_HEIGHT - 120);
+            ball.setDx(initDx);
+            ball.setDy(initDy);
+
+            if (currentHeart >= 0) {
+                ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
+                Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                heart.get(currentHeart).setIcon(new ImageIcon(scaled));
+            }
+        }
+
+        // Va chạm với gạch
+        for (Brick b : bricks) {
+            if (ball.collide(b)) {
+                if (b.isDestroyed()) {
+                    removed.add(b);
+
+                    // 30% chance drop PowerUp
+                    if (Math.random() < 0.3) {
+                        PowerUp pu = Math.random() < 0.5
+                                ? new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball))
+                                : new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
+
+                        powerUps.add(pu);
+                        ObjectPrinter pup = new ObjectPrinter();
+                        configurePrinter(pup);
+                        pup.setGameObject(pu);
+                        powerUpPrinters.put(pu, pup);
+                        layers.add(pup, Integer.valueOf(7));
+                    }
                 } else {
-                    if (rightPressed) {
-                        paddle.setX(Math.min(paddle.getX() + paddle.getDx(), PLAYFRAME_WIDTH - paddle.getWidth()));
-                        paddle.setMovingRight();
-                    } else {
-                        paddle.setDefaultMoving();
-                    }
+                    ObjectPrinter p = brickPrinters.get(b);
+                    if (p != null) p.startFlash();
                 }
+                break; // Chỉ va chạm 1 gạch/lần
+            }
+        }
 
-                // Cập nhật bóng
-                ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
-                ball.collideWithPaddle(paddle);
+        // Xóa gạch bị phá
+        for (Brick b : removed) {
+            bricks.remove(b);
+            ObjectPrinter p = brickPrinters.remove(b);
+            if (p != null) layers.remove(p);
+        }
+        removed.clear();
 
-                // Mất mạng
-                if (ball.getY() > GAME_HEIGHT) {
-                    currentHeart--;
-                    ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
-                    ball.setY(GAME_HEIGHT - 120);
-                    ball.setDx(initDx);
-                    ball.setDy(initDy);
+        // Cập nhật PowerUp
+        for (int i = powerUps.size() - 1; i >= 0; i--) {
+            PowerUp pu = powerUps.get(i);
+            pu.setY(pu.getY() + 3);
 
-                    if (currentHeart >= 0) {
-                        ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
-                        Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                        heart.get(currentHeart).setIcon(new ImageIcon(scaled));
-                    }
-                }
+            tempPuRect.setBounds(pu.getX(), pu.getY(), pu.getWidth(), pu.getHeight());
+            tempPaddleRect.setBounds(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
 
-                // Va chạm với gạch
-                for (Brick b : bricks) {
-                    if (ball.collide(b)) {
-                        if (b.isDestroyed()) {
-                            removed.add(b);
+            if (tempPuRect.intersects(tempPaddleRect)) {
+                powerUpManager.apply(pu);
+                removePowerUp(pu);
+                powerUps.remove(i);
+            } else if (pu.isOutOfBounds()) {
+                removePowerUp(pu);
+                powerUps.remove(i);
+            } else {
+                ObjectPrinter p = powerUpPrinters.get(pu);
+                if (p != null) p.setGameObject(pu);
+            }
+        }
 
-                            // 30% chance drop PowerUp
-                            if (Math.random() < 0.3) {
-                                PowerUp pu = Math.random() < 0.5
-                                        ? new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball))
-                                        : new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
+        // Cập nhật hiển thị
+        paddlePrinter.setGameObject(paddle);
+        ballPrinter.setGameObject(ball);
 
-                                powerUps.add(pu);
-                                ObjectPrinter pup = new ObjectPrinter();
-                                configurePrinter(pup);
-                                pup.setGameObject(pu);
-                                powerUpPrinters.put(pu, pup);
-                                layers.add(pup, Integer.valueOf(7));
-                            }
-                        } else {
-                            ObjectPrinter p = brickPrinters.get(b);
-                            if (p != null) p.startFlash();
-                        }
-                        break; // Chỉ va chạm 1 gạch/lần
-                    }
-                }
+        paddleWidthLabel.setText("Width: " + paddle.getWidth());
+        paddleDxLabel.setText("Speed: " + paddle.getDx());
+        ballElementLabel.setText("Element: " + ball.getElement());
+        ballDxLabel.setText("Dx: " + ball.getDx());
+        ballDyLabel.setText("Dy: " + ball.getDy());
+        ballDamageLabel.setText("Damage: " + ball.getBaseDamage());
 
-                // Xóa gạch bị phá
-                for (Brick b : removed) {
-                    bricks.remove(b);
-                    ObjectPrinter p = brickPrinters.remove(b);
-                    if (p != null) layers.remove(p);
-                }
-                removed.clear();
+        // ===== Boss logic =====
+        if (bossSpawned && boss != null) {
+            updateBossMovementAndCollision();
+            updateBossSkills();
+        }
 
-                // Cập nhật PowerUp
-                for (int i = powerUps.size() - 1; i >= 0; i--) {
-                    PowerUp pu = powerUps.get(i);
-                    pu.setY(pu.getY() + 3);
+        layers.revalidate();
+        layers.repaint();
+    }
 
-                    tempPuRect.setBounds(pu.getX(), pu.getY(), pu.getWidth(), pu.getHeight());
-                    tempPaddleRect.setBounds(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
+    // === Boss: movement + va chạm bóng ===
+    private void updateBossMovementAndCollision() {
+        // di chuyển L-R trong playframe
+        boss.tick();
+        int nx = boss.getX() + boss.getDx();
+        if (nx < 0) {
+            nx = 0;
+            boss.setDx(Math.abs(boss.getDx()));
+        } else if (nx > PLAYFRAME_WIDTH - boss.getWidth()) {
+            nx = PLAYFRAME_WIDTH - boss.getWidth();
+            boss.setDx(-Math.abs(boss.getDx()));
+        }
+        boss.setX(nx);
+        bossPrinter.setGameObject(boss);
 
-                    if (tempPuRect.intersects(tempPaddleRect)) {
-                        powerUpManager.apply(pu);
-                        removePowerUp(pu);
-                        powerUps.remove(i);
-                    } else if (pu.isOutOfBounds()) {
-                        removePowerUp(pu);
-                        powerUps.remove(i);
-                    } else {
-                        ObjectPrinter p = powerUpPrinters.get(pu);
-                        if (p != null) p.setGameObject(pu);
-                    }
-                }
-
-                // Cập nhật hiển thị
-                paddlePrinter.setGameObject(paddle);
-                ballPrinter.setGameObject(ball);
-
-                paddleWidthLabel.setText("Width: " + paddle.getWidth());
-                paddleDxLabel.setText("Speed: " + paddle.getDx());
-                ballElementLabel.setText("Element: " + ball.getElement());
-                ballDxLabel.setText("Dx: " + ball.getDx());
-                ballDyLabel.setText("Dy: " + ball.getDy());
-                ballDamageLabel.setText("Damage: " + ball.getBaseDamage());
-
+        // bật lại bóng khi chạm boss
+        if (bossSpawnGrace > 0) {
+            bossSpawnGrace--;
+            return;
+        }
+        if (ball.collideWithBoss(boss)) {
+            try {
+                bossPrinter.startFlash();
+            } catch (Throwable ignore) {
+            }
+            if (boss.isDead()) {
+                layers.remove(bossPrinter);
+                boss = null; // tick sau isBossDead() = true
                 layers.revalidate();
                 layers.repaint();
-            } else {
-                timer.stop();
-                JOptionPane.showMessageDialog(this, "Game over!, qua ngu");
-                this.dispose();
             }
         }
     }
+
+    // === Boss: kỹ năng theo element ===
+    private void updateBossSkills() {
+        if (boss == null) return;
+
+        if ("fire".equals(boss.getElement())) {
+            maybeActivateFireRain();
+            boss.tickSkill(PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT);
+
+            // render projectile trên layer riêng
+            fireballLayer.setProjectiles(boss.getFireballs());
+            fireballLayer.repaint();
+
+            // xử lý va chạm fireball với paddle
+            handleFireballHitsPaddle();
+        }
+
+        // nếu có element khác thì thêm các nhánh else-if tại đây
+    }
+
+    private void maybeActivateFireRain() {
+        // kích hoạt ngẫu nhiên
+        if (Math.random() < 0.01) boss.activateFireRain();
+    }
+
+    private void handleFireballHitsPaddle() {
+        List<? extends GameObject> fbs = boss.getFireballs();
+        for (int i = 0; i < fbs.size(); ) {
+            GameObject fb = fbs.get(i);
+
+            boolean hit = paddle.collideFireball(fb, 0.5f);
+            if (hit) {
+                if (currentHeart > 0) {
+                    currentHeart--;
+                    ImageIcon iconH = new ImageIcon("img/heart/grayheart.png");
+                    Image scaledH = iconH.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                    heart.get(currentHeart).setIcon(new ImageIcon(scaledH));
+                }
+                List list = (List) fbs;
+                int last = list.size() - 1;
+                list.set(i, list.get(last));
+                list.remove(last);
+                try {
+                    paddlePrinter.startFlash();
+                } catch (Throwable ignore) {
+                }
+            } else {
+                i++;
+            }
+        }
+    }
+
 
     private void removePowerUp(PowerUp pu) {
         ObjectPrinter printer = powerUpPrinters.remove(pu);
@@ -558,6 +707,23 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             rightPressed = true;
             leftPressed = false;
         }
+        // DEBUG: F8 -> dọn sạch gạch để kích hoạt boss logic
+        if (e.getKeyCode() == KeyEvent.VK_F8) {
+            // remove printers khỏi UI và map
+            for (Brick b : new ArrayList<>(bricks)) {
+                ObjectPrinter p = brickPrinters.remove(b);
+                if (p != null) layers.remove(p);
+            }
+            bricks.clear();
+            removed.clear();      // tránh double-remove ở tick sau
+            totalBrick = 0;
+
+            layers.revalidate();  // vì vừa remove components
+            layers.repaint();
+
+            System.out.println("[DEV] Cleared all bricks");
+        }
+
     }
 
     @Override

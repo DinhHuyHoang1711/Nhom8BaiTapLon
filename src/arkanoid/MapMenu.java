@@ -5,7 +5,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import GachaMachine.DiamondSquareGacha;
-import arkanoid.*;
 
 import static arkanoid.Game.*;
 
@@ -16,6 +15,7 @@ public class MapMenu extends JFrame {
 
     private Sound click;
     private Image mapImage;
+    protected static final int TOTAL_LEVEL = 20;
 
     //Nhung gi nguoi choi so huu se nam trong lop nay
     private OwnedManager ownedManager = new OwnedManager();
@@ -28,9 +28,11 @@ public class MapMenu extends JFrame {
 
     private String currentGameScene = "img/Beach.jpg";
 
+    private java.util.List<Boolean> levelStatus = new java.util.ArrayList<>(java.util.Collections.nCopies(TOTAL_LEVEL + 1, false));
+
     //chuan bi bircks
     private ArrayList <Brick> lv1Bricks = new ArrayList<>();
-    
+
     public MapMenu() {
 
         lv1Bricks.clear();
@@ -128,8 +130,16 @@ public class MapMenu extends JFrame {
         Paddle paddleCopy = new Paddle(currentPaddle);
         Ball ballCopy = new Ball(ownedManager.getCurrentBall());
 
-        new Game(paddleCopy, ballCopy, "levels/level1.txt" ,
-                currentGameScene);
+        String leveltxt = "levels/level" + level + ".txt";
+        Boss boss = Boss.makeBossForLevel(level);
+
+        new Game(paddleCopy,
+                ballCopy,
+                leveltxt,
+                currentGameScene,
+                level,
+                levelStatus,
+                boss);
         //thoat khoi man choi thi bat
         //Game da implement window listener roi nen khi dong game, bgm tu phat lai
     }
