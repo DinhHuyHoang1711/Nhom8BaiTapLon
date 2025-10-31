@@ -16,7 +16,8 @@ public abstract class PowerUp extends GameObject {
 
     public enum PowerUpType {
         INCREASE_DAMAGE,
-        EXTRA_HEART
+        EXTRA_HEART,
+        EXPAND_PADDLE
     }
 
     public PowerUp(int x, int y, int width, int height, String imagePath, PowerUpType type, long duration) {

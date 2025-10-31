@@ -535,9 +535,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
                     // 30% chance drop PowerUp
                     if (Math.random() < 0.3) {
-                        PowerUp pu = Math.random() < 0.5
-                                ? new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball))
-                                : new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
+                        PowerUp pu;
+
+                        if(Math.random() < 0.3) {
+                            pu = new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball));
+                        }
+                        else if(Math.random() < 0.4) {
+                            pu = new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
+                        }
+                        else {
+                            pu = new PowerUpExpandPaddle(b.getX() + 20, b.getY() + 10, paddle);
+                        }
 
                         powerUps.add(pu);
                         ObjectPrinter pup = new ObjectPrinter();
