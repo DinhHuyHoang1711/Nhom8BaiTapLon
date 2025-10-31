@@ -69,6 +69,14 @@ public class DiamondSquareGacha extends JPanel {
     }
 
     /**
+     * cap nhat hien thi tien .
+     */
+    private void updateMoneyLabel() {
+        moneyLabel.setText("" + currentMoney.getAmount());
+    }
+
+
+    /**
      * Load vật phẩm và túi đồ
      */
     private void setupItemsAndInventory() {
@@ -119,7 +127,15 @@ public class DiamondSquareGacha extends JPanel {
     private class SpinButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            spinAnim.startSpin();
+            int cost = 1000;
+            if(currentMoney.spend(cost)) {
+                spinAnim.startSpin();
+                updateMoneyLabel();
+            }else{
+                JOptionPane.showMessageDialog(DiamondSquareGacha.this,
+                        "Không đủ coin để quay!", "Thông báo", JOptionPane.WARNING_MESSAGE);
+            }
+
         }
     }
 
