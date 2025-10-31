@@ -6,6 +6,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+
+import MoneyCollected.Coin;
 import arkanoid.*;
 
 import PowerUp.*;
@@ -43,6 +45,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final int initDx;
     private final int initDy;
 
+    // Coin
+    private final Coin amount = new Coin();
+
     //bricks
     private int totalBrick; // so gach 1 man choi
     private final List<Brick> bricks = new ArrayList<>();
@@ -52,6 +57,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private static final int STEP_X = 80;
     private static final int STEP_Y = 30;
     private static final int PLAY_LEFT = 0;
+    private static final double COIN_DROP_CHANCE = 0.7;
+    private static final double POWER_UP_DROP_CHANCE = 0.3;
 
     //cong cu ho tro in hinh anh
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
@@ -87,6 +94,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private JLabel artifactTitle;
     private boolean isCoolingDown = false;
     private boolean unbreakable = false;
+
+    //stat coin
+    private JLabel coinTitle;
+    private JLabel amountLabel;
 
     // PowerUp
     private final PowerUpManager powerUpManager;
@@ -303,6 +314,19 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         artifactTitle.setFont(new java.awt.Font("Adobe Garamond Pro", 1, 25));
         artifactTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(artifactTitle, Integer.valueOf(2));
+
+        // COIN INFO
+        coinTitle = new JLabel("Coin");
+        coinTitle.setBounds(840, 485, 200, 25); // vi tri va kich thuoc
+        coinTitle.setFont(new java.awt.Font("Adobe Garamond Pro", 1, 25));
+        coinTitle.setForeground(java.awt.Color.YELLOW); // mau
+        layers.add(coinTitle, Integer.valueOf(2));
+
+        amountLabel = new JLabel("Amount: " + amount.getAmount());
+        amountLabel.setBounds(840, 515, 200, 15);
+        amountLabel.setFont(new Font("Adobe Garamond Pro", Font.PLAIN, 15));
+        amountLabel.setForeground(Color.WHITE);
+        layers.add(amountLabel, Integer.valueOf(2));
 
         // --- FIRE BALL ---
         fireballLayer = new FireballLayer(PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT);
@@ -642,26 +666,31 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     removed.add(b);
 
                     // 30% chance drop PowerUp
-                    if (Math.random() < 0.3) {
-                        PowerUp pu;
-
-                        if(Math.random() < 0.3) {
+                    PowerUp pu;
+                    if (Math.random() < POWER_UP_DROP_CHANCE) {
+                        if(Math.random() < 0.1) {
                             pu = new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball));
                         }
-                        else if(Math.random() < 0.4) {
+                        else if(Math.random() < 0.2) {
                             pu = new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
                         }
-                        else {
+                        else if(Math.random() < 0.3){
                             pu = new PowerUpExpandPaddle(b.getX() + 20, b.getY() + 10, paddle);
                         }
+                        else {
+                            pu = new PowerUpSlowPaddle(b.getX() + 20, b.getY() + 10, paddle);
+                        }
 
-                        powerUps.add(pu);
-                        ObjectPrinter pup = new ObjectPrinter();
-                        configurePrinter(pup);
-                        pup.setGameObject(pu);
-                        powerUpPrinters.put(pu, pup);
-                        layers.add(pup, Integer.valueOf(7));
+                    } else {
+                        pu = new CoinBonus(b.getX() + 20, b.getY() + 10, amount);
                     }
+                    powerUps.add(pu);
+                    ObjectPrinter pup = new ObjectPrinter();
+                    configurePrinter(pup);
+                    pup.setGameObject(pu);
+                    powerUpPrinters.put(pu, pup);
+                    layers.add(pup, Integer.valueOf(7));
+
                 } else {
                     ObjectPrinter p = brickPrinters.get(b);
                     if (p != null) p.startFlash();
@@ -709,6 +738,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         ballDxLabel.setText("Dx: " + ball.getDx());
         ballDyLabel.setText("Dy: " + ball.getDy());
         ballDamageLabel.setText("Damage: " + ball.getBaseDamage());
+        amountLabel.setText("Amount : " + amount.getAmount());
 
         // ===== Boss logic =====
         if (bossSpawned && boss != null) {

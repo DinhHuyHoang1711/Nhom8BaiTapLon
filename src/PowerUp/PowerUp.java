@@ -18,7 +18,8 @@ public abstract class PowerUp extends GameObject {
         INCREASE_DAMAGE,
         EXTRA_HEART,
         EXPAND_PADDLE,
-        SLOW_PADDLE
+        SLOW_PADDLE,
+        COIN
     }
 
     public PowerUp(int x, int y, int width, int height, String imagePath, PowerUpType type, long duration) {
