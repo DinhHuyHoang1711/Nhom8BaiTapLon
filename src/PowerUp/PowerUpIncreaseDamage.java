@@ -21,7 +21,7 @@ public class PowerUpIncreaseDamage extends PowerUp {
         Ball ball = ownedManager.getCurrentBall();
         if (ball == null) return; // tránh null pointer
 
-        // 🔹 Lưu lại thông tin gốc
+        // Lưu lại thông tin gốc
         currentDamage = ball.getBaseDamage();
         previousWidth = ball.getWidth();
         previousHeight = ball.getHeight();
@@ -43,4 +43,5 @@ public class PowerUpIncreaseDamage extends PowerUp {
         ball.setWidth(previousWidth);
         ball.setHeight(previousHeight);
     }
+
 }

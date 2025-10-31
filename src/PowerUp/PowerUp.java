@@ -17,7 +17,8 @@ public abstract class PowerUp extends GameObject {
     public enum PowerUpType {
         INCREASE_DAMAGE,
         EXTRA_HEART,
-        EXPAND_PADDLE
+        EXPAND_PADDLE,
+        SLOW_PADDLE
     }
 
     public PowerUp(int x, int y, int width, int height, String imagePath, PowerUpType type, long duration) {
@@ -48,21 +49,13 @@ public abstract class PowerUp extends GameObject {
     public abstract void removeEffect();
 
     // Cập nhật trạng thái rơi và hiệu ứng
-    public void update(Paddle paddle) {
+    public void update(Paddle paddle, PowerUpManager manager) {
         if (!isCaught) {
-            setY(getY() + getDy()); // Power-up rơi xuống
+            setY(getY() + getDy());
             if (checkCollision(paddle)) {
                 isCaught = true;
-                isActive = true;
-                startTime = System.currentTimeMillis();
                 catchedSound.play();
-                applyEffect();
-            }
-        } else if (isActive) {
-            long elapsed = System.currentTimeMillis() - startTime;
-            if (elapsed >= duration) {
-                removeEffect();
-                isActive = false;
+                manager.apply(this);
             }
         }
     }

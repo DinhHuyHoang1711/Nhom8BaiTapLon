@@ -28,9 +28,4 @@ public class PowerUpManager {
             activeTimers.put(pu, timer);
         }
     }
-
-    public void clear() {
-        activeTimers.values().forEach(Timer::stop);
-        activeTimers.clear();
-    }
 }

@@ -537,14 +537,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     if (Math.random() < 0.3) {
                         PowerUp pu;
 
-                        if(Math.random() < 0.3) {
+                        if(Math.random() < 0.25) {
                             pu = new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball));
                         }
-                        else if(Math.random() < 0.4) {
+                        else if(Math.random() < 0.5) {
                             pu = new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
                         }
-                        else {
+                        else if(Math.random() < 0.75){
                             pu = new PowerUpExpandPaddle(b.getX() + 20, b.getY() + 10, paddle);
+                        }
+                        else {
+                            pu = new PowerUpSlowPaddle(b.getX() + 20, b.getY() + 10, paddle);
                         }
 
                         powerUps.add(pu);
