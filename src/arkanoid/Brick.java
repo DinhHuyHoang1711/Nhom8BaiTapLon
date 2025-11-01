@@ -6,12 +6,18 @@ import java.util.ArrayList;
 
 public class Brick extends GameObject {
     // Kích thước gạch
-    private static final int BRICK_WIDTH = 80;
-    private static final int BRICK_HEIGHT = 30;
+    protected static final int BRICK_WIDTH = 80;
+    protected static final int BRICK_HEIGHT = 30;
 
     // Thuộc tính
     private int hitPoints;
     private String element;
+
+    // === Earth-skill dynamic sprite ===
+    private boolean summonedByBoss = false;
+    private int summonWaveId = -1;
+
+
 
     // ==== Constructor ==== //
     public Brick() {
@@ -301,6 +307,22 @@ public class Brick extends GameObject {
         return hitPoints;
     }
 
+    public void setSummonedByBoss(boolean v) {
+        this.summonedByBoss = v;
+    }
+
+    public boolean isSummonedByBoss() {
+        return this.summonedByBoss;
+    }
+
+    public void setSummonWaveId(int id) {
+        this.summonWaveId = id;
+    }
+
+    public int getSummonWaveId() {
+        return this.summonWaveId;
+    }
+
     public String getElement() {
         return element;
     }
@@ -315,7 +337,8 @@ public class Brick extends GameObject {
 
     public void takeHit(int damage) {
         //if (hitPoints > 0) hitPoints--;
-        hitPoints = Math.max(hitPoints - damage, 0);
+        int dd = Math.max(0, damage);
+        hitPoints = Math.max(0, hitPoints - dd);
     }
 
     public boolean isDestroyed() {

@@ -58,6 +58,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     //bricks
     private int totalBrick; // so gach 1 man choi
+    private int registeredBricks = 0;
     private final List<Brick> bricks = new ArrayList<>();
     private final List<Brick> removed = new ArrayList<>();
     private static final int BRICK_W = 80;
@@ -126,6 +127,16 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final arkanoid.FireballLayer fireballLayer;              // 1 layer vẽ tất cả fireball
     private final Rectangle tmpR2 = new Rectangle();
     private int bossSpawnGrace = 0; // số tick miễn va chạm ngay sau khi spawn
+
+    // ===== Water Waves =====
+    private final java.util.List<Brick> waveBricks = new ArrayList<>();
+    private final Image waveSprite = new ImageIcon("img/Boss/WaterWave.png").getImage();
+    private final WaterWaveLayer waterLayer = new WaterWaveLayer(waveSprite);
+    // ===== Wind Shuriken =====
+    private final Image shurikenSprite = new ImageIcon("img/Boss/WindShuriken.png").getImage();
+    private final ShurikenLayer shurikenLayer = new ShurikenLayer(shurikenSprite);
+    // Tick counter cho scheduler
+    private int tickCounter = 0;
 
     // ==== Levels ====
     private final int currentLevel;
@@ -356,6 +367,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         fireballLayer = new FireballLayer(PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT);
         layers.add(fireballLayer, Integer.valueOf(7));
 
+        // --- WATER WAVE ---
+        waterLayer.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
+        layers.add(waterLayer, Integer.valueOf(9));
+
         setVisible(true);
 
         //them keylistender
@@ -421,6 +436,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        tickCounter++;
         if (bricks.isEmpty()) {
             if (bossForLevel == null) {
                 timer.stop();
@@ -433,7 +449,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 boss.setX(PLAYFRAME_WIDTH / 2 - boss.getWidth() / 2);
                 boss.setY(120);
                 boss.setDx(3);
-                boss.setDy(0);
+                boss.setDy(2);
 
                 configurePrinter1(bossPrinter);
                 bossPrinter.setGameObject(boss);
@@ -441,7 +457,20 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 bossSpawned = true;
                 bossSpawnGrace = 12;
 
-                boss.activateFireRain();             // kích hoạt skill một lần
+                GraphicsEffect.ScreenShakeEffect.shake(this,  1000, 8);
+                if ("fire".equals(boss.getElement())) {
+                    boss.activateFireRain();             // kích hoạt skill một lần
+                    boss.activateFireRain();
+                } else if ("wind".equals(boss.getElement())) {
+                    shurikenLayer.bindBoss(boss);
+                    shurikenLayer.setBounds(0, 0, PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT);
+                    layers.add(shurikenLayer, Integer.valueOf(10));
+                } else if ("water".equals(boss.getElement())) {
+                    waterLayer.setWaves(boss.getWaves());
+                    boss.maybeActivateWaveRain(PLAYFRAME_WIDTH, /*minW*/200, /*maxW*/100);
+                } else if ("earth".equals(boss.getElement())) {
+                    boss.maybeActivateEarthBulwark(bricks, PLAYFRAME_WIDTH, BRICK_W, BRICK_H);
+                }
             } else if (isBossDead()) {
                 timer.stop();
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
@@ -467,6 +496,14 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 paddle.setMovingRight();
             } else {
                 paddle.setDefaultMoving();
+            }
+        }
+
+        // Wind shuriken scheduler
+        if (boss != null && "wind".equals(boss.getElement())) {
+            // ~1.5s một lần nếu đang còn sống
+            if ((tickCounter % 90) == 0) {
+                boss.activateWindSeek(paddle);
             }
         }
 
@@ -582,6 +619,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         if (bossSpawned && boss != null) {
             updateBossMovementAndCollision();
             updateBossSkills();
+            registerNewBricks();
         }
 
         layers.revalidate();
@@ -590,32 +628,58 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     // === Boss: movement + va chạm bóng ===
     private void updateBossMovementAndCollision() {
-        // di chuyển L-R trong playframe
+        // 1) Cập nhật animation nội bộ nếu có
         boss.tick();
+
+        // 2) Biên di chuyển
+        final int maxX = PLAYFRAME_WIDTH - boss.getWidth();
+        final int TOP_Y = 80;          // tránh HUD/gạch
+        final int BOTTOM_Y = 320;      // không lấn vùng paddle
+        final int maxY = BOTTOM_Y - boss.getHeight();
+
+        // 3) Tính bước tiếp theo
         int nx = boss.getX() + boss.getDx();
+        int ny = boss.getY() + boss.getDy();
+
+        // 4) Bật nảy theo X
         if (nx < 0) {
             nx = 0;
             boss.setDx(Math.abs(boss.getDx()));
-        } else if (nx > PLAYFRAME_WIDTH - boss.getWidth()) {
-            nx = PLAYFRAME_WIDTH - boss.getWidth();
+        } else if (nx > maxX) {
+            nx = maxX;
             boss.setDx(-Math.abs(boss.getDx()));
         }
+
+        // 5) Bật nảy theo Y → tạo zigzag
+        if (ny < TOP_Y) {
+            ny = TOP_Y;
+            boss.setDy(Math.abs(boss.getDy()));
+        } else if (ny > maxY) {
+            ny = maxY;
+            boss.setDy(-Math.abs(boss.getDy()));
+        }
+
+        // 6) Ghi toạ độ mới và render
         boss.setX(nx);
+        boss.setY(ny);
         bossPrinter.setGameObject(boss);
 
-        // bật lại bóng khi chạm boss
+        // 7) Miễn va chạm trong grace period
         if (bossSpawnGrace > 0) {
             bossSpawnGrace--;
             return;
         }
+
+        // 8) Va chạm bóng–boss
         if (ball.collideWithBoss(boss)) {
-            try {
-                bossPrinter.startFlash();
-            } catch (Throwable ignore) {
+            boolean canFlash = !("earth".equals(boss.getElement()) && boss.isInvulnerable());
+            if (canFlash) {
+                try { bossPrinter.startFlash(); } catch (Throwable ignore) {}
             }
             if (boss.isDead()) {
+                cleanupBossSkills();
                 layers.remove(bossPrinter);
-                boss = null; // tick sau isBossDead() = true
+                boss = null;
                 layers.revalidate();
                 layers.repaint();
             }
@@ -636,9 +700,49 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
             // xử lý va chạm fireball với paddle
             handleFireballHitsPaddle();
+        } else if ("water".equals(boss.getElement())) {
+            // spawn theo cooldown nằm trong Boss
+            boss.maybeActivateWaveRain(PLAYFRAME_WIDTH, 200, 100);
+
+            // cập nhật rơi
+            boss.tickWaves(PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT);
+
+            // vẽ bằng WaterWaveLayer
+            waterLayer.setWaves(boss.getWaves());
+            waterLayer.repaint();
+
+            // va chạm
+            handleWaterWaveCollisions();
+        } else if ("earth".equals(boss.getElement())) {
+            boss.tickEarth(bricks);
+            if ((System.nanoTime() & 63) == 0) { // nhẹ, không phụ thuộc tick đếm ngoài
+                boss.maybeActivateEarthBulwark(bricks, PLAYFRAME_WIDTH, BRICK_W, BRICK_H);
+            }
+        } else {
+            boss.tickWindShurikens(PLAYFRAME_WIDTH, PLAYFRAME_HEIGHT, paddle);
+            shurikenLayer.repaint();
+            handleShurikenCollisions();
         }
 
         // nếu có element khác thì thêm các nhánh else-if tại đây
+    }
+
+    private void cleanupBossSkills() {
+        // Fire
+        fireballLayer.setProjectiles(java.util.Collections.emptyList());
+        fireballLayer.repaint();
+
+        // Water
+        if (boss != null) {
+            waterLayer.setWaves(java.util.Collections.emptyList());
+            waterLayer.repaint();
+        }
+
+        // Wind
+        if (shurikenLayer.getParent() != null) {
+            shurikenLayer.unbind(); // viết hàm này để bỏ tham chiếu boss, nếu chưa có thì bỏ qua
+            layers.remove(shurikenLayer);
+        }
     }
 
     private void maybeActivateFireRain() {
@@ -671,6 +775,174 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 i++;
             }
         }
+    }
+
+    // cấu hình
+    private static final int WAVE_INSET_X = 8;
+    private static final int WAVE_INSET_Y = 6;
+    private static final int MIN_PEN = 2;
+    private static final boolean WAVE_ONE_WAY = false; // true: chỉ chặn từ trên xuống
+
+    private void handleWaterWaveCollisions() {
+        java.util.List<? extends GameObject> ws = boss.getWaves();
+
+        for (int i = 0; i < ws.size();) {
+            GameObject w = ws.get(i);
+
+            // hitbox đã co
+            final int wx  = w.getX() + WAVE_INSET_X;
+            final int wy  = w.getY() + WAVE_INSET_Y;
+            final int ww0 = w.getWidth()  - 2*WAVE_INSET_X;
+            final int wh0 = w.getHeight() - 2*WAVE_INSET_Y;
+            if (ww0 <= 0 || wh0 <= 0) { i++; continue; }
+            final int ww = ww0, wh = wh0;
+            final int wright = wx + ww, wbot = wy + wh;
+
+            // paddle ↔ wave
+            if (paddle.collideWave(w, WAVE_INSET_X, WAVE_INSET_Y)) {
+                if (currentHeart > 0 && !unbreakable) {
+                    currentHeart--;
+                    ImageIcon iconH = new ImageIcon("img/heart/grayheart.png");
+                    Image scaledH = iconH.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                    heart.get(currentHeart).setIcon(new ImageIcon(scaledH));
+                }
+                @SuppressWarnings("rawtypes")
+                java.util.List list = (java.util.List) ws;
+                int last = list.size() - 1;
+                list.set(i, list.get(last));
+                list.remove(last);
+                try { paddlePrinter.startFlash(); } catch (Throwable ignore) {}
+                continue;
+            }
+
+            // bóng ↔ wave
+            final int bx = ball.getX(),  by = ball.getY();
+            final int bw = ball.getWidth(), bh = ball.getHeight();
+            final int bdx = ball.getDx(),  bdy = ball.getDy();
+            final int prevX = bx - bdx,     prevY = by - bdy;
+
+            boolean bounced = false;
+
+            // --- 1) Swept theo trục Y ---
+            if (bdy > 0) {
+                // đi xuống: đáy bóng quét qua mép trên y=wy
+                int prevBottom = prevY + bh, currBottom = by + bh;
+                if (prevBottom <= wy && currBottom >= wy) {
+                    double t = (double)(wy - prevBottom) / (double)(currBottom - prevBottom);
+                    double xAt = prevX + t * (bx - prevX);
+                    double brightAt = xAt + bw;
+                    if (xAt < wright && brightAt > wx) {
+                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
+                        ball.collide(cur);
+                        bounced = true;
+                    }
+                }
+            } else if (!WAVE_ONE_WAY && bdy < 0) {
+                // đi lên: đỉnh bóng quét qua mép dưới y=wbot
+                int prevTop = prevY, currTop = by;
+                if (prevTop >= wbot && currTop <= wbot) {
+                    double t = (double)(prevTop - wbot) / (double)(prevTop - currTop); // 0..1
+                    double xAt = prevX + t * (bx - prevX);
+                    double brightAt = xAt + bw;
+                    if (xAt < wright && brightAt > wx) {
+                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
+                        ball.collide(cur);
+                        bounced = true;
+                    }
+                }
+            }
+
+            // --- 2) Swept theo trục X (chống xuyên ở mép trái/phải) ---
+            if (!bounced && bdx > 0) {
+                // đi sang phải: mép phải bóng quét qua x = wx
+                int prevRight = prevX + bw, currRight = bx + bw;
+                if (prevRight <= wx && currRight >= wx) {
+                    double t = (double)(wx - prevRight) / (double)(currRight - prevRight);
+                    double yAt = prevY + t * (by - prevY);
+                    double bbotAt = yAt + bh;
+                    if (yAt < wbot && bbotAt > wy) {
+                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
+                        ball.collide(cur);
+                        bounced = true;
+                    }
+                }
+            } else if (!bounced && bdx < 0) {
+                // đi sang trái: mép trái bóng quét qua x = wright
+                int prevLeft = prevX, currLeft = bx;
+                if (prevLeft >= wright && currLeft <= wright) {
+                    double t = (double)(prevLeft - wright) / (double)(prevLeft - currLeft);
+                    double yAt = prevY + t * (by - prevY);
+                    double bbotAt = yAt + bh;
+                    if (yAt < wbot && bbotAt > wy) {
+                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
+                        ball.collide(cur);
+                        bounced = true;
+                    }
+                }
+            }
+
+            // --- 3) Fallback AABB với ngưỡng chồng lấn ---
+            if (!bounced) {
+                int bright = bx + bw, bbotNow = by + bh;
+                boolean inter = bx < wright && bright > wx && by < wbot && bbotNow > wy;
+                if (inter) {
+                    int penW = Math.min(bright, wright) - Math.max(bx, wx);
+                    int penH = Math.min(bbotNow, wbot) - Math.max(by, wy);
+                    if (penW >= MIN_PEN && penH >= MIN_PEN) {
+                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
+                        ball.collide(cur);
+                    }
+                }
+            }
+
+            i++;
+        }
+    }
+
+    private void handleShurikenCollisions() {
+        if (boss == null) return;
+
+        java.util.List<ShurikenWind> ss = boss.getShurikens();
+        for (int i = 0; i < ss.size(); ) {
+            ShurikenWind s = ss.get(i);
+
+            // Paddle tự xử lý knockback + markDead; Game chỉ trừ tim nếu có va chạm
+            boolean hit = paddle.collideWithShuriken(s, PLAYFRAME_WIDTH);
+            if (hit) {
+                if (currentHeart > 0 && !unbreakable) {
+                    currentHeart--;
+                    updateHeartDisplay();  // dùng hàm sẵn có để đổi icon tim
+                }
+                try { paddlePrinter.startFlash(); } catch (Throwable ignore) {}
+            }
+
+            // swap-remove nếu đã chết
+            if (s.isDead()) {
+                @SuppressWarnings({"rawtypes","unchecked"})
+                java.util.List list = (java.util.List) ss;
+                int last = list.size() - 1;
+                list.set(i, list.get(last));
+                list.remove(last);
+            } else {
+                i++;
+            }
+        }
+    }
+
+
+    private void registerNewBricks() {
+        for (int i = registeredBricks; i < bricks.size(); i++) {
+            Brick b = bricks.get(i);
+            if (!brickPrinters.containsKey(b)) {
+                ObjectPrinter bp = new ObjectPrinter();
+                configurePrinter(bp);
+                bp.setGameObject(b);                // nạp ảnh 1 lần
+                brickPrinters.put(b, bp);
+                layers.add(bp, Integer.valueOf(8)); // cùng layer với bricks ban đầu
+            }
+        }
+        // Đồng bộ lại chỉ số đã đăng ký
+        registeredBricks = bricks.size();
     }
 
 

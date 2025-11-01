@@ -77,6 +77,7 @@ public class Boss extends arkanoid.GameObject {
      * Gây sát thương dương. Trả về true nếu đã chết sau khi trừ.
      */
     public boolean takeDamage(int dmg) {
+        if (invulnerable) return false;
         if (iFrames > 0) return false;
         hp = Math.max(0, hp - Math.max(1, dmg));
         iFrames = 6;
@@ -130,6 +131,13 @@ public class Boss extends arkanoid.GameObject {
                 fireballs.set(i, fireballs.get(fireballs.size() - 1));
                 fireballs.remove(fireballs.size() - 1);
             } else i++;
+        }
+
+        // cập nhật sóng
+        for (int i = waves.size() - 1; i >= 0; i--) {
+            GameObject w = waves.get(i);
+            w.setY(w.getY() + 3);                  // tốc độ rơi
+            if (w.getY() > playH) waves.remove(i);
         }
 
         // giảm cooldown
@@ -196,19 +204,251 @@ public class Boss extends arkanoid.GameObject {
         return fireballs;
     }
 
+    // ==== WATER WAVE ====
+    private int waveCooldown = 0;                      // tick
+    private static final int WAVE_COOLDOWN_TICKS = 120; // ~2s nếu TICK_MS=16
+    private static final int MAX_WAVES = 10;           // trần số wave đang sống
+    private static final int WAVE_GAP = 20;            // khoảng cách tối thiểu theo trục X
+
+    private final java.util.ArrayList<GameObject> waves = new java.util.ArrayList<>();
+    private final java.util.Random rnd = new java.util.Random();
+
+    public java.util.List<? extends GameObject> getWaves() {
+        return waves;
+    }
+
+    // Gọi mỗi tick khi boss element = "water"
+    public void maybeActivateWaveRain(int playWidth, int brickW, int brickH) {
+        if (waveCooldown > 0) {
+            waveCooldown--;
+            return;
+        }
+        if (waves.size() >= MAX_WAVES) return;
+
+        // batch nhỏ: 2–3 viên, có spacing + stagger
+        int batch = 2 + rnd.nextInt(2);
+        spawnWaveBatchSafe(batch, playWidth, brickW, brickH);
+        waveCooldown = WAVE_COOLDOWN_TICKS;
+    }
+
+    private void spawnWaveBatchSafe(int count, int playWidth, int brickW, int brickH) {
+        // snapshot X để tránh dính nhau
+        int n = waves.size();
+        int[] xs = new int[n];
+        for (int i = 0; i < n; i++) xs[i] = waves.get(i).getX();
+
+        int added = 0, attempts = 0;
+        while (added < count && attempts < 50) {
+            attempts++;
+            int x = rnd.nextInt(Math.max(1, playWidth - brickW));
+            boolean ok = true;
+            for (int xi : xs) {
+                if (Math.abs(x - xi) < brickW + WAVE_GAP) {
+                    ok = false;
+                    break;
+                }
+            }
+            if (!ok) continue;
+
+            GameObject w = new GameObject(
+                    x,                 // x
+                    -brickH - 8,       // y spawn trên đỉnh
+                    brickW,            // width
+                    brickH,            // height
+                    0,                 // dx
+                    3,                 // dy rơi
+                    "img/brick/WaveWater.png"  // imagePath (không bắt buộc nếu vẽ bằng layer)
+            );
+
+            w.setY(w.getY() - 6 * added); // stagger dọc
+            waves.add(w);
+            xs = java.util.Arrays.copyOf(xs, xs.length + 1);
+            xs[xs.length - 1] = x;
+            added++;
+            if (waves.size() >= MAX_WAVES) break;
+        }
+    }
+
+    /**
+     * Cập nhật vị trí và dọn wave. Gọi mỗi tick khi element="water".
+     */
+    public void tickWaves(int playWidth, int playHeight) {
+        for (int i = waves.size() - 1; i >= 0; i--) {
+            GameObject w = waves.get(i);
+            w.setY(w.getY() + w.getDy());   // dùng dy đã set = 3
+            if (w.getY() > playHeight) {
+                waves.set(i, waves.get(waves.size() - 1));
+                waves.remove(waves.size() - 1);
+            }
+        }
+    }
+
+    // ==== EARTH BULWARK (spawn stone bricks, boss bất tử đến khi phá hết) ====
+    private boolean invulnerable = false;        // chặn sát thương khi earth wave còn sống
+    private int earthWaveId = 0;                 // id của đợt đang active
+    private int earthCooldown = 90;               // đếm lùi hồi chiêu
+    private boolean earthActive = false;         // đang có đợt earth đang sống
+
+    // Thông số điều chỉnh
+    private static final int EARTH_COOLDOWN_TICKS = 11 * 60; // ~11s nếu ~60 FPS
+    private static final int EARTH_MIN = 4;                   // số gạch mỗi đợt
+    private static final int EARTH_MAX = 6;                   // số gạch mỗi đợt
+    private static final int EARTH_HP  = 200;                // HP mỗi gạch
+
+    public boolean isInvulnerable() { return invulnerable; }
+
+    // Gọi để thử kích hoạt: chỉ có tác dụng khi element="earth", hết cooldown, và chưa có wave sống
+    public void maybeActivateEarthBulwark(java.util.List<arkanoid.Brick> bricks,
+                                          int playWidth, int brickW, int brickH) {
+        if (!"earth".equals(element)) return;
+        if (earthActive) return;
+        if (earthCooldown > 0) return;
+
+        int count = EARTH_MIN + rng.nextInt(EARTH_MAX - EARTH_MIN + 1);
+        int spawned = spawnEarthBricks(bricks, count, playWidth, brickW, brickH);
+        if (spawned > 0) {
+            earthActive = true;
+            invulnerable = true;           // bất tử đến khi phá hết
+            earthWaveId++;
+            // earthCooldown = EARTH_COOLDOWN_TICKS;  // đặt hồi chiêu ngay từ lúc spawn
+        }
+    }
+
+    // Gọi mỗi tick khi element="earth": giảm cooldown và theo dõi còn brick nào của wave không
+    public void tickEarth(java.util.List<arkanoid.Brick> bricks) {
+        if (!"earth".equals(element)) return;
+
+        if (earthCooldown > 0) earthCooldown--;
+
+        if (!earthActive) return;
+
+        // Kiểm tra còn viên earth nào thuộc wave hiện tại không
+        int alive = 0;
+        for (arkanoid.Brick b : bricks) {
+            if (b != null
+                    && "earth".equals(b.getElement())
+                    && b.isSummonedByBoss()
+                    && b.getSummonWaveId() == earthWaveId
+                    && b.getHitPoints() > 0) {
+                alive++;
+                if (alive > 0) break;
+            }
+        }
+
+        if (alive == 0) {
+            earthActive = false;
+            invulnerable = false;   // hết bất tử khi đã phá hết
+            earthCooldown = EARTH_COOLDOWN_TICKS;
+        }
+    }
+
+    // Spawn count viên, căn theo lưới, tránh overlap sơ bộ
+    private int spawnEarthBricks(java.util.List<arkanoid.Brick> bricks, int count,
+                                 int playWidth, int brickW, int brickH) {
+        java.util.Random rnd = rng;  // dùng RNG có sẵn
+        int spawned = 0, attempts = 0;
+
+        // vùng spawn: hàng trên giữa màn (y ∈ [140, 300]), căn theo lưới
+        while (spawned < count && attempts < 80) {
+            attempts++;
+            int x = rnd.nextInt(Math.max(1, playWidth - brickW));
+            int y = 140 + rnd.nextInt(Math.max(1, 300 - 140 + 1));
+
+            x = (x / brickW) * brickW;
+            y = (y / brickH) * brickH;
+
+            // tránh chồng lên brick hiện có
+            java.awt.Rectangle rect = new java.awt.Rectangle(x, y, brickW, brickH);
+            boolean overlap = false;
+            for (arkanoid.Brick b : bricks) {
+                if (b == null) continue;
+                java.awt.Rectangle r2 = new java.awt.Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+                if (rect.intersects(r2)) { overlap = true; break; }
+            }
+            if (overlap) continue;
+
+            // tạo viên earth skill: HP=EARTH_HP, sprite trạng thái 1
+            arkanoid.Brick eb = new arkanoid.Brick(x, y, brickW, brickH,
+                    EARTH_HP, "earth", "img/Boss/Stone1.png");
+            eb.setSummonedByBoss(true);
+            eb.setSummonWaveId(earthWaveId + 1);   // wave mới
+
+            bricks.add(eb);
+            spawned++;
+        }
+        return spawned;
+    }
+
+    // ===== WIND SHURIKEN =====
+    private final java.util.List<ShurikenWind> shurikens = new java.util.ArrayList<>();
+
+    public java.util.List<ShurikenWind> getShurikens() {
+        return shurikens;
+    }
+
+    public void activateWindSeek(Paddle paddle) {
+        if (!"wind".equals(element)) return;
+
+        java.util.concurrent.ThreadLocalRandom r = java.util.concurrent.ThreadLocalRandom.current();
+        int n = 1; // số viên
+
+        for (int i = 0; i < n; i++) {
+            int bossCenterX = getX() + getWidth() / 2;
+            int bossBottom  = getY() + getHeight();
+
+            double init = Math.atan2(
+                    paddle.getCenterY() - bossBottom,
+                    paddle.getCenterX() - bossCenterX
+            );
+            init += r.nextDouble(-0.35, 0.35);
+
+            ShurikenWind s = new ShurikenWind(bossCenterX - 12, bossBottom, 32, init);
+            shurikens.add(s);
+        }
+    }
+
+
+
+    public void tickWindShurikens(int playW, int playH, Paddle paddle) {
+        for (int i = 0; i < shurikens.size(); ) {
+            ShurikenWind s = shurikens.get(i);
+
+            // chết => swap-remove
+            if (s.isDead()) {
+                shurikens.set(i, shurikens.get(shurikens.size() - 1));
+                shurikens.remove(shurikens.size() - 1);
+                continue;
+            }
+
+            // ra khỏi đáy màn (dùng mép dưới)
+            if (s.getY() + s.getHeight() >= playH) {
+                s.markDead();
+                shurikens.set(i, shurikens.get(shurikens.size() - 1));
+                shurikens.remove(shurikens.size() - 1);
+                continue;
+            }
+
+            // còn trong màn -> dẫn đường + bước
+            s.seekTowards(paddle.getCenterX(), paddle.getCenterY());
+            s.step(playW, playH);
+            i++;
+        }
+    }
+
+
     public String getElement() {
         return element;
     }
 
     protected static Boss makeBossForLevel(int level) {
         switch (level) {
-            case 1:
+            case 2:
                 return new Boss("fire", 5000);
-            case 5:
+            case 1:
                 return new Boss("water", 5000);
-            case 8:
+            case 3:
                 return new Boss("wind", 5000);
-            case 12:
+            case 4:
                 return new Boss("earth", 5000);
             default:
                 return null; // các level khác không có boss

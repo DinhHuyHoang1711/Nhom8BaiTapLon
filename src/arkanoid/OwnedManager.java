@@ -16,7 +16,7 @@ public class OwnedManager {
 
     public  OwnedManager() {
         this.currentBall = Ball.bongnguhanh();
-        this.currentItem = Item.boom();
+        this.currentItem = Item.helmet();
         loadBalls();
     }
 
