@@ -2,6 +2,8 @@ package arkanoid;
 
 import javax.swing.*;
 import java.awt.*;
+
+import GachaMachine.Item;
 import arkanoid.*;
 
 import static arkanoid.GameObject.GAME_HEIGHT;
@@ -65,7 +67,9 @@ public class BaloUI extends JFrame {
     }
 
     private void openArtifactList() {
-
+        this.dispose();
+        Item[] itemList = Item.loadItems(12);
+        new ItemUI(this, ownedManager, itemList);
     }
 
     public static void main(String[] args) {

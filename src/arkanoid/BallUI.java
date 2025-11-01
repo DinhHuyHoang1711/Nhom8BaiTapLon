@@ -34,7 +34,7 @@ public class BallUI extends JFrame {
         setResizable(false);
 
         clickSound = new Sound("sound/click.wav");
-        ballListImg = new ImageIcon("img/ball_List.png").getImage();
+        ballListImg = new ImageIcon("img/list.jpg").getImage();
 
         JPanel panel = new JPanel() {
             @Override
@@ -67,13 +67,13 @@ public class BallUI extends JFrame {
         Image currentBallImg = icon.getImage().getScaledInstance(BALL_SIZE * 2, BALL_SIZE * 2, Image.SCALE_SMOOTH);
 
         currentBallLabel = new JLabel(new ImageIcon(currentBallImg));
-        currentBallLabel.setBounds(GAME_WIDTH / 2 - BALL_SIZE, 250, BALL_SIZE * 2, BALL_SIZE * 2);
+        currentBallLabel.setBounds(GAME_WIDTH / 2 - BALL_SIZE, 200, BALL_SIZE * 2, BALL_SIZE * 2);
         panel.add(currentBallLabel);
     }
 
     private void loadBallsToPanel(JPanel panel) {
         List<Ball> balls = ballList;
-        int startX = 300;
+        int startX = 320;
         int startY = 450;
         int gap = 15;
         int count = 0;
