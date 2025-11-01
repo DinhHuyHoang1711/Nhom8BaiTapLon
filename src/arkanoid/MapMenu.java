@@ -42,7 +42,7 @@ public class MapMenu extends JFrame {
 
         setTitle("SELECT MAP");
         setSize(GAME_WIDTH, GAME_HEIGHT);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 

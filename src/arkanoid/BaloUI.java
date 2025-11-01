@@ -25,7 +25,7 @@ public class BaloUI extends JFrame {
 
         setTitle("Vật phầm đang sở hữu");
         setSize(GAME_WIDTH, GAME_HEIGHT);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 

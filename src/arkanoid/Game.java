@@ -49,6 +49,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     //ball
     private final Ball ball;
     private int currentDamage;
+    //cai nay de xem bong da dc ban hay chua hay con nam o tren paddle
+    private boolean isBallActive = false;
 
     //dx, dy mac dinh cua ball
     private final int initDx;
@@ -150,7 +152,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, String level, String currentGameScene,
                 int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel, MapMenu parentMenu) {
         super("Arkanoid (Ball + Brick)");
-        setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(GAME_WIDTH, GAME_HEIGHT);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -532,19 +534,29 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             }
         }
 
-        // Cập nhật bóng
-        ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
-        ball.collideWithPaddle(paddle);
+        // Cap nhat bong neu bong da ban ra roi
+        // Hoac neu bong chua ban ra thi bong se dinh vao paddle
+        if(isBallActive == true) {
+            ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
+            ball.collideWithPaddle(paddle);
+        } else {
+            ball.setX(paddle.getX() + paddle.getWidth() / 2 - ball.getWidth() / 2);
+            ball.setY(paddle.getY() - ball.getHeight());
+            ball.setDx(0);
+            ball.setDy(0);
+        }
 
         // Mất mạng
         if (ball.getY() > GAME_HEIGHT) {
             if(unbreakable == false) {
                 currentHeart--;
 
-                ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
-                ball.setY(GAME_HEIGHT - 120);
-                ball.setDx(initDx);
-                ball.setDy(initDy);
+                //cho bong ve lai giua paddle
+                isBallActive = false;
+                ball.setX(paddle.getX() + paddle.getWidth() / 2 - ball.getWidth() / 2);
+                ball.setY(paddle.getY() - ball.getHeight());
+                ball.setDx(0);
+                ball.setDy(0);
 
                 if (currentHeart >= 0) {
                     ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
@@ -552,10 +564,11 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     heart.get(currentHeart).setIcon(new ImageIcon(scaled));
                 }
             } else {
-                ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
-                ball.setY(GAME_HEIGHT - 120);
-                ball.setDx(initDx);
-                ball.setDy(initDy);
+                ball.setX(paddle.getX() + paddle.getWidth() / 2 - ball.getWidth() / 2);
+                ball.setY(paddle.getY() - ball.getHeight());
+                ball.setDx(0);
+                ball.setDy(0);
+
             }
         }
 
@@ -1552,6 +1565,20 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     break;
                 default:
                     break;
+            }
+        }
+        //Khi bong dinh vao paddle co the an space de ban
+        if(e.getKeyCode() == KeyEvent.VK_SPACE) {
+            if(isPause) {
+                return; // pause thi khong lam gi ca
+            }
+            if(isBallActive == true) {
+                return; //bong da ban roi thi an space lam j ???
+            }
+            else {
+                isBallActive = true;
+                ball.setDx(0);
+                ball.setDy(-10);
             }
         }
     }

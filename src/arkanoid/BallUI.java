@@ -29,7 +29,7 @@ public class BallUI extends JFrame {
     private void initUI() {
         setTitle("Bộ Sưu Tập Bóng");
         setSize(GAME_WIDTH, GAME_HEIGHT);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 

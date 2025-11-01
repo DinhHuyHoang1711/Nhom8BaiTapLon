@@ -259,7 +259,9 @@ public class Ball extends GameObject{
                 } else {
                     //Paddle dung yen thi bong tiep tuc di theo huong ban dau
                     this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
-                    this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(4) + Math.abs(this.baseDx)));
+                    if(this.getDx() != 0) {//De tranh truong hop Dx cua bong = 0
+                        this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(4) + Math.abs(this.baseDx)));
+                    }
                 }
             }
             //this.setDy(-Math.abs(rand.nextInt(2) + this.getDy()));
