@@ -23,10 +23,14 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     public static final int GAME_HEIGHT = 700;
     public static final int PLAYFRAME_WIDTH = 800;
     public static final int PLAYFRAME_HEIGHT = 700;
-    private static final int TICK_MS = 16;
+    private static final int TICK_MS = 33;
+
+    //cua so cha
+    MapMenu parentMenu;
 
     //Am thanh man choi
     private Sound bgm = new Sound("sound/CombatSound.wav");
+    Sound bossSound = new Sound("sound/bossSound.wav");
 
     //heart, so mau trong tro choi
     public int currentHeart;
@@ -144,12 +148,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final Boss bossForLevel; // null = level này không có boss
 
     public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, String level, String currentGameScene,
-                int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel) {
+                int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel, MapMenu parentMenu) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setSize(GAME_WIDTH, GAME_HEIGHT);
         setResizable(false);
         setLocationRelativeTo(null);
+
+        //an man hinh cha di
+        //cua so cha
+        this.parentMenu = parentMenu;
+        this.parentMenu.setVisible(false);
 
         layers.setPreferredSize(new Dimension(GAME_WIDTH, GAME_HEIGHT));
         layers.setLayout(null);
@@ -390,6 +399,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             pauseButton.setIcon(new ImageIcon(new ImageIcon("img/pauseButton.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             timer.start();
+            artifactTimer.start();
             isPause = false;
             this.requestFocusInWindow();
         } else {
@@ -397,14 +407,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             pauseButton.setIcon(new ImageIcon(new ImageIcon("img/pauseButton1.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover1.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             timer.stop();
+            artifactTimer.stop();
             isPause = true;
         }
     }
 
     private void surrender() {
         timer.stop();
+        bgm.close();
+        bossSound.close();
         JOptionPane.showMessageDialog(this, "Chua j da dau hang roi ga vcl");
         this.dispose();
+        parentMenu.setVisible(true);
     }
 
     private void configurePrinter(ObjectPrinter p) {
@@ -441,7 +455,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             if (bossForLevel == null) {
                 timer.stop();
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
+                bgm.close();
+                bossSound.close();
                 this.dispose();
+                parentMenu.setVisible(true);
                 return;
             }
             if (!bossSpawned) {
@@ -458,6 +475,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 bossSpawnGrace = 12;
 
                 GraphicsEffect.ScreenShakeEffect.shake(this,  1000, 8);
+                bossSound.play();
+
                 if ("fire".equals(boss.getElement())) {
                     boss.activateFireRain();             // kích hoạt skill một lần
                     boss.activateFireRain();
@@ -474,7 +493,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             } else if (isBossDead()) {
                 timer.stop();
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
+                bgm.close();
+                bossSound.close();
                 this.dispose();
+                parentMenu.setVisible(true);
                 return;
             }
         }
@@ -482,7 +504,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         if (currentHeart <= 0) {
             timer.stop();
             JOptionPane.showMessageDialog(this, "Game over!, qua ngu");
+            bgm.close();
+            bossSound.close();
             this.dispose();
+            parentMenu.setVisible(true);
             return;
         }
 
@@ -815,7 +840,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 continue;
             }
 
-            // bóng ↔ wave
+            // bóng ↔ wave, sua roi bong k va voi wave nua nhe
+            /*
+
             final int bx = ball.getX(),  by = ball.getY();
             final int bw = ball.getWidth(), bh = ball.getHeight();
             final int bdx = ball.getDx(),  bdy = ball.getDy();
@@ -894,6 +921,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     }
                 }
             }
+            */
 
             i++;
         }
@@ -1127,11 +1155,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         Sound effect = new Sound("sound/boom.wav");
         effect.play();
+        GraphicsEffect.ScreenShakeEffect.shake(this, 400, 6);
 
         isCoolingDown = true;
+        int boomDamage = 100;
 
         for(Brick b : bricks) {
-            b.takeHit(100);
+            b.takeHit(boomDamage);
             if (b.isDestroyed()) {
                 removed.add(b);
 
@@ -1146,6 +1176,27 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             ObjectPrinter p = brickPrinters.remove(b);
             if (p != null) layers.remove(p);
         }
+
+        //Neu co boss
+        if(bossForLevel != null && bossSpawned) {
+            boolean canFlash = !("earth".equals(boss.getElement()) && boss.isInvulnerable());
+            if (canFlash) {
+                try {
+                    boss.takeDamage(boomDamage);
+                    bossPrinter.startFlash();
+                } catch (Throwable ignore) {
+                }
+            }
+            if (boss.isDead()) {
+                cleanupBossSkills();
+                layers.remove(bossPrinter);
+                boss = null;
+                layers.revalidate();
+                layers.repaint();
+            }
+
+        }
+
         removed.clear();
         layers.revalidate();
         layers.repaint();
@@ -1322,7 +1373,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         Sound effect = new Sound("sound/lightning.wav");
         effect.play();
-
+        GraphicsEffect.ScreenShakeEffect.shake(this,  300, 6);
 
         isCoolingDown = true;
 
@@ -1357,7 +1408,30 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
         removed.clear();
 
+        //Neu co boss
+        if(bossForLevel != null && bossSpawned) {
+            Rectangle bossRect = new Rectangle(boss.getX(), boss.getY(), boss.getWidth(), boss.getHeight());
+            if (laserRect.intersects(bossRect)) {
+                boolean canFlash = !("earth".equals(boss.getElement()) && boss.isInvulnerable());
+                if (canFlash) {
+                    try {
+                        boss.takeDamage(laserDamage);
+                        bossPrinter.startFlash();
+                    } catch (Throwable ignore) {
+                    }
+                }
+                if (boss.isDead()) {
+                    cleanupBossSkills();
+                    layers.remove(bossPrinter);
+                    boss = null;
+                    layers.revalidate();
+                    layers.repaint();
+                }
+            }
+        }
+
         layers.add(laser, Integer.valueOf(13));
+        layers.revalidate();
         layers.repaint();
 
         Timer durationMs = new Timer(200, e ->{
@@ -1512,6 +1586,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     public void windowClosed(WindowEvent e) {
         bgm.close();
         MapMenu.backgroundMusic.loop(); // bật lại nhạc menu
+        parentMenu.setVisible(true);
     }
 
     @Override

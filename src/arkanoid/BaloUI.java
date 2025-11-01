@@ -2,6 +2,8 @@ package arkanoid;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
+import java.awt.event.WindowListener;
 
 import GachaMachine.Item;
 import arkanoid.*;
@@ -72,9 +74,11 @@ public class BaloUI extends JFrame {
         new ItemUI(this, ownedManager, itemList);
     }
 
+
     public static void main(String[] args) {
         OwnedManager ownedManager = new OwnedManager();
 
         new BaloUI(ownedManager);
     }
+
 }

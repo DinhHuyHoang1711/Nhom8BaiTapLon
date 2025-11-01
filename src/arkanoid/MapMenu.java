@@ -42,7 +42,7 @@ public class MapMenu extends JFrame {
 
         setTitle("SELECT MAP");
         setSize(GAME_WIDTH, GAME_HEIGHT);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         setResizable(false);
 
@@ -73,13 +73,13 @@ public class MapMenu extends JFrame {
                 950, 330, click, e -> openLevel(4)));
 
         // Nút Back
-        JButton back = ButtonManager.createImageButton(
-                "img/back_button.png", null,
-                0, 550, click, e -> {
+        JButton exit = ButtonManager.createImageButton(
+                "img/exit.png","img/exithover.png" ,
+                10, 570, click, e -> {
                     this.dispose();
-                    new Menu();
+                    System.exit(0);
                 });
-        panel.add(back);
+        panel.add(exit);
 
         // Nút Gacha
         JButton gacha = ButtonManager.createImageButton(
@@ -96,7 +96,6 @@ public class MapMenu extends JFrame {
                     frame.pack();
                     frame.setLocationRelativeTo(null);
                     frame.setVisible(true);
-
                     //sau khi tat gacha nhac nen se duoc bat lai
                     frame.addWindowListener(new java.awt.event.WindowAdapter() {
                         @Override
@@ -143,7 +142,8 @@ public class MapMenu extends JFrame {
                 currentGameScene,
                 level,
                 levelStatus,
-                boss);
+                boss,
+                this);
         //thoat khoi man choi thi bat
         //Game da implement window listener roi nen khi dong game, bgm tu phat lai
     }

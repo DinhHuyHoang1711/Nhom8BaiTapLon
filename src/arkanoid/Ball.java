@@ -310,7 +310,6 @@ public class Ball extends GameObject{
             // Nếu bạn muốn tương tác nguyên tố (ví dụ trùng nguyên tố x2):
             dmg = this.element.equalsIgnoreCase(boss.getElement()) ? dmg * 2 : dmg;
         }
-        boolean dead = boss.takeDamage(Math.max(1, dmg));
 
         return true; // đã va
     }
