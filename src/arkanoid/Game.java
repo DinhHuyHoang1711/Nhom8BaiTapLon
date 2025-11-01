@@ -6,6 +6,10 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import java.util.List;
+import arkanoid.ArtifactSlot;
+import arkanoid.LaserBeam;
+
+import GachaMachine.Item;
 
 import MoneyCollected.Coin;
 import arkanoid.*;
@@ -40,10 +44,14 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     //ball
     private final Ball ball;
+    private int currentDamage;
 
     //dx, dy mac dinh cua ball
     private final int initDx;
     private final int initDy;
+
+    //item cua nguoi choi, hay goi la artifacts
+    private final Item item;
 
     // Coin
     private final Coin amount = new Coin();
@@ -92,11 +100,15 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     // stat artifact
     private JLabel artifactTitle;
+    //cai nay de in ra hinh anh artifact hoi chieu giong lien quan
+    private ArtifactSlot artifactSlot;
+    //Timer cua artifact, dung de dem cooldown
+    private Timer artifactTimer;
+
     private boolean isCoolingDown = false;
+    //Artifact se cap nhat trang thai khong the bi pha vo cho gach
     private boolean unbreakable = false;
     private Coin coin = new Coin();
-    private int slowX = 2;
-    private int slowY = 2;
 
     //stat coin
     private JLabel coinTitle;
@@ -120,7 +132,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final java.util.List<Boolean> levelStatus;
     private final Boss bossForLevel; // null = level này không có boss
 
-    public Game(Paddle currentPaddle, Ball currentBall, String level, String currentGameScene,
+    public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, String level, String currentGameScene,
                 int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -187,9 +199,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         ball = currentBall;
         initDx = ball.getDx();
         initDy = ball.getDy();
+        currentDamage = ball.getBaseDamage();
 
         paddlePrinter.setGameObject(paddle);
         ballPrinter.setGameObject(ball);
+
+        //item
+        item = currentItem;
 
         powerUpManager = new PowerUpManager(this);
 
@@ -318,6 +334,11 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         artifactTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(artifactTitle, Integer.valueOf(2));
 
+        //hien thi hinh anh artifact co the cooldown nhu lien quan
+        artifactSlot = new ArtifactSlot(item.getImage().getScaledInstance(60, 60, Image.SCALE_SMOOTH));
+        artifactSlot.setBounds(840, 420, 50, 50);
+        layers.add(artifactSlot, Integer.valueOf(2));
+
         // COIN INFO
         coinTitle = new JLabel("Coin");
         coinTitle.setBounds(840, 485, 200, 25); // vi tri va kich thuoc
@@ -398,243 +419,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         layers.repaint();
     }
 
-
-    //Khi kích hoạt hiệu ứng tim sẽ +1 tim và hồi trong khoảng 30s
-    public void Heart(){
-        if(isCoolingDown) {
-            return ;
-        }
-
-        if(currentHeart == 3) {
-            return;
-        }
-
-        isCoolingDown = true;
-
-        ++currentHeart;
-        updateHeartDisplay();
-
-        Timer coolDown = new Timer(30000, e ->{
-            isCoolingDown = false;
-            ((Timer)e.getSource()).stop();
-        });
-        coolDown.setRepeats(false);
-        coolDown.start();
-    }
-
-    // Khi kích hoạt sẽ nhận được 1 -> 3 trái tym mới , hồi chiêu 60s
-    public void RandomHeart() {
-        if(isCoolingDown) {
-            return ;
-        }
-
-        if(currentHeart == 3) {
-            return ;
-        }
-
-        isCoolingDown = true;
-
-        currentHeart += (int)(Math.random() * 3) + 1;
-        if(currentHeart > 3) {
-            currentHeart = 3;
-        }
-        updateHeartDisplay();
-
-        Timer coolDown = new Timer(60000, e-> {
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        coolDown.setRepeats(false);
-        coolDown.start();
-    }
-
-    // khi kích hoạt sẽ tăng kích thước của paddle lên 20 hồi chiêu trong 40s
-    public void ExpandPaddle() {
-        if(isCoolingDown) {
-            return;
-        }
-
-        isCoolingDown = true;
-
-        int oldWidth = paddle.getWidth();
-        int oldHeight = paddle.getHeight();
-        paddle.setWidth(paddle.getWidth() + 20);
-        paddle.setHeight(paddle.getHeight() + 20);
-        paddlePrinter.setGameObject(paddle);
-        layers.revalidate();
-        layers.repaint();
-
-        Timer durationMs = new Timer(30000, e ->{
-            paddle.setWidth(oldWidth);
-            paddle.setHeight(oldHeight);
-            paddlePrinter.setGameObject(paddle);
-            layers.revalidate();
-            layers.repaint();
-            ((Timer) e.getSource()).stop();
-        });
-        durationMs.setRepeats(false);
-        durationMs.start();
-
-        Timer cooldown = new Timer(40000, e->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // khi kích hoạt sẽ gây 100 sát thương cho toàn bộ gạch, cooldown 60s
-    public void Boom() {
-        if(isCoolingDown) {
-            return;
-        }
-
-        isCoolingDown = true;
-
-        for(Brick b : bricks) {
-            b.takeHit(100);
-        }
-
-        Timer cooldown = new Timer(60000, e->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // khi kích hoạt -1 máu, +300 sát thương trong 10 giây, cooldown 90s
-    public void Fire() {
-        if(isCoolingDown) {
-            return;
-        }
-
-        isCoolingDown = true;
-
-        int oldDamage = ball.getBaseDamage();
-        ball.setBaseDamage(oldDamage + 300);
-        currentHeart--;
-        ballPrinter.setGameObject(ball);
-
-        layers.revalidate();
-        layers.repaint();
-
-        Timer durationMs = new Timer(10000, e ->{
-            ball.setBaseDamage(oldDamage);
-            ballPrinter.setGameObject(ball);
-
-            layers.revalidate();
-            layers.repaint();
-            ((Timer) e.getSource()).stop();
-        });
-        durationMs.setRepeats(false);
-        durationMs.start();
-
-        Timer cooldown = new Timer(90000, e->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // khi kích hoạt miễn nhiễm sát thương trong 5s, cooldown 70s
-    public void Helmet() {
-        if(isCoolingDown) {
-            return;
-        }
-
-        isCoolingDown = true;
-
-        unbreakable = true;
-
-        layers.revalidate();
-        layers.repaint();
-
-        Timer durationMs = new Timer(5000, e ->{
-            unbreakable = false;
-
-            layers.revalidate();
-            layers.repaint();
-            ((Timer) e.getSource()).stop();
-        });
-        durationMs.setRepeats(false);
-        durationMs.start();
-
-        Timer cooldown = new Timer(70000, e->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // khi kích hoạt tăng vĩnh viễn 50 sát thương, 60s hồi chiêu
-    public void Diamond() {
-        if(isCoolingDown) {
-            return;
-        }
-
-        isCoolingDown = true;
-
-        ball.setBaseDamage(ball.getBaseDamage() + 50);
-
-        layers.revalidate();
-        layers.repaint();
-
-        Timer cooldown = new Timer(60, e->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // Nhận random tiền 1-300 , cooldown 120s
-    public void chest() {
-        if(isCoolingDown) {
-            return;
-        }
-        isCoolingDown = true;
-        coin.add((int)(Math.random() * 300) + 1);
-
-        Timer cooldown = new Timer(120000, e->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // Tăng giảm tốc độ của bóng
-    public void clock() {
-        if(isCoolingDown) {
-            return;
-        }
-
-        isCoolingDown = true;
-        int oldDx = ball.getDx();
-        int oldDy = ball.getDy();
-
-        ball.setDx(Math.abs(oldDx - slowX));
-        ball.setDy(Math.abs(oldDy - slowY));
-
-        Timer durationMs = new Timer(50000, e -> {
-            ball.setDx(oldDx);
-            ball.setDy(oldDy);
-            ((Timer) e.getSource()).stop();
-        });
-        durationMs.setRepeats(false);
-        durationMs.start();
-
-        Timer timer = new Timer(30000, e ->{
-            isCoolingDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        timer.setRepeats(false);
-        timer.start();
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
         if (bricks.isEmpty()) {
@@ -692,16 +476,24 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         // Mất mạng
         if (ball.getY() > GAME_HEIGHT) {
-            currentHeart--;
-            ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
-            ball.setY(GAME_HEIGHT - 120);
-            ball.setDx(initDx);
-            ball.setDy(initDy);
+            if(unbreakable == false) {
+                currentHeart--;
 
-            if (currentHeart >= 0) {
-                ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
-                Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
-                heart.get(currentHeart).setIcon(new ImageIcon(scaled));
+                ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
+                ball.setY(GAME_HEIGHT - 120);
+                ball.setDx(initDx);
+                ball.setDy(initDy);
+
+                if (currentHeart >= 0) {
+                    ImageIcon icon = new ImageIcon("img/heart/grayheart.png");
+                    Image scaled = icon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+                    heart.get(currentHeart).setIcon(new ImageIcon(scaled));
+                }
+            } else {
+                ball.setX(PLAYFRAME_WIDTH / 2 - ball.getWidth() / 2);
+                ball.setY(GAME_HEIGHT - 120);
+                ball.setDx(initDx);
+                ball.setDy(initDy);
             }
         }
 
@@ -861,7 +653,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
             boolean hit = paddle.collideFireball(fb, 0.5f);
             if (hit) {
-                if (currentHeart > 0) {
+                if (currentHeart > 0 && unbreakable == false) {
                     currentHeart--;
                     ImageIcon iconH = new ImageIcon("img/heart/grayheart.png");
                     Image scaledH = iconH.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
@@ -887,6 +679,448 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         if (printer != null) layers.remove(printer);
     }
 
+    // CAC HAM CHUC NANG CUA ARTIFACT, cam dong vao
+    // +100 sát thương trong 5 giây, cooldown 20s
+    public void Sword() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        ball.setBaseDamage(ball.getBaseDamage() + 100);
+        ballPrinter.setGameObject(ball);
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(5000, e ->{
+            ball.setBaseDamage(currentDamage);
+            ballPrinter.setGameObject(ball);
+
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(20000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // +70 sát thương trong 4 giây, cooldown 10s
+    public void Bow() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        ball.setBaseDamage(ball.getBaseDamage() + 70);
+        ballPrinter.setGameObject(ball);
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(4000, e ->{
+            ball.setBaseDamage(currentDamage);
+            ballPrinter.setGameObject(ball);
+
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(10000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    //Khi kích hoạt hiệu ứng tim sẽ +1 tim và hồi trong khoảng 30s
+    public void Heart(){
+        if(isCoolingDown) {
+            return ;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        if(currentHeart == 3) {
+            return;
+        }
+
+        isCoolingDown = true;
+
+        ++currentHeart;
+        updateHeartDisplay();
+
+        Timer coolDown = new Timer(30000, e ->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer)e.getSource()).stop();
+        });
+        coolDown.setRepeats(false);
+        coolDown.start();
+    }
+
+    // Khi kích hoạt sẽ nhận được 1 -> 3 trái tym mới , hồi chiêu 60s
+    public void Meat() {
+        if(isCoolingDown) {
+            return ;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        if(currentHeart == 3) {
+            return ;
+        }
+
+        isCoolingDown = true;
+
+        currentHeart += (int)(Math.random() * 3) + 1;
+        if(currentHeart > 3) {
+            currentHeart = 3;
+        }
+        updateHeartDisplay();
+
+        Timer coolDown = new Timer(60000, e-> {
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        coolDown.setRepeats(false);
+        coolDown.start();
+    }
+
+    // khi kích hoạt sẽ tăng kích thước của paddle lên 20 trong 10s, hồi chiêu trong 40s
+    public void Brick() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        int oldWidth = paddle.getWidth();
+        paddle.setWidth(paddle.getWidth() + 20);
+        paddlePrinter.setGameObject(paddle);
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(10000, e ->{
+            paddle.setWidth(oldWidth);
+            paddlePrinter.setGameObject(paddle);
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(40000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt sẽ gây 100 sát thương cho toàn bộ gạch, cooldown 60s
+    public void Boom() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/boom.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        for(Brick b : bricks) {
+            b.takeHit(100);
+            if (b.isDestroyed()) {
+                removed.add(b);
+
+            } else {
+                ObjectPrinter p = brickPrinters.get(b);
+                if (p != null) p.startFlash();
+            }
+        }
+
+        for (Brick b : removed) {
+            bricks.remove(b);
+            ObjectPrinter p = brickPrinters.remove(b);
+            if (p != null) layers.remove(p);
+        }
+        removed.clear();
+        layers.revalidate();
+        layers.repaint();
+
+        Timer cooldown = new Timer(60000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt -1 máu, +300 sát thương trong 10 giây, cooldown 90s
+    public void Fire() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        ball.setBaseDamage(ball.getBaseDamage() + 300);
+        currentHeart--;
+        ballPrinter.setGameObject(ball);
+        updateHeartDisplay();
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(10000, e ->{
+            ball.setBaseDamage(currentDamage);
+            ballPrinter.setGameObject(ball);
+
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(90000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt miễn nhiễm sát thương trong 5s, cooldown 70s
+    public void Helmet() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        unbreakable = true;
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer durationMs = new Timer(5000, e ->{
+            unbreakable = false;
+
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(70000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // khi kích hoạt tăng vĩnh viễn 50 sát thương, 60s hồi chiêu
+    public void Diamond() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+
+        ball.setBaseDamage(ball.getBaseDamage() + 50);
+        currentDamage += 50;
+
+        layers.revalidate();
+        layers.repaint();
+
+        Timer cooldown = new Timer(60000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // Nhận random tiền 1-300 , cooldown 200s
+    public void Chest() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+        coin.add((int)(Math.random() * 300) + 1);
+
+        Timer cooldown = new Timer(200000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    // Tăng giảm tốc độ của bóng
+    public void Clock() {
+        if(isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/activate.wav");
+        effect.play();
+
+        isCoolingDown = true;
+        int oldDx = ball.getDx();
+        int oldDy = ball.getDy();
+
+        ball.setDx(Math.abs(oldDx / 2));
+        ball.setDy(Math.abs(oldDy / 2));
+
+        /*
+        Timer durationMs = new Timer(50000, e -> {
+            ball.setDx(oldDx);
+            ball.setDy(oldDy);
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+         */
+
+        Timer timer = new Timer(30000, e ->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        timer.setRepeats(false);
+        timer.start();
+    }
+    //Ban ra laser gay 300 damage, cooldown 10s
+    public void Lightning() {
+        if (isCoolingDown) {
+            return;
+        }
+
+        Sound effect = new Sound("sound/lightning.wav");
+        effect.play();
+
+
+        isCoolingDown = true;
+
+        //Vi tri cua laser phu thuoc vao vi tri paddle hien tai do
+        int laserDamage = 300;
+        int laserWidth = 10;
+        int laserHeight = GAME_HEIGHT;
+        int laserX = paddle.getX() + paddle.getWidth() / 2 - laserWidth / 2;
+        int laserY = paddle.getY();
+
+        LaserBeam laser = new LaserBeam(laserX, laserY, laserWidth, laserHeight);
+        Rectangle laserRect = new Rectangle(paddle.getX() + paddle.getWidth() / 2 - laserWidth / 2,
+                0, 10, paddle.getY());
+        for(Brick b : bricks) {
+            Rectangle bRect = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
+            if (laserRect.intersects(bRect)) {
+                b.takeHit(laserDamage);
+                if (b.isDestroyed()) {
+                    removed.add(b);
+
+                } else {
+                    ObjectPrinter p = brickPrinters.get(b);
+                    if (p != null) p.startFlash();
+                }
+            }
+        }
+
+        for (Brick b : removed) {
+            bricks.remove(b);
+            ObjectPrinter p = brickPrinters.remove(b);
+            if (p != null) layers.remove(p);
+        }
+        removed.clear();
+
+        layers.add(laser, Integer.valueOf(13));
+        layers.repaint();
+
+        Timer durationMs = new Timer(200, e ->{
+            layers.remove(laser);
+            layers.revalidate();
+            layers.repaint();
+            ((Timer) e.getSource()).stop();
+        });
+        durationMs.setRepeats(false);
+        durationMs.start();
+
+        Timer cooldown = new Timer(10000, e->{
+            effect.close();
+            isCoolingDown = false;
+            ((Timer) e.getSource()).stop();
+        });
+        cooldown.setRepeats(false);
+        cooldown.start();
+    }
+
+    //ham dem thoi gian hoi chieu cho artifact
+    private void startArtifactCooldownTimer() {
+        if (artifactTimer != null && artifactTimer.isRunning()) {
+            artifactTimer.stop();
+        }
+
+        artifactTimer = new Timer(1000, e -> {
+            artifactSlot.tickCooldown();
+            if (!artifactSlot.isCoolingDown()) {
+                ((Timer) e.getSource()).stop();
+            }
+        });
+        artifactTimer.start();
+    }
+
 
     //Tranh truong hop an cung luc ca left ca right, chi 1 trong 2 cai dc true
     @Override
@@ -898,6 +1132,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
             rightPressed = true;
             leftPressed = false;
+        }
+        if (e.getKeyCode() == KeyEvent.VK_P) {
+            togglePause();
         }
         // DEBUG: F8 -> dọn sạch gạch để kích hoạt boss logic
         if (e.getKeyCode() == KeyEvent.VK_F8) {
@@ -915,7 +1152,62 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
             System.out.println("[DEV] Cleared all bricks");
         }
+        //an E la kich hoat artifact
+        if(e.getKeyCode() == KeyEvent.VK_E) {
+            if (artifactSlot.isCoolingDown()) {
+                return;
+            }
+            if (isPause) {
+                return;
+            }
+            int cooldownSeconds = item.getCooldown() / 1000;
+            artifactSlot.setCooldown(cooldownSeconds);
+            //bat dau dem thoi gian hoi chieu
+            startArtifactCooldownTimer();
 
+            //Dua vao ten artifact ma co ham chuc nang tuong ung
+            String artifactName = item.getName();
+            switch (artifactName) {
+                case "Heart":
+                    Heart();
+                    break;
+                case "Sword":
+                    Sword();
+                    break;
+                case "Bow":
+                    Bow();
+                    break;
+                case "Boom":
+                    Boom();
+                    break;
+                case "Helmet":
+                    Helmet();
+                    break;
+                case "Diamond":
+                    Diamond();
+                    break;
+                case "Fire":
+                    Fire();
+                    break;
+                case "Clock":
+                    Clock();
+                    break;
+                case "Treasure Chest":
+                    Chest();
+                    break;
+                case "Lightning":
+                    Lightning();
+                    break;
+                case "Brick":
+                    Brick();
+                    break;
+                case "Meat":
+                    Meat();
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     @Override

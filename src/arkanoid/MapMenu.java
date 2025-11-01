@@ -5,6 +5,7 @@ import java.awt.*;
 import java.util.ArrayList;
 
 import GachaMachine.DiamondSquareGacha;
+import GachaMachine.Item;
 
 import static arkanoid.Game.*;
 
@@ -24,7 +25,8 @@ public class MapMenu extends JFrame {
     private Paddle currentPaddle = new Paddle(PLAYFRAME_WIDTH / 2 - 60, 600, 120, 20,
             15, 0, "img/paddle/paddlevip.png");
 
-    //bong hien tai dang bi chinh la ownedManager.getcurrentball()
+    //bong hien tai dang trang bi chinh la ownedManager.getCurrentBall()
+    //item hien tai dang trang bi chinh la ownedManager.getCurrentItem()
 
     private String currentGameScene = "img/Beach.jpg";
 
@@ -129,12 +131,14 @@ public class MapMenu extends JFrame {
         //copy current ball va paddle de chung no khong bi thay doi sau game()
         Paddle paddleCopy = new Paddle(currentPaddle);
         Ball ballCopy = new Ball(ownedManager.getCurrentBall());
+        Item itemCopy = new Item(ownedManager.getCurrentItem());
 
         String leveltxt = "levels/level" + level + ".txt";
         Boss boss = Boss.makeBossForLevel(level);
 
         new Game(paddleCopy,
                 ballCopy,
+                itemCopy,
                 leveltxt,
                 currentGameScene,
                 level,

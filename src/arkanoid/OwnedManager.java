@@ -3,30 +3,32 @@ package arkanoid;
 import java.util.ArrayList;
 import java.util.List;
 import arkanoid.Ball;
-import arkanoid.Artifact;
+
+import GachaMachine.Item;
+
 
 public class OwnedManager {
     private List<Ball> balls = new ArrayList<>();
-    private List<Artifact> artifacts = new ArrayList<>();
+    private List<Item> items = new ArrayList<>();
 
     private Ball currentBall;
-    private Artifact currentArtifact;
+    private Item currentItem;
 
     public  OwnedManager() {
         this.currentBall = Ball.bongnguhanh();
-        this.currentArtifact = null;
+        this.currentItem = Item.boom();
         loadBalls();
     }
 
     public OwnedManager(Ball currentBall) {
         this.currentBall = currentBall;
-        this.currentArtifact = null;
+        this.currentItem = null;
         loadBalls();
     }
 
-    public OwnedManager(Ball currentBall, Artifact currentArtifact) {
+    public OwnedManager(Ball currentBall, Item currentItem) {
         this.currentBall = currentBall;
-        this.currentArtifact = currentArtifact;
+        this.currentItem = currentItem;
     }
 
     public Ball getCurrentBall() {
@@ -37,16 +39,16 @@ public class OwnedManager {
         this.currentBall = currentBall;
     }
 
-    public Artifact getCurrentArtifact() {
-        return currentArtifact;
+    public Item getCurrentItem() {
+        return currentItem;
     }
 
-    public void setCurrentArtifact(Artifact currentArtifact) {
-        this.currentArtifact = currentArtifact;
+    public void setCurrentItem(Item currentItem) {
+        this.currentItem = currentItem;
     }
 
-    public List<Artifact> getArtifacts() {
-        return artifacts;
+    public List<Item> getItems() {
+        return items;
     }
 
     public List<Ball> getBalls() {
@@ -59,9 +61,9 @@ public class OwnedManager {
         }
     }
 
-    public void addArtifact(Artifact artifact) {
-        if (!artifacts.contains(artifact)) {
-            artifacts.add(artifact);
+    public void addItem(Item item) {
+        if (!items.contains(item)) {
+            items.add(item);
         }
     }
 
@@ -69,8 +71,8 @@ public class OwnedManager {
         balls.remove(ball);
     }
 
-    public void removeArtifact(Artifact artifact) {
-        artifacts.remove(artifact);
+    public void removeItem(Item item) {
+        items.remove(item);
     }
 
     public List<Ball> getOwnedBalls() {

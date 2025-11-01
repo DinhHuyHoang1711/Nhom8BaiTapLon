@@ -33,9 +33,6 @@ public class Ball extends GameObject{
     private Random rand = new Random();
     private int baseDx;
     private int baseDy;
-    private Timer powerUpTimer;
-    private boolean isSwordCoolDown = false;
-    private boolean isBowCoolDown = false;
 
     // Ảnh
     private static final String NORMAL_BALL_IMG = "img/ball/normal.png";
@@ -148,67 +145,6 @@ public class Ball extends GameObject{
                 -8, "img/ball/bongnguhanh.png", 50);
     }
 
-    // Hàm khi bật hiệu ứng thanh kiếm lên tăng 100 damage và trong 5s;
-    public void powerUpEffectSword(int extraDamage, int durationMs) {
-        if(isSwordCoolDown) {
-            return;
-        }
-
-        isSwordCoolDown = true;
-        // tăng damage tạm thời
-        int oldDamage = baseDamage;
-        baseDamage += extraDamage;
-
-        // nếu đã có timer trước đó, dừng nó
-        if (powerUpTimer != null && powerUpTimer.isRunning()) {
-            powerUpTimer.stop();
-        }
-
-        // tạo timer để sau durationMs thì trả về damage cũ
-        powerUpTimer = new Timer(durationMs, e -> {
-            baseDamage = oldDamage;
-            ((Timer)e.getSource()).stop();
-        });
-        powerUpTimer.setRepeats(false);
-        powerUpTimer.start();
-
-        Timer cooldown = new Timer(20000, e -> {
-            isSwordCoolDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
-
-    // Hàm khi bật hiệu ứng cung lên tăng 50 damage trong 3s
-    public void powerUpEffectBow(int extraDamage, int durationMs) {
-        if(isBowCoolDown) {
-            return;
-        }
-
-        isBowCoolDown = true;
-        int oldDamage = baseDamage;
-        baseDamage += extraDamage;
-
-        if(powerUpTimer != null && powerUpTimer.isRunning()){
-            powerUpTimer.stop();
-        }
-
-        powerUpTimer = new Timer(durationMs, e -> {
-            baseDamage = oldDamage;
-            ((Timer) e.getSource()).stop();
-        });
-
-        powerUpTimer.setRepeats(false);
-        powerUpTimer.start();
-
-        Timer cooldown = new Timer(10000, e -> {
-            isBowCoolDown = false;
-            ((Timer) e.getSource()).stop();
-        });
-        cooldown.setRepeats(false);
-        cooldown.start();
-    }
 
     // ==== GETTER/SETTER ==== //
     public String getElement() {
@@ -285,10 +221,15 @@ public class Ball extends GameObject{
 
             // Gây sát thương
             if (this.element.equals("normal")) {
-                normalbrickHit.play();
                 b.takeHit(this.getBaseDamage());
+                if(b.getElement().equals("normal")) normalbrickHit.play();
+                if(b.getElement().equals("fire")) firebirckHit.play();
+                if(b.getElement().equals("water")) waterbrickHit.play();
+                if(b.getElement().equals("earth")) earthbrickHit.play();
+                if(b.getElement().equals("wind")) windbrickHit.play();
             } else {
                 b.takeHit(this.element.equals(b.getElement()) ? this.getBaseDamage() * 2 : this.getBaseDamage());
+                if(b.getElement().equals("normal")) normalbrickHit.play();
                 if(b.getElement().equals("fire")) firebirckHit.play();
                 if(b.getElement().equals("water")) waterbrickHit.play();
                 if(b.getElement().equals("earth")) earthbrickHit.play();
