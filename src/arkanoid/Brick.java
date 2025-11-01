@@ -274,25 +274,31 @@ public class Brick extends GameObject {
 
     public static Brick createBrickFromId(int id, int x, int y) {
         switch (id) {
-            case 11: return Brick.lightOrangeBrick(x, y);
-            case 12: return Brick.orangeBrick(x, y);
-            case 13: return Brick.redBrick(x, y);
+            case 1: return Brick.lightOrangeBrick(x, y);
+            case 2: return Brick.orangeBrick(x, y);
+            case 3: return Brick.lightRedBrick(x, y);
+            case 4: return Brick.redBrick(x, y);
+            case 5: return Brick.brownBrick(x, y);
+            case 6: return Brick.purpleBrick(x, y);
+            case 7: return Brick.blueBrick(x, y);
+            case 8: return Brick.limeBrick(x, y);
+            case 9: return Brick.paleGreenBrick(x, y);
 
-            case 21: return Brick.fireBrick3(x, y);
-            case 22: return Brick.fireBrick2(x, y);
-            case 23: return Brick.fireBrick1(x, y);
+            case 10: return Brick.earthBrick3(x, y);
+            case 11: return Brick.earthBrick2(x, y);
+            case 12: return Brick.earthBrick1(x, y);
 
-            case 31: return Brick.waterBrick3(x, y);
-            case 32: return Brick.waterBrick2(x, y);
-            case 33: return Brick.waterBrick1(x, y);
+            case 13: return Brick.waterBrick3(x, y);
+            case 14: return Brick.waterBrick2(x, y);
+            case 15: return Brick.waterBrick1(x, y);
 
-            case 41: return Brick.windBrick3(x, y);
-            case 42: return Brick.windBrick2(x, y);
-            case 43: return Brick.windBrick1(x, y);
+            case 16: return Brick.windBrick3(x, y);
+            case 17: return Brick.windBrick2(x, y);
+            case 18: return Brick.windBrick1(x, y);
 
-            case 51: return Brick.earthBrick3(x, y);
-            case 52: return Brick.earthBrick2(x, y);
-            case 53: return Brick.earthBrick1(x, y);
+            case 19: return Brick.fireBrick3(x, y);
+            case 20: return Brick.fireBrick2(x, y);
+            case 21: return Brick.fireBrick1(x, y);
 
             default: return null;
         }

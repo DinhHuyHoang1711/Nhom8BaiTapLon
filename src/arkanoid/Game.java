@@ -258,7 +258,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         int cols = grid[0].length;
         int totalW = BRICK_W + (cols - 1) * STEP_X;
         int originX = PLAY_LEFT + (PLAYFRAME_WIDTH - totalW) / 2;
-        int originY = 80;
+        int originY = 0;
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
