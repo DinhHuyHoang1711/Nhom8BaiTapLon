@@ -34,6 +34,7 @@ public class Ball extends GameObject {
     private Random rand = new Random(); // Dùng để random góc nảy
     private int baseDx;   // Tốc độ gốc theo trục X
     private int baseDy;   // Tốc độ gốc theo trục Y
+    Rectangle ba = new Rectangle();
 
     // Đường dẫn ảnh của bóng theo từng nguyên tố
     private static final String NORMAL_BALL_IMG = "img/ball/normal.png";
@@ -222,7 +223,7 @@ public class Ball extends GameObject {
         if (b == null || b.isDestroyed()) return false; // Nếu brick null hoặc vỡ thì bỏ qua
 
         Rectangle br = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-        Rectangle ba = new Rectangle(getX(), getY(), getWidth(), getHeight());
+        ba.setBounds(getX(), getY(), getWidth(), getHeight());
 
         if (!ba.intersects(br)) return false;
         else {
@@ -233,23 +234,19 @@ public class Ball extends GameObject {
 
             int minHoriz = Math.min(overlapLeft, overlapRight);
             int minVert = Math.min(overlapTop, overlapBottom);
-
-            if (minHoriz < minVert) {
-                // Va chạm trái hoặc phải
-                if (overlapLeft < overlapRight) {
-                    setX(getX() - overlapLeft - 1); // Đẩy bóng sang trái
-                } else {
-                    setX(getX() + overlapRight + 1); // Đẩy bóng sang phải
-                }
+            if (Math.abs(minHoriz - minVert) < 2) {
                 setDx(-getDx());
-            } else {
-                // Va chạm trên hoặc dưới
-                if (overlapTop < overlapBottom) {
-                    setY(getY() - overlapTop - 1); // Đẩy bóng lên
-                } else {
-                    setY(getY() + overlapBottom + 1); // Đẩy bóng xuống
-                }
                 setDy(-getDy());
+            } else {
+                if (minHoriz < minVert) {
+                    // Va chạm trái hoặc phải
+                    setX((int)(getX() - Math.signum(getDx()) * (minHoriz + 1)));
+                    setDx(-getDx());
+                } else {
+                    // Va chạm trên hoặc dưới
+                    setY((int)(getY() - Math.signum(getDy()) * (minVert + 1)));
+                    setDy(-getDy());
+                }
             }
 
             // Gây sát thương
@@ -272,6 +269,7 @@ public class Ball extends GameObject {
             return true;
         }
     }
+
 
     public void collideWithPaddle(Paddle paddle) {
         Rectangle paddleRect = new Rectangle(paddle.getX(), paddle.getY(), paddle.getWidth(), paddle.getHeight());
