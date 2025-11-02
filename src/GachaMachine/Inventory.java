@@ -64,8 +64,11 @@ class Inventory {
                 row.add(nameLabel);
 
                 listPanel.add(row);
+                listPanel.add(Box.createVerticalStrut(5));
+
                 y += 95;
             }
+            listPanel.setPreferredSize(new Dimension(450, ownedItems.size() * 95));
 
             // Nếu danh sách dài, cho vào ScrollPane
             JScrollPane scroll = new JScrollPane(listPanel);
