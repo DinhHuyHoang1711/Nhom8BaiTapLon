@@ -70,8 +70,8 @@ public class BaloUI extends JFrame {
 
     private void openArtifactList() {
         this.dispose();
-        Item[] itemList = Item.loadItems(12);
-        new ItemUI(this, ownedManager, itemList);
+        Item[] ownedItems = ownedManager.getOwnedItemsArray();
+        new ItemUI(this, ownedManager, ownedItems);
     }
 
 

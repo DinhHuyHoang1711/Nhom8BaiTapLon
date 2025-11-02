@@ -119,5 +119,18 @@ public class Item {
     public static Item meat() {
         return new Item("Meat", "images/test" +12 + "-removebg-preview.png", 60000);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Item other = (Item) obj;
+        return name != null && name.equals(other.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name != null ? name.hashCode() : 0;
+    }
 }
 

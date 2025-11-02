@@ -60,7 +60,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final Item item;
 
     // Coin
-    private final Coin amount = new Coin();
+    private Coin amount = new Coin();
 
     //bricks
     private int totalBrick; // so gach 1 man choi
@@ -115,7 +115,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private boolean isCoolingDown = false;
     //Artifact se cap nhat trang thai khong the bi pha vo cho gach
     private boolean unbreakable = false;
-    private Coin coin = new Coin();
 
     //stat coin
     private JLabel coinTitle;
@@ -149,7 +148,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private java.util.List<Boolean> levelStatus;
     private final Boss bossForLevel; // null = level này không có boss
 
-    public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, String level, String currentGameScene,
+    public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, Coin coin, String level, String currentGameScene,
                 int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel, MapMenu parentMenu) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -229,10 +228,16 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         //item
         item = currentItem;
 
+        //coin
+        this.amount = coin;
+
         powerUpManager = new PowerUpManager(this);
 
         layers.add(paddlePrinter, Integer.valueOf(9));
         layers.add(ballPrinter, Integer.valueOf(10));
+
+
+        //coin
 
         //bricks
         /*
@@ -457,6 +462,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             if (bossForLevel == null) {
                 timer.stop();
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
+                amount.add(500);
                 levelStatus.set(currentLevel - 1, true);
                 bgm.close();
                 bossSound.close();
@@ -497,6 +503,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             } else if (isBossDead()) {
                 timer.stop();
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
+                amount.add(500);
                 bgm.close();
                 bossSound.close();
                 levelStatus.set(currentLevel - 1, true);
@@ -1337,7 +1344,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         effect.play();
 
         isCoolingDown = true;
-        coin.add((int)(Math.random() * 300) + 1);
+        amount.add((int)(Math.random() * 300) + 1);
 
         Timer cooldown = new Timer(200000, e->{
             effect.close();

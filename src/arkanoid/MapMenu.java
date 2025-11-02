@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import GachaMachine.DiamondSquareGacha;
 import GachaMachine.Item;
 
+import MoneyCollected.Coin;
+
 import static arkanoid.Game.*;
 
 public class MapMenu extends JFrame {
@@ -81,7 +83,7 @@ public class MapMenu extends JFrame {
                     gachaBgm.loop();
                     JFrame frame = new JFrame("Vòng Quay 12 Ô - Hình Thoi");
                     frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                    frame.getContentPane().add(new DiamondSquareGacha());
+                    frame.getContentPane().add(new DiamondSquareGacha(ownedManager));
                     frame.pack();
                     frame.setLocationRelativeTo(null);
                     frame.setVisible(true);
@@ -198,6 +200,7 @@ public class MapMenu extends JFrame {
         Paddle paddleCopy = new Paddle(currentPaddle);
         Ball ballCopy = new Ball(ownedManager.getCurrentBall());
         Item itemCopy = new Item(ownedManager.getCurrentItem());
+        Coin coinCopy = ownedManager.getCurrentCoin();
 
         String leveltxt = "levels/level" + level + ".txt";
         String scene = "img/levelbackground/lv" + level + ".png";
@@ -206,6 +209,7 @@ public class MapMenu extends JFrame {
         new Game(paddleCopy,
                 ballCopy,
                 itemCopy,
+                coinCopy,
                 leveltxt,
                 scene,
                 level,

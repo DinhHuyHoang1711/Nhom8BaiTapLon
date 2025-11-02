@@ -8,6 +8,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 
+import arkanoid.OwnedManager;
+
 /**
  * 🎮 Game Vòng Quay 12 Ô - Hình Thoi
  */
@@ -27,13 +29,16 @@ public class DiamondSquareGacha extends JPanel {
     private Inventory inventory;
     private SpinAnimation spinAnim;
     private Coin currentMoney;
+    private OwnedManager ownedManager;
 
     // Giao diện & nút
     private JLabel moneyLabel;
     private JPanel moneyPanel;
     private JButton spinBtn, bagBtn;
 
-    public DiamondSquareGacha() {
+    public DiamondSquareGacha(OwnedManager ownedManager) {
+        this.ownedManager = ownedManager;
+        this.currentMoney = ownedManager.getCurrentCoin();
         setupBackground();
         setupMoneyPanel();
         setupItemsAndInventory();
@@ -53,7 +58,6 @@ public class DiamondSquareGacha extends JPanel {
      * Khung hiển thị tiền
      */
     private void setupMoneyPanel() {
-        currentMoney = new Coin();
         moneyPanel = new JPanel();
         moneyPanel.setLayout(null);
         moneyPanel.setBounds(380, 10, 100, 40);
@@ -118,7 +122,7 @@ public class DiamondSquareGacha extends JPanel {
      * Thiết lập hoạt ảnh quay
      */
     private void setupSpinAnimation() {
-        spinAnim = new SpinAnimation(this, NUM_TILES, items, inventory);
+        spinAnim = new SpinAnimation(this, NUM_TILES, items, inventory, ownedManager);
     }
 
     /**
@@ -218,7 +222,7 @@ public class DiamondSquareGacha extends JPanel {
     public static void main(String[] args) {
         JFrame frame = new JFrame("🎮 Vòng Quay 12 Ô - Hình Thoi");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().add(new DiamondSquareGacha());
+        frame.getContentPane().add(new DiamondSquareGacha(new OwnedManager()));
         frame.pack();
         frame.setLocationRelativeTo(null);
         frame.setResizable(false);

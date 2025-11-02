@@ -5,6 +5,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.Random;
 
+import arkanoid.OwnedManager;
+
 /**
  * Quản lý hoạt ảnh vòng quay và kết quả
  */
@@ -18,12 +20,14 @@ public class SpinAnimation {
     private int numTiles;
     private Item[] items;
     private Inventory inventory;
+    private OwnedManager ownedManager;
 
-    public SpinAnimation(DiamondSquareGacha panel, int numTiles, Item[] items, Inventory inventory) {
+    public SpinAnimation(DiamondSquareGacha panel, int numTiles, Item[] items, Inventory inventory, OwnedManager ownedManager) {
         this.panel = panel;
         this.numTiles = numTiles;
         this.items = items;
         this.inventory = inventory;
+        this.ownedManager = ownedManager;
     }
 
     public void highlightNext() {
@@ -61,6 +65,47 @@ public class SpinAnimation {
 
     private void showResult(Item item) {
         inventory.addItem(item);
+        switch(item.getName()) {
+            case "Heart":
+                ownedManager.addItem(Item.heart());
+                break;
+            case "Sword":
+                ownedManager.addItem(Item.sword());
+                break;
+            case "Bow":
+                ownedManager.addItem(Item.bow());
+                break;
+            case "Boom":
+                ownedManager.addItem(Item.boom());
+                break;
+            case "Helmet":
+                ownedManager.addItem(Item.helmet());
+                break;
+            case "Diamond":
+                ownedManager.addItem(Item.diamond());
+                break;
+            case "Fire":
+                ownedManager.addItem(Item.fire());
+                break;
+            case "Clock":
+                ownedManager.addItem(Item.clock());
+                break;
+            case "Treasure Chest":
+                ownedManager.addItem(Item.treasurechest());
+                break;
+            case "Lightning":
+                ownedManager.addItem(Item.lightning());
+                break;
+            case "Brick":
+                ownedManager.addItem(Item.brick());
+                break;
+            case "Meat":
+                ownedManager.addItem(Item.meat());
+                break;
+            default:
+                break;
+        }
+
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(panel)
                 , "Kết quả", true);
         dialog.setSize(200, 200);

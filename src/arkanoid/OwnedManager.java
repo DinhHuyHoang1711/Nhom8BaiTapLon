@@ -5,6 +5,7 @@ import java.util.List;
 import arkanoid.Ball;
 
 import GachaMachine.Item;
+import MoneyCollected.Coin;
 
 
 public class OwnedManager {
@@ -13,11 +14,14 @@ public class OwnedManager {
 
     private Ball currentBall;
     private Item currentItem;
+    private Coin currentCoin;
 
-    public  OwnedManager() {
+    public OwnedManager() {
         this.currentBall = Ball.bongnguhanh();
         this.currentItem = Item.lightning();
         loadBalls();
+        addItem(currentItem);
+        this.currentCoin = new Coin();
     }
 
     public OwnedManager(Ball currentBall) {
@@ -47,8 +51,19 @@ public class OwnedManager {
         this.currentItem = currentItem;
     }
 
+    public Coin getCurrentCoin() {
+        return currentCoin;
+    }
+    public void setCurrentCoin(Coin amount) {
+        this.currentCoin = amount;
+    }
+
     public List<Item> getItems() {
         return items;
+    }
+
+    public Item[] getOwnedItemsArray() {
+        return items.toArray(new Item[0]);
     }
 
     public List<Ball> getBalls() {
