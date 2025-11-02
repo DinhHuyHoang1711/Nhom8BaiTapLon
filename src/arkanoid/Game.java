@@ -21,29 +21,29 @@ import PowerUp.*;
 
 public class Game extends JFrame implements ActionListener, KeyListener, WindowListener {
 
-    //Thong so khung hinh
+    //Thông số khung hình
     public static final int GAME_WIDTH = 1200;
     public static final int GAME_HEIGHT = 700;
     public static final int PLAYFRAME_WIDTH = 800;
     public static final int PLAYFRAME_HEIGHT = 700;
     private static final int TICK_MS = 33;
 
-    //cua so cha
+    //Cửa sổ cha
     MapMenu parentMenu;
 
-    //Am thanh man choi
+    //Âm thanh màn chơi
     private Sound bgm = new Sound("sound/CombatSound.wav");
     Sound bossSound = new Sound("sound/bossSound.wav");
 
-    //heart, so mau trong tro choi
+    //Số máu trong trò chơi
     public int currentHeart;
     public ArrayList<JLabel> heart = new ArrayList<>();
 
-    //Trang thai pause hay chua
+    //Trạng thái pause hay chưa
     private boolean isPause = false;
     private JButton pauseButton;
-    //
-    //Nut dau hang
+
+    //Nút đầu hàng
     private JButton surrenderButton;
 
     //paddle
@@ -52,14 +52,15 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     //ball
     private final Ball ball;
     private int currentDamage;
-    //cai nay de xem bong da dc ban hay chua hay con nam o tren paddle
+
+    //Kiểm tra xem bóng đã được phóng đi hay chưa.
     private boolean isBallActive = false;
 
-    //dx, dy mac dinh cua ball
+    //dx, dy mặc định của ball
     private final int initDx;
     private final int initDy;
 
-    //item cua nguoi choi, hay goi la artifacts
+    //item của người chơi
     private final Item item;
 
     // Coin
@@ -78,52 +79,55 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private static final double COIN_DROP_CHANCE = 0.7;
     private static final double POWER_UP_DROP_CHANCE = 0.3;
 
-    //cong cu ho tro in hinh anh
+    // Công cụ hỗ trợ in hình ảnh
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
     private final ObjectPrinter ballPrinter = new ObjectPrinter();
     private final JLayeredPane layers = new JLayeredPane();
     private final Map<Brick, ObjectPrinter> brickPrinters = new HashMap<>();
     private final String gameScene;
+
     //timer
     private final Timer timer = new Timer(TICK_MS, this);
 
-    // trang thai (fix delay)
+    // Trạng thái (fix delay)
     private boolean leftPressed = false;
     private boolean rightPressed = false;
 
     private final Rectangle tempPuRect = new Rectangle();
     private final Rectangle tempPaddleRect = new Rectangle();
 
-    //Info hien thi tren stat bar
-
-    // stat cua paddle
+    // Nhãn hiển thị thông tin paddle
     private JLabel paddleTitle;
     private JLabel paddleWidthLabel;
     private JLabel paddleDxLabel;
 
-    // stat ball
+    // Nhãn hiển thị thông tin Ball
     private JLabel ballTitle;
     private JLabel ballElementLabel;
     private JLabel ballDxLabel;
     private JLabel ballDyLabel;
     private JLabel ballDamageLabel;
 
-    // stat artifact
+    // Nhãn hiển thị thông tin artifact
     private JLabel artifactTitle;
-    //cai nay de in ra hinh anh artifact hoi chieu giong lien quan
+
+    //Slot hiển thị artifact có cooldown
     private ArtifactSlot artifactSlot;
-    //Timer cua artifact, dung de dem cooldown
+
+    //Timer đếm cooldown của artifact
     private Timer artifactTimer;
 
+    //Trạng thái cooldown của artifact
     private boolean isCoolingDown = false;
-    //Artifact se cap nhat trang thai khong the bi pha vo cho gach
+
+    //Trạng thái không thể bị phá (từ artifact)
     private boolean unbreakable = false;
 
-    //stat coin
+    //Nhãn hiển thị thông tin Coin
     private JLabel coinTitle;
     private JLabel amountLabel;
 
-    // PowerUp
+    //  Quản lý PowerUp trong game
     private final PowerUpManager powerUpManager;
     private final List<PowerUp> powerUps = new ArrayList<>();
     private final Map<PowerUp, ObjectPrinter> powerUpPrinters = new HashMap<>();
@@ -140,9 +144,11 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final List<Brick> waveBricks = new ArrayList<>();
     private final Image waveSprite = new ImageIcon("img/Boss/WaterWave.png").getImage();
     private final WaterWaveLayer waterLayer = new WaterWaveLayer(waveSprite);
+
     // ===== Wind Shuriken =====
     private final Image shurikenSprite = new ImageIcon("img/Boss/WindShuriken.png").getImage();
     private final ShurikenLayer shurikenLayer = new ShurikenLayer(shurikenSprite);
+
     // Tick counter cho scheduler
     private int tickCounter = 0;
 
@@ -151,6 +157,20 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private List<Boolean> levelStatus;
     private final Boss bossForLevel; // null = level này không có boss
 
+    /**
+     * Khởi tạo một đối tượng Game mới, bao gồm toàn bộ thành phần gameplay và UI.
+     *
+     * @param currentPaddle paddle mà người chơi đang chọn
+     * @param currentBall bóng mà người chơi đang dùng
+     * @param currentItem vật phẩm (artifact) của người chơi
+     * @param coin đối tượng quản lý coin của người chơi
+     * @param level tên file cấu hình màn chơi (dùng để sinh gạch)
+     * @param currentGameScene đường dẫn hình nền của màn chơi
+     * @param currentLevel số thứ tự màn chơi hiện tại
+     * @param levelStatus danh sách trạng thái hoàn thành của các màn
+     * @param bossForLevel boss của màn chơi (có thể null)
+     * @param parentMenu cửa sổ cha (MapMenu)
+     */
     public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, Coin coin, String level, String currentGameScene,
                 int currentLevel, List<Boolean> levelStatus, Boss bossForLevel, MapMenu parentMenu) {
         super("Arkanoid (Ball + Brick)");
@@ -239,25 +259,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         layers.add(paddlePrinter, Integer.valueOf(9));
         layers.add(ballPrinter, Integer.valueOf(10));
 
-
-        //coin
-
-        //bricks
-        /*
-        for(int i = 0; i < currentBricks.size(); i++) {
-
-            Brick b = new Brick();
-            b = currentBricks.get(i);
-            bricks.add(b);
-
-            ObjectPrinter bp = new ObjectPrinter();
-            configurePrinter(bp);
-
-            bp.setGameObject(b);
-            brickPrinters.put(b, bp);
-            layers.add(bp, Integer.valueOf(8));
-        }
-         */
         int[][] grid;
         try {
             grid = Brick.readGrid(level);
@@ -403,6 +404,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         timer.start();
     }
 
+    /**
+     * Chuyển đổi trạng thái tạm dừng của trò chơi.
+     * <p>
+     * Nếu trò chơi đang tạm dừng thì tiếp tục; ngược lại, dừng lại.
+     * Cập nhật biểu tượng của nút Pause tương ứng với trạng thái hiện tại.
+     */
     private void togglePause() {
         if (isPause) {
             // luc nay dang pause, an vao de tiep tuc game
@@ -422,6 +429,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
+    /**
+     * Kích hoạt hành động đầu hàng của người chơi.
+     * <p>
+     * Dừng trò chơi, tắt nhạc nền và âm thanh boss, hiển thị thông báo đầu hàng
+     * và quay trở lại menu bản đồ cha.
+     */
     private void surrender() {
         timer.stop();
         bgm.close();
@@ -431,21 +444,41 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         parentMenu.setVisible(true);
     }
 
+    /**
+     * Cấu hình một {@link ObjectPrinter} để hiển thị đối tượng trong khung trò chơi.
+     *
+     * @param p đối tượng {@link ObjectPrinter} cần cấu hình
+     */
     private void configurePrinter(ObjectPrinter p) {
         p.setOpaque(false);
         p.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
     }
 
+    /**
+     * Cấu hình một {@link ObjectPrinter1} để hiển thị đối tượng trong khung trò chơi.
+     *
+     * @param p đối tượng {@link ObjectPrinter1} cần cấu hình
+     */
     private void configurePrinter1(ObjectPrinter1 p) {
         p.setOpaque(false);
         p.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
     }
 
+    /**
+     * Kiểm tra trạng thái sống của boss.
+     *
+     * @return {@code true} nếu boss đã bị tiêu diệt hoặc chưa tồn tại; {@code false} nếu boss còn sống
+     */
     private boolean isBossDead() {
         return boss == null;
     }
 
-    // Cập nhật giao diện tim dựa vào currentHeart
+    /**
+     * Cập nhật hiển thị trái tim trên giao diện dựa theo số mạng hiện tại của người chơi.
+     * <p>
+     * Những trái tim tương ứng với số mạng còn lại sẽ hiển thị màu đỏ,
+     * các trái tim đã mất hiển thị màu xám.
+     */
     private void updateHeartDisplay() {
         for (int i = 0; i < heart.size(); i++) {
             String path = (i < currentHeart)
@@ -458,6 +491,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         layers.repaint();
     }
 
+    /**
+     * Hàm chính điều khiển toàn bộ vòng lặp logic của trò chơi, được gọi mỗi tick bởi {@link javax.swing.Timer}.
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         tickCounter++;
@@ -527,7 +563,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             return;
         }
 
-        //tuc la chua thua
+        //Tức là chưa thua
         if (leftPressed) {
             paddle.setX(Math.max(paddle.getX() - paddle.getDx(), 0));
             paddle.setMovingLeft();
@@ -548,8 +584,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             }
         }
 
-        // Cap nhat bong neu bong da ban ra roi
-        // Hoac neu bong chua ban ra thi bong se dinh vao paddle
+        // Cập nhật bóng nếu đã bắn ra rồi hoặc nếu bóng chưa bắn ra thì bóng sé dính vào paddle
         if(isBallActive == true) {
             ball.step(new Rectangle(0, 0, PLAYFRAME_WIDTH, GAME_HEIGHT));
             ball.collideWithPaddle(paddle);
@@ -740,7 +775,16 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
-    // === Boss: kỹ năng theo element ===
+    /**
+     * Cập nhật và kích hoạt các kỹ năng của boss dựa trên nguyên tố hiện tại.
+     * <p>
+     * - {@code fire}: kích hoạt mưa lửa, cập nhật đường đạn và xử lý va chạm với paddle. <br>
+     * - {@code water}: sinh sóng nước, cập nhật rơi và kiểm tra va chạm. <br>
+     * - {@code earth}: tạo lá chắn hoặc hiệu ứng rung đất ảnh hưởng đến gạch. <br>
+     * - {@code wind}: tạo phi tiêu di chuyển và va chạm với paddle. <br>
+     * <p>
+     * Mỗi loại nguyên tố được cập nhật và vẽ trên layer riêng tương ứng.
+     */
     private void updateBossSkills() {
         if (boss == null) return;
 
@@ -781,6 +825,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         // nếu có element khác thì thêm các nhánh else-if tại đây
     }
 
+    /**
+     * Dọn dẹp toàn bộ hiệu ứng và kỹ năng còn tồn tại của boss sau khi bị tiêu diệt.
+     * <p>
+     * Xóa các projectiles (Fireball), sóng nước (WaterWave), và phi tiêu (Wind Shuriken)
+     * khỏi các layer tương ứng để tránh rò rỉ tham chiếu hoặc vẽ dư thừa.
+     */
     private void cleanupBossSkills() {
         // Fire
         fireballLayer.setProjectiles(Collections.emptyList());
@@ -799,11 +849,28 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
+    /**
+     * Kích hoạt kỹ năng mưa lửa của boss với xác suất ngẫu nhiên.
+     * <p>
+     * Hàm được gọi định kỳ trong vòng lặp cập nhật để tạo hiệu ứng tấn công không liên tục.
+     * Xác suất mặc định là 1%.
+     */
     private void maybeActivateFireRain() {
         // kích hoạt ngẫu nhiên
         if (Math.random() < 0.01) boss.activateFireRain();
     }
 
+    /**
+     * Xử lý va chạm giữa các quả cầu lửa (Fireball) và paddle của người chơi.
+     * <p>
+     * Khi va chạm xảy ra:
+     * <ul>
+     *   <li>Giảm số lượng tim nếu người chơi không ở trạng thái bất tử.</li>
+     *   <li>Xóa quả cầu lửa khỏi danh sách projectiles.</li>
+     *   <li>Kích hoạt hiệu ứng nhấp nháy cho paddle để báo hiệu trúng đòn.</li>
+     * </ul>
+     * Hàm duy trì danh sách projectiles an toàn bằng cách hoán đổi phần tử cuối.
+     */
     private void handleFireballHitsPaddle() {
         List<? extends GameObject> fbs = boss.getFireballs();
         for (int i = 0; i < fbs.size(); ) {
@@ -837,6 +904,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private static final int MIN_PEN = 2;
     private static final boolean WAVE_ONE_WAY = false; // true: chỉ chặn từ trên xuống
 
+    /**
+     * Xử lý va chạm giữa các đợt sóng nước (WaterWave) và paddle của người chơi.
+     * <p>
+     * Khi xảy ra va chạm:
+     * <ul>
+     *   <li>Người chơi mất một tim nếu không ở trạng thái bất tử.</li>
+     *   <li>Sóng bị loại khỏi danh sách sóng đang hoạt động.</li>
+     *   <li>Kích hoạt hiệu ứng nhấp nháy (flash) cho paddle.</li>
+     * </ul>
+     * Hàm đồng thời thu nhỏ hitbox của sóng bằng giá trị WAVE_INSET để va chạm chính xác hơn.
+     */
     private void handleWaterWaveCollisions() {
         List<? extends GameObject> ws = boss.getWaves();
 
@@ -869,93 +947,21 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 continue;
             }
 
-            // bóng ↔ wave, sua roi bong k va voi wave nua nhe
-            /*
-
-            final int bx = ball.getX(),  by = ball.getY();
-            final int bw = ball.getWidth(), bh = ball.getHeight();
-            final int bdx = ball.getDx(),  bdy = ball.getDy();
-            final int prevX = bx - bdx,     prevY = by - bdy;
-
-            boolean bounced = false;
-
-            // --- 1) Swept theo trục Y ---
-            if (bdy > 0) {
-                // đi xuống: đáy bóng quét qua mép trên y=wy
-                int prevBottom = prevY + bh, currBottom = by + bh;
-                if (prevBottom <= wy && currBottom >= wy) {
-                    double t = (double)(wy - prevBottom) / (double)(currBottom - prevBottom);
-                    double xAt = prevX + t * (bx - prevX);
-                    double brightAt = xAt + bw;
-                    if (xAt < wright && brightAt > wx) {
-                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
-                        ball.collide(cur);
-                        bounced = true;
-                    }
-                }
-            } else if (!WAVE_ONE_WAY && bdy < 0) {
-                // đi lên: đỉnh bóng quét qua mép dưới y=wbot
-                int prevTop = prevY, currTop = by;
-                if (prevTop >= wbot && currTop <= wbot) {
-                    double t = (double)(prevTop - wbot) / (double)(prevTop - currTop); // 0..1
-                    double xAt = prevX + t * (bx - prevX);
-                    double brightAt = xAt + bw;
-                    if (xAt < wright && brightAt > wx) {
-                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
-                        ball.collide(cur);
-                        bounced = true;
-                    }
-                }
-            }
-
-            // --- 2) Swept theo trục X (chống xuyên ở mép trái/phải) ---
-            if (!bounced && bdx > 0) {
-                // đi sang phải: mép phải bóng quét qua x = wx
-                int prevRight = prevX + bw, currRight = bx + bw;
-                if (prevRight <= wx && currRight >= wx) {
-                    double t = (double)(wx - prevRight) / (double)(currRight - prevRight);
-                    double yAt = prevY + t * (by - prevY);
-                    double bbotAt = yAt + bh;
-                    if (yAt < wbot && bbotAt > wy) {
-                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
-                        ball.collide(cur);
-                        bounced = true;
-                    }
-                }
-            } else if (!bounced && bdx < 0) {
-                // đi sang trái: mép trái bóng quét qua x = wright
-                int prevLeft = prevX, currLeft = bx;
-                if (prevLeft >= wright && currLeft <= wright) {
-                    double t = (double)(prevLeft - wright) / (double)(prevLeft - currLeft);
-                    double yAt = prevY + t * (by - prevY);
-                    double bbotAt = yAt + bh;
-                    if (yAt < wbot && bbotAt > wy) {
-                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
-                        ball.collide(cur);
-                        bounced = true;
-                    }
-                }
-            }
-
-            // --- 3) Fallback AABB với ngưỡng chồng lấn ---
-            if (!bounced) {
-                int bright = bx + bw, bbotNow = by + bh;
-                boolean inter = bx < wright && bright > wx && by < wbot && bbotNow > wy;
-                if (inter) {
-                    int penW = Math.min(bright, wright) - Math.max(bx, wx);
-                    int penH = Math.min(bbotNow, wbot) - Math.max(by, wy);
-                    if (penW >= MIN_PEN && penH >= MIN_PEN) {
-                        Brick cur = new Brick(wx, wy, ww, wh, "nothing");
-                        ball.collide(cur);
-                    }
-                }
-            }
-            */
-
             i++;
         }
     }
 
+    /**
+     * Xử lý va chạm giữa phi tiêu gió (Shuriken) của boss và paddle.
+     * <p>
+     * Khi va chạm xảy ra:
+     * <ul>
+     *   <li>Trừ tim người chơi nếu không bất tử.</li>
+     *   <li>Paddle có thể bị hất lùi (knockback) thông qua logic nội bộ.</li>
+     *   <li>Phi tiêu bị xóa khỏi danh sách khi đánh trúng hoặc rời khỏi màn chơi.</li>
+     * </ul>
+     * Đồng thời kích hoạt hiệu ứng nhấp nháy để báo hiệu trúng đòn.
+     */
     private void handleShurikenCollisions() {
         if (boss == null) return;
 
@@ -986,7 +992,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
-
+    /**
+     * Đăng ký các viên gạch mới được thêm vào danh sách
+     */
     private void registerNewBricks() {
         for (int i = registeredBricks; i < bricks.size(); i++) {
             Brick b = bricks.get(i);
@@ -1002,14 +1010,26 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         registeredBricks = bricks.size();
     }
 
-
+    /**
+     * Xóa vật phẩm tăng cường (PowerUp) ra khỏi màn chơi.
+     */
     private void removePowerUp(PowerUp pu) {
         ObjectPrinter printer = powerUpPrinters.remove(pu);
         if (printer != null) layers.remove(printer);
     }
 
-    // CAC HAM CHUC NANG CUA ARTIFACT, cam dong vao
-    // +100 sát thương trong 5 giây, cooldown 20s
+    /**
+     * Kích hoạt kỹ năng **Sword Artifact**: tăng 100 sát thương cho bóng trong 5 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh hiệu ứng kích hoạt.</li>
+     *   <li>Tăng tạm thời sát thương cơ bản của bóng thêm 100.</li>
+     *   <li>Hiệu lực kéo dài 5 giây, sau đó sát thương được khôi phục về giá trị ban đầu.</li>
+     *   <li>Thời gian hồi chiêu: 20 giây.</li>
+     * </ul>
+     * Nếu đang trong thời gian hồi chiêu, kỹ năng sẽ không được kích hoạt.
+     */
     public void Sword() {
         if(isCoolingDown) {
             return;
@@ -1046,7 +1066,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // +70 sát thương trong 4 giây, cooldown 10s
+    /**
+     * Kích hoạt kỹ năng **Bow Artifact**: tăng 70 sát thương trong 4 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh hiệu ứng kích hoạt.</li>
+     *   <li>Tăng sát thương cơ bản của bóng thêm 70 điểm.</li>
+     *   <li>Hiệu lực kéo dài 4 giây, sau đó quay về giá trị cũ.</li>
+     *   <li>Thời gian hồi chiêu: 10 giây.</li>
+     * </ul>
+     * Nếu đang trong trạng thái hồi chiêu, kỹ năng sẽ không được thực thi.
+     */
     public void Bow() {
         if(isCoolingDown) {
             return;
@@ -1083,7 +1114,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    //Khi kích hoạt hiệu ứng tim sẽ +1 tim và hồi trong khoảng 30s
+    /**
+     * Kích hoạt kỹ năng **Heart Artifact**: hồi 1 tim (nếu chưa đầy) và khởi động hồi chiêu 30 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh hiệu ứng kích hoạt.</li>
+     *   <li>Tăng số tim hiện tại thêm 1, tối đa 3 tim.</li>
+     *   <li>Hiệu lực tức thời (không kéo dài theo thời gian).</li>
+     *   <li>Thời gian hồi chiêu: 30 giây.</li>
+     * </ul>
+     * Nếu người chơi đã đủ 3 tim hoặc đang trong thời gian hồi chiêu, kỹ năng không có hiệu lực.
+     */
     public void Heart(){
         if(isCoolingDown) {
             return ;
@@ -1110,7 +1152,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         coolDown.start();
     }
 
-    // Khi kích hoạt sẽ nhận được 1 -> 3 trái tym mới , hồi chiêu 60s
+    /**
+     * Kích hoạt kỹ năng **Meat Artifact**: hồi ngẫu nhiên 1 đến 3 tim và bắt đầu hồi chiêu 60 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh kích hoạt.</li>
+     *   <li>Tăng số tim hiện tại thêm ngẫu nhiên từ 1–3, tối đa 3 tim.</li>
+     *   <li>Thời gian hồi chiêu: 60 giây.</li>
+     * </ul>
+     * Nếu đã đủ tim hoặc đang trong thời gian hồi chiêu, kỹ năng không được thi triển.
+     */
     public void Meat() {
         if(isCoolingDown) {
             return ;
@@ -1140,7 +1192,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         coolDown.start();
     }
 
-    // khi kích hoạt sẽ tăng kích thước của paddle lên 20 trong 10s, hồi chiêu trong 40s
+    /**
+     * Kích hoạt kỹ năng **Brick Artifact**: tăng kích thước paddle thêm 20 đơn vị trong 10 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh kích hoạt.</li>
+     *   <li>Tăng chiều rộng của paddle thêm 20 đơn vị.</li>
+     *   <li>Sau 10 giây, paddle trở lại kích thước ban đầu.</li>
+     *   <li>Thời gian hồi chiêu: 40 giây.</li>
+     * </ul>
+     * Nếu đang trong thời gian hồi chiêu, kỹ năng sẽ không được kích hoạt.
+     */
     public void Brick() {
         if(isCoolingDown) {
             return;
@@ -1176,7 +1239,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // khi kích hoạt sẽ gây 100 sát thương cho toàn bộ gạch, cooldown 60s
+    /**
+     * Kích hoạt kỹ năng **Boom Artifact**: gây 100 sát thương cho toàn bộ gạch trên màn hình.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh nổ và hiệu ứng rung màn hình.</li>
+     *   <li>Mỗi viên gạch nhận 100 sát thương, gạch bị phá sẽ bị loại bỏ khỏi danh sách.</li>
+     *   <li>Nếu có boss đang xuất hiện, boss cũng chịu 100 sát thương (trừ khi ở trạng thái miễn nhiễm).</li>
+     *   <li>Thời gian hồi chiêu: 60 giây.</li>
+     * </ul>
+     * Nếu đang trong thời gian hồi chiêu, kỹ năng sẽ không được kích hoạt.
+     */
     public void Boom() {
         if(isCoolingDown) {
             return;
@@ -1206,7 +1280,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             if (p != null) layers.remove(p);
         }
 
-        //Neu co boss
+        //Nếu có boss
         if(bossForLevel != null && bossSpawned) {
             boolean canFlash = !("earth".equals(boss.getElement()) && boss.isInvulnerable());
             if (canFlash) {
@@ -1239,7 +1313,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // khi kích hoạt -1 máu, +300 sát thương trong 10 giây, cooldown 90s
+    /**
+     * Kích hoạt kỹ năng **Fire Artifact**: tiêu hao 1 tim để tăng 300 sát thương trong 10 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh hiệu ứng kích hoạt.</li>
+     *   <li>Tăng sát thương bóng thêm 300 điểm trong 10 giây.</li>
+     *   <li>Giảm 1 tim hiện tại của người chơi.</li>
+     *   <li>Thời gian hồi chiêu: 90 giây.</li>
+     * </ul>
+     * Nếu đang hồi chiêu, kỹ năng sẽ không kích hoạt.
+     */
     public void Fire() {
         if(isCoolingDown) {
             return;
@@ -1278,7 +1363,18 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // khi kích hoạt miễn nhiễm sát thương trong 5s, cooldown 70s
+    /**
+     * Kích hoạt kỹ năng **Helmet Artifact**: giúp người chơi miễn nhiễm sát thương trong 5 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh kích hoạt.</li>
+     *   <li>Người chơi trở nên không thể bị tổn thương trong 5 giây (unbreakable = true).</li>
+     *   <li>Hết 5 giây, hiệu ứng kết thúc.</li>
+     *   <li>Thời gian hồi chiêu: 70 giây.</li>
+     * </ul>
+     * Nếu đang hồi chiêu, kỹ năng sẽ không hoạt động.
+     */
     public void Helmet() {
         if(isCoolingDown) {
             return;
@@ -1313,7 +1409,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // khi kích hoạt tăng vĩnh viễn 50 sát thương, 60s hồi chiêu
+    /**
+     * Kích hoạt kỹ năng **Diamond Artifact**: tăng vĩnh viễn 50 sát thương cho bóng.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh kích hoạt.</li>
+     *   <li>Tăng sát thương cơ bản của bóng thêm 50 điểm, hiệu ứng vĩnh viễn.</li>
+     *   <li>Thời gian hồi chiêu: 60 giây.</li>
+     * </ul>
+     * Nếu đang hồi chiêu, kỹ năng sẽ không được thi triển.
+     */
     public void Diamond() {
         if(isCoolingDown) {
             return;
@@ -1339,7 +1445,17 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // Nhận random tiền 1-300 , cooldown 200s
+    /**
+     * Kích hoạt kỹ năng **Chest Artifact**: nhận ngẫu nhiên từ 1–300 xu.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh kích hoạt.</li>
+     *   <li>Thêm số tiền ngẫu nhiên (1–300) vào ví của người chơi.</li>
+     *   <li>Thời gian hồi chiêu: 200 giây.</li>
+     * </ul>
+     * Nếu đang trong thời gian hồi chiêu, kỹ năng sẽ không hoạt động.
+     */
     public void Chest() {
         if(isCoolingDown) {
             return;
@@ -1360,7 +1476,16 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    // Tăng giảm tốc độ của bóng
+    /**
+     * Kích hoạt kỹ năng **Clock Artifact**: giảm tốc độ bóng xuống một nửa trong 30 giây.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh kích hoạt.</li>
+     *   <li>Giảm tốc độ di chuyển của bóng còn 1/2 ban đầu.</li>
+     *   <li>Thời gian hồi chiêu: 30 giây.</li>
+     * </ul>
+     */
     public void Clock() {
         if(isCoolingDown) {
             return;
@@ -1376,16 +1501,6 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         ball.setDx(Math.abs(oldDx / 2));
         ball.setDy(Math.abs(oldDy / 2));
 
-        /*
-        Timer durationMs = new Timer(50000, e -> {
-            ball.setDx(oldDx);
-            ball.setDy(oldDy);
-            ((Timer) e.getSource()).stop();
-        });
-        durationMs.setRepeats(false);
-        durationMs.start();
-         */
-
         Timer timer = new Timer(30000, e ->{
             effect.close();
             isCoolingDown = false;
@@ -1394,7 +1509,19 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         timer.setRepeats(false);
         timer.start();
     }
-    //Ban ra laser gay 300 damage, cooldown 10s
+    /**
+     * Kích hoạt kỹ năng **Lightning Artifact**: bắn tia sét thẳng đứng gây 30.000 sát thương cho tất cả gạch trên đường bắn.
+     * <p>
+     * Khi kích hoạt:
+     * <ul>
+     *   <li>Phát âm thanh sét và hiệu ứng rung màn hình.</li>
+     *   <li>Tạo tia laser dọc từ vị trí paddle hiện tại, gây 30.000 sát thương cho tất cả gạch bị chạm.</li>
+     *   <li>Nếu có boss trong vùng ảnh hưởng, boss cũng nhận sát thương tương ứng.</li>
+     *   <li>Hiệu ứng tồn tại trong 0.2 giây, sau đó biến mất.</li>
+     *   <li>Thời gian hồi chiêu: 10 giây.</li>
+     * </ul>
+     * Nếu đang hồi chiêu, kỹ năng sẽ không kích hoạt.
+     */
     public void Lightning() {
         if (isCoolingDown) {
             return;
@@ -1481,7 +1608,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         cooldown.start();
     }
 
-    //ham dem thoi gian hoi chieu cho artifact
+    /**
+     * Bắt đầu đếm thời gian hồi chiêu cho Artifact hiện tại.
+     */
     private void startArtifactCooldownTimer() {
         if (artifactTimer != null && artifactTimer.isRunning()) {
             artifactTimer.stop();
@@ -1497,7 +1626,21 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     }
 
 
-    //Tranh truong hop an cung luc ca left ca right, chi 1 trong 2 cai dc true
+    /**
+     * Xử lý sự kiện bàn phím khi người chơi nhấn phím.
+     * <p>
+     * Bao gồm:
+     * <ul>
+     *   <li><b>← / →</b>: di chuyển paddle, đảm bảo chỉ một hướng được nhấn cùng lúc.</li>
+     *   <li><b>P</b>: tạm dừng (pause) hoặc tiếp tục trò chơi.</li>
+     *   <li><b>F8</b>: (chế độ DEV) xóa toàn bộ gạch để kích hoạt logic boss.</li>
+     *   <li><b>E</b>: kích hoạt Artifact hiện tại (nếu không trong thời gian hồi chiêu hoặc tạm dừng).</li>
+     *   <li><b>SPACE</b>: bắn bóng khi đang dính vào paddle.</li>
+     * </ul>
+     * Các phím khác sẽ bị bỏ qua.
+     *
+     * @param e sự kiện phím được nhấn
+     */
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -1527,7 +1670,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
             System.out.println("[DEV] Cleared all bricks");
         }
-        //an E la kich hoat artifact
+        //Ấn E là kích hoạt artifact
         if(e.getKeyCode() == KeyEvent.VK_E) {
             if (artifactSlot.isCoolingDown()) {
                 return;
@@ -1540,10 +1683,11 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             }
             int cooldownSeconds = item.getCooldown() / 1000;
             artifactSlot.setCooldown(cooldownSeconds);
-            //bat dau dem thoi gian hoi chieu
+
+            //Bắt đầu đếm thời gian hồi chiêu
             startArtifactCooldownTimer();
 
-            //Dua vao ten artifact ma co ham chuc nang tuong ung
+            //Đưa vào tên artifact mà có hàm chức năng tương ứng
             String artifactName = item.getName();
             switch (artifactName) {
                 case "Heart":
@@ -1586,13 +1730,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     break;
             }
         }
-        //Khi bong dinh vao paddle co the an space de ban
+        //Khi bóng dính vào paddle có thể ấn space để bắn
         if(e.getKeyCode() == KeyEvent.VK_SPACE) {
             if(isPause) {
-                return; // pause thi khong lam gi ca
+                return; // pause thì không làm gì cả
             }
             if(isBallActive == true) {
-                return; //bong da ban roi thi an space lam j ???
+                return;
             }
             else {
                 isBallActive = true;
@@ -1602,6 +1746,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
+    /**
+     * Xử lý khi người chơi thả phím.
+     */
     @Override
     public void keyReleased(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -1614,6 +1761,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
+    /**
+     * Xử lý sự kiện khi người chơi gõ phím (key typed).
+     */
     @Override
     public void keyTyped(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_LEFT) {
@@ -1626,8 +1776,16 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         }
     }
 
-    //implements cac phuong thuoc cua interface windowlistener
-    //tat man cua so game thi bat bgm
+    /**
+     * Khi cửa sổ trò chơi bị đóng:
+     * <ul>
+     *   <li>Dừng nhạc nền của trò chơi (bgm).</li>
+     *   <li>Phát lại nhạc nền của menu chính.</li>
+     *   <li>Hiển thị lại menu cha (parentMenu).</li>
+     * </ul>
+     *
+     * @param e sự kiện cửa sổ
+     */
     @Override
     public void windowClosed(WindowEvent e) {
         bgm.close();
