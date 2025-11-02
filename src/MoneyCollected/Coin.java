@@ -1,26 +1,26 @@
 package MoneyCollected;
 
 public class Coin {
-    private int amount;
+    private static int totalAmount = 0;
 
     public Coin() {
-        amount = 500;
+
     }
 
     // add money
     public void add(int money){
-        amount += money;
+        totalAmount += money;
     }
 
     // getter
     public int getAmount() {
-        return amount;
+        return totalAmount;
     }
 
     // when use money for buying
     public boolean spend(int cost) {
-        if(cost <= amount){
-            amount -= cost;
+        if(cost <= totalAmount){
+            totalAmount -= cost;
             return true;
         }else{
             return false;
