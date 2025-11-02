@@ -142,7 +142,7 @@ public class Ball extends GameObject{
 
     public static Ball bongnguhanh() {
         return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, Ball.BALL_SIZE, 6,
-                -8, "img/ball/bongnguhanh.png", 50);
+                -8, "img/ball/bongnguhanh.png", 500);
     }
 
 

@@ -16,7 +16,7 @@ public class MapMenu extends JFrame {
 
     private Sound click;
     private Image mapImage;
-    protected static final int TOTAL_LEVEL = 20;
+    protected static final int TOTAL_LEVEL = 15;
 
     //Nhung gi nguoi choi so huu se nam trong lop nay
     private OwnedManager ownedManager = new OwnedManager();
@@ -28,9 +28,8 @@ public class MapMenu extends JFrame {
     //bong hien tai dang trang bi chinh la ownedManager.getCurrentBall()
     //item hien tai dang trang bi chinh la ownedManager.getCurrentItem()
 
-    private String currentGameScene = "img/Beach.jpg";
-
-    private java.util.List<Boolean> levelStatus = new java.util.ArrayList<>(java.util.Collections.nCopies(TOTAL_LEVEL + 1, false));
+    private java.util.List<Boolean> levelStatus = new java.util.ArrayList<>(java.util.Collections.nCopies(TOTAL_LEVEL, false));
+    private ArrayList <JButton> levelButton = new ArrayList <> ();
 
     //chuan bi bircks
     private ArrayList <Brick> lv1Bricks = new ArrayList<>();
@@ -61,16 +60,6 @@ public class MapMenu extends JFrame {
             }
         };
         panel.setLayout(null);
-
-        // Thêm các nút level
-        panel.add(ButtonManager.createImageButton("img/button/1.png", null,
-                200, 300, click, e -> openLevel(1)));
-        panel.add(ButtonManager.createImageButton("img/button/2.png", null,
-                450, 280, click, e -> openLevel(2)));
-        panel.add(ButtonManager.createImageButton("img/button/3.png", null,
-                700, 260, click, e -> openLevel(3)));
-        panel.add(ButtonManager.createImageButton("img/button/4.png", null,
-                950, 330, click, e -> openLevel(4)));
 
         // Nút Back
         JButton exit = ButtonManager.createImageButton(
@@ -119,8 +108,86 @@ public class MapMenu extends JFrame {
         );
         panel.add(balo);
 
+        // Thêm các nút level
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                630, 340, click, e -> showLevelPreview(1)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                515, 315, click, e -> showLevelPreview(2)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                575, 400, click, e -> showLevelPreview(3)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                760, 496, click, e -> showLevelPreview(4)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                855, 527, click, e -> showLevelPreview(5)));
+        levelButton.add(ButtonManager.createImageButton("img/button/3.png", null,
+                806, 585, click, e -> showLevelPreview(6)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                450, 490, click, e -> showLevelPreview(7)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                315, 440, click, e -> showLevelPreview(8)));
+        levelButton.add(ButtonManager.createImageButton("img/button/3.png", null,
+                205, 461, click, e -> showLevelPreview(9)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                434, 154, click, e -> showLevelPreview(10)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                339, 123, click, e -> showLevelPreview(11)));
+        levelButton.add(ButtonManager.createImageButton("img/button/3.png", null,
+                402, 92, click, e -> showLevelPreview(12)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                904, 355, click, e -> showLevelPreview(13)));
+        levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
+                953, 419, click, e -> showLevelPreview(14)));
+        levelButton.add(ButtonManager.createImageButton("img/button/3.png", null,
+                997, 302, click, e -> showLevelPreview(15)));
+
+        for(int i = 0; i < 15; i++) {
+            panel.add(levelButton.get(i));
+        }
+
+        updateLevelStatus();
+
         setContentPane(panel);
         setVisible(true);
+    }
+
+    //Mo Popup gioi thieu ve level
+    private void showLevelPreview(int level) {
+
+        //Dung Jdialog nhe
+        JDialog dialog = new JDialog(this, "Level " + level, true);
+        dialog.setSize(1100, 600);
+        dialog.setLocationRelativeTo(this);
+        dialog.setResizable(false);
+        dialog.setLayout(null);
+
+        //Anh popup
+        ImageIcon previewIcon = new ImageIcon("img/levelpreview/lv" + level + ".png");
+        Image scaledImage = previewIcon.getImage().getScaledInstance(1100, 600, Image.SCALE_SMOOTH);
+        JLabel backgroundLabel = new JLabel(new ImageIcon(scaledImage));
+        backgroundLabel.setBounds(0, 0, 1100, 600);
+        backgroundLabel.setLayout(null);
+
+        // Nút Start và Cancel
+        JButton startButton = new JButton("Start");
+        JButton cancelButton = new JButton("Cancel");
+        startButton.setBounds(890, 520, 80, 30);
+        cancelButton.setBounds(990, 520, 80, 30);
+        startButton.setFocusPainted(false);
+        cancelButton.setFocusPainted(false);
+
+
+        startButton.addActionListener(e -> {
+            dialog.dispose();
+            openLevel(level);
+        });
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+
+        backgroundLabel.add(startButton);
+        backgroundLabel.add(cancelButton);
+        dialog.add(backgroundLabel);
+
+        dialog.setVisible(true);
     }
 
     private void openLevel(int level) {
@@ -133,19 +200,28 @@ public class MapMenu extends JFrame {
         Item itemCopy = new Item(ownedManager.getCurrentItem());
 
         String leveltxt = "levels/level" + level + ".txt";
+        String scene = "img/levelbackground/lv" + level + ".png";
         Boss boss = Boss.makeBossForLevel(level);
 
         new Game(paddleCopy,
                 ballCopy,
                 itemCopy,
                 leveltxt,
-                currentGameScene,
+                scene,
                 level,
                 levelStatus,
                 boss,
                 this);
         //thoat khoi man choi thi bat
         //Game da implement window listener roi nen khi dong game, bgm tu phat lai
+    }
+
+    public void updateLevelStatus() {
+        for(int i = 0; i < TOTAL_LEVEL; i++) {
+            if(levelStatus.get(i) == true) {
+                levelButton.get(i).setIcon(new ImageIcon("img/button/2.png"));
+            }
+        }
     }
 
     public static void main(String[] args) {

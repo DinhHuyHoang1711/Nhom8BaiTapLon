@@ -442,13 +442,13 @@ public class Boss extends arkanoid.GameObject {
 
     protected static Boss makeBossForLevel(int level) {
         switch (level) {
-            case 2:
+            case 15:
                 return new Boss("fire", 5000);
-            case 1:
+            case 6:
                 return new Boss("water", 5000);
-            case 3:
+            case 12:
                 return new Boss("wind", 5000);
-            case 4:
+            case 9:
                 return new Boss("earth", 5000);
             default:
                 return null; // các level khác không có boss

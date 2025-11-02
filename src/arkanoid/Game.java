@@ -145,8 +145,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private int tickCounter = 0;
 
     // ==== Levels ====
-    private final int currentLevel;
-    private final java.util.List<Boolean> levelStatus;
+    private int currentLevel;
+    private java.util.List<Boolean> levelStatus;
     private final Boss bossForLevel; // null = level này không có boss
 
     public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, String level, String currentGameScene,
@@ -457,8 +457,10 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             if (bossForLevel == null) {
                 timer.stop();
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
+                levelStatus.set(currentLevel - 1, true);
                 bgm.close();
                 bossSound.close();
+                parentMenu.updateLevelStatus();
                 this.dispose();
                 parentMenu.setVisible(true);
                 return;
@@ -497,6 +499,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 JOptionPane.showMessageDialog(this, "Yee thang roi");
                 bgm.close();
                 bossSound.close();
+                levelStatus.set(currentLevel - 1, true);
+                parentMenu.updateLevelStatus();
                 this.dispose();
                 parentMenu.setVisible(true);
                 return;
@@ -1391,7 +1395,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         isCoolingDown = true;
 
         //Vi tri cua laser phu thuoc vao vi tri paddle hien tai do
-        int laserDamage = 300;
+        int laserDamage = 30000;
         int laserWidth = 10;
         int laserHeight = GAME_HEIGHT;
         int laserX = paddle.getX() + paddle.getWidth() / 2 - laserWidth / 2;
@@ -1517,6 +1521,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 return;
             }
             if (isPause) {
+                return;
+            }
+            if (isBallActive == false) {
                 return;
             }
             int cooldownSeconds = item.getCooldown() / 1000;
