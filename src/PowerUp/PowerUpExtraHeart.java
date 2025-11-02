@@ -9,7 +9,7 @@ public class PowerUpExtraHeart extends PowerUp {
     private static final int MAX_HEARTS = 3;
 
     public PowerUpExtraHeart(int x, int y) {
-        super(x, y, 40, 40, "img/button/4.png", PowerUp.PowerUpType.EXTRA_HEART, 0);
+        super(x, y, 40, 40, "img/powerup/heartPowerup.png", PowerUpType.EXTRA_HEART, 0);
     }
 
     @Override

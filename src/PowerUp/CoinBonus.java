@@ -7,7 +7,7 @@ public class CoinBonus extends PowerUp {
     private final Coin amount;
 
     public CoinBonus(int x, int y, Coin amount) {
-        super(x, y, 40, 40, "img/coin.png", PowerUp.PowerUpType.COIN, 0);
+        super(x, y, 40, 40, "img/coin.png", PowerUpType.COIN, 0);
         this.amount = amount;
     }
 

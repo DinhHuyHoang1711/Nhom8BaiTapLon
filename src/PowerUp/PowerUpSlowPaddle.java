@@ -11,7 +11,7 @@ public class PowerUpSlowPaddle extends PowerUp {
     private final int originalSpeed;
 
     public PowerUpSlowPaddle(int x, int y, Paddle paddle) {
-        super(x, y ,40, 40, "img/button/3.png", PowerUp.PowerUpType.SLOW_PADDLE, 6000);
+        super(x, y ,40, 40, "img/powerup/slow_paddle.png", PowerUpType.SLOW_PADDLE, 6000);
         this.paddle = paddle;
         this.originalWidth = paddle.getWidth();
         this.originalSpeed = paddle.getDx();
@@ -24,7 +24,7 @@ public class PowerUpSlowPaddle extends PowerUp {
             return;
         }
 
-        int newSpeed = Math.min(originalSpeed - PENALTY_SPEED, MIN_SPEED);
+        int newSpeed = Math.max(originalSpeed - PENALTY_SPEED, MIN_SPEED);
         int newWidth = (int) (originalWidth / SIZE_MULTIPLIER);
 
         paddle.setWidth(newWidth);

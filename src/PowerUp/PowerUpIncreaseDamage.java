@@ -12,7 +12,7 @@ public class PowerUpIncreaseDamage extends PowerUp {
     private int previousHeight;
 
     public PowerUpIncreaseDamage(int x, int y, OwnedManager ownedManager) {
-        super(x, y, 40, 40, "img/button/2.png", PowerUp.PowerUpType.INCREASE_DAMAGE, 8000);
+        super(x, y, 40, 40, "img/powerup/increase_damage.png", PowerUpType.INCREASE_DAMAGE, 8000);
         this.ownedManager = ownedManager;
     }
 

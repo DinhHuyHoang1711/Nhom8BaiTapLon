@@ -10,7 +10,7 @@ public class PowerUpExpandPaddle extends PowerUp {
     private final int originalWidth;
 
     public PowerUpExpandPaddle(int x, int y, Paddle paddle) {
-        super(x, y, 40, 40, "img/button/1.png", PowerUp.PowerUpType.EXPAND_PADDLE, 10000);
+        super(x, y, 40, 40, "img/powerup/expand_paddle.png", PowerUpType.EXPAND_PADDLE, 10000);
         this.paddle = paddle;
         this.originalWidth = paddle.getWidth();
     }
