@@ -18,108 +18,175 @@ public class Brick extends GameObject {
     private int summonWaveId = -1;
 
 
-
     // ==== Constructor ==== //
+
+    /**
+     * Khởi tạo gạch rỗng (dành cho mục đích đặc biệt hoặc khi load file).
+     */
     public Brick() {
         super();
         this.hitPoints = 0;
         this.element = "";
     }
 
+    /**
+     * Khởi tạo gạch với vị trí, kích thước, máu và ảnh.
+     */
     public Brick(int x, int y, int width, int height, int hp, String imgPath) {
         super(x, y, width, height, 0, 0, imgPath);
         this.hitPoints = Math.max(0, hp);
         this.element = "normal";
     }
 
+    /**
+     * Khởi tạo gạch với thông tin chi tiết bao gồm nguyên tố.
+     *
+     * @param x       Tọa độ X
+     * @param y       Tọa độ Y
+     * @param width   Chiều rộng
+     * @param height  Chiều cao
+     * @param hp      Lượng máu
+     * @param element Thuộc tính nguyên tố
+     * @param imgPath Đường dẫn ảnh
+     */
     public Brick(int x, int y, int width, int height, int hp, String element, String imgPath) {
         super(x, y, width, height, 0, 0, imgPath);
         this.hitPoints = Math.max(0, hp);
         this.element = (element.isEmpty() ? "normal" : element);
     }
 
+    /**
+     * Khởi tạo gạch với 1 HP mặc định.
+     *
+     * @param x       Tọa độ X
+     * @param y       Tọa độ Y
+     * @param width   Chiều rộng
+     * @param height  Chiều cao
+     * @param imgPath Đường dẫn ảnh
+     */
     public Brick(int x, int y, int width, int height, String imgPath) {
         this(x, y, width, height, 1, imgPath);
     }
 
     // ==== BASIC BRICK ==== //
+
+    /**
+     * @return Gạch cam nhạt (50 HP).
+     */
     public static Brick lightOrangeBrick(int x, int y) { // 50
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 50,  "normal", "img/brick/BASIC/cam nhạt.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 50, "normal", "img/brick/BASIC/cam nhạt.png");
     }
 
+    /**
+     * @return Gạch cam đậm (75 HP).
+     */
     public static Brick orangeBrick(int x, int y) { // 75
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 75,  "normal", "img/brick/BASIC/cam.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 75, "normal", "img/brick/BASIC/cam.png");
     }
 
+    /**
+     * @return Gạch đỏ nhạt (100 HP).
+     */
     public static Brick lightRedBrick(int x, int y) { // 100
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 100, "normal", "img/brick/BASIC/đỏ nhạt.png");
     }
 
+    /**
+     * @return Gạch đỏ (125 HP).
+     */
     public static Brick redBrick(int x, int y) { // 125
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 125, "normal", "img/brick/BASIC/đỏ.png");
     }
 
+    /**
+     * @return Gạch nâu (150 HP).
+     */
     public static Brick brownBrick(int x, int y) { // 150
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 150, "normal", "img/brick/BASIC/nâu.png");
     }
 
+    /**
+     * @return Gạch tím (175 HP).
+     */
     public static Brick purpleBrick(int x, int y) { // 175
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 175, "normal", "img/brick/BASIC/tím.png");
     }
 
+    /**
+     * @return Gạch xanh dương (200 HP).
+     */
     public static Brick blueBrick(int x, int y) { // 200
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200, "normal", "img/brick/BASIC/xanh blue.png");
     }
 
+    /**
+     * @return Gạch xanh lá mạ (225 HP).
+     */
     public static Brick limeBrick(int x, int y) { // 225
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 225, "normal", "img/brick/BASIC/xanh lá mạ.png");
     }
 
+    /**
+     * @return Gạch xanh nhạt (250 HP).
+     */
     public static Brick paleGreenBrick(int x, int y) { // 250
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 250, "normal", "img/brick/BASIC/xanh lợ lợ.png");
     }
 
     // ==== ELEMENT BRICK ==== //
     public static Brick fireBrick1(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200,  "fire",  "img/brick/ELEMENTAL/lửa/lửa 1.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200, "fire", "img/brick/ELEMENTAL/lửa/lửa 1.png");
     }
+
     public static Brick fireBrick2(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500,  "fire",  "img/brick/ELEMENTAL/lửa/lửa 2.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500, "fire", "img/brick/ELEMENTAL/lửa/lửa 2.png");
     }
+
     public static Brick fireBrick3(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "fire",  "img/brick/ELEMENTAL/lửa/lửa 3.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "fire", "img/brick/ELEMENTAL/lửa/lửa 3.png");
     }
 
     public static Brick waterBrick1(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200,  "water", "img/brick/ELEMENTAL/nước/nước 1.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200, "water", "img/brick/ELEMENTAL/nước/nước 1.png");
     }
+
     public static Brick waterBrick2(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500,  "water", "img/brick/ELEMENTAL/nước/nước 2.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500, "water", "img/brick/ELEMENTAL/nước/nước 2.png");
     }
+
     public static Brick waterBrick3(int x, int y) {
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "water", "img/brick/ELEMENTAL/nước/nước 3.png");
     }
 
     public static Brick windBrick1(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200,  "wind",  "img/brick/ELEMENTAL/gió/gió 1.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200, "wind", "img/brick/ELEMENTAL/gió/gió 1.png");
     }
+
     public static Brick windBrick2(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500,  "wind",  "img/brick/ELEMENTAL/gió/gió 2.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500, "wind", "img/brick/ELEMENTAL/gió/gió 2.png");
     }
+
     public static Brick windBrick3(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "wind",  "img/brick/ELEMENTAL/gió/gió 3.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "wind", "img/brick/ELEMENTAL/gió/gió 3.png");
     }
 
     public static Brick earthBrick1(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200,  "earth", "img/brick/ELEMENTAL/đất/đất 1.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 200, "earth", "img/brick/ELEMENTAL/đất/đất 1.png");
     }
+
     public static Brick earthBrick2(int x, int y) {
-        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500,  "earth", "img/brick/ELEMENTAL/đất/đất 2.png");
+        return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 500, "earth", "img/brick/ELEMENTAL/đất/đất 2.png");
     }
+
     public static Brick earthBrick3(int x, int y) {
         return new Brick(x, y, BRICK_WIDTH, BRICK_HEIGHT, 1000, "earth", "img/brick/ELEMENTAL/đất/đất 3.png");
     }
 
+    /**
+     * Tạo danh sách gạch cho Level 1 (màu cam - đỏ cơ bản).
+     *
+     * @return Danh sách gạch của level 1
+     */
     public static ArrayList<Brick> buildLevel1Bricks() {
         ArrayList<Brick> list = new ArrayList<>();
         list.add(Brick.lightOrangeBrick(155, 40));
@@ -145,6 +212,11 @@ public class Brick extends GameObject {
         return list;
     }
 
+    /**
+     * Tạo danh sách gạch cho Level 2 (nguyên tố lửa).
+     *
+     * @return Danh sách gạch của level 2
+     */
     public static ArrayList<Brick> buildLevel2Bricks() {
         ArrayList<Brick> list = new ArrayList<>();
         list.add(Brick.fireBrick3(155, 40));
@@ -170,6 +242,11 @@ public class Brick extends GameObject {
         return list;
     }
 
+    /**
+     * Tạo danh sách gạch cho Level 3 (nguyên tố gió).
+     *
+     * @return Danh sách gạch của level 3
+     */
     public static ArrayList<Brick> buildLevel3Bricks() {
         ArrayList<Brick> list = new ArrayList<>();
         list.add(Brick.windBrick3(155, 40));
@@ -195,6 +272,11 @@ public class Brick extends GameObject {
         return list;
     }
 
+    /**
+     * Tạo danh sách gạch cho Level 4 (nguyên tố nước).
+     *
+     * @return Danh sách gạch của level 4
+     */
     public static ArrayList<Brick> buildLevel4Bricks() {
         ArrayList<Brick> list = new ArrayList<>();
         list.add(Brick.waterBrick3(155, 40));
@@ -220,6 +302,11 @@ public class Brick extends GameObject {
         return list;
     }
 
+    /**
+     * Tạo danh sách gạch cho Level 5 (nguyên tố đất).
+     *
+     * @return Danh sách gạch của level 5
+     */
     public static ArrayList<Brick> buildLevel5Bricks() {
         ArrayList<Brick> list = new ArrayList<>();
         list.add(Brick.earthBrick3(155, 40));
@@ -245,6 +332,9 @@ public class Brick extends GameObject {
         return list;
     }
 
+    /**
+     * Đọc lưới (grid) map từ file văn bản.
+     */
     public static int[][] readGrid(String path) throws java.io.IOException {
         java.util.List<int[]> rows = new java.util.ArrayList<>();
         int cols = -1, ln = 0;
@@ -272,35 +362,65 @@ public class Brick extends GameObject {
         return rows.toArray(new int[0][]);
     }
 
+    /**
+     * Tạo gạch dựa theo ID đọc từ file bản đồ.
+     *
+     * @param id Mã ID gạch
+     * @param x  Tọa độ X
+     * @param y  Tọa độ Y
+     * @return Đối tượng Brick tương ứng hoặc null nếu ID không hợp lệ
+     */
     public static Brick createBrickFromId(int id, int x, int y) {
         switch (id) {
-            case 1: return Brick.lightOrangeBrick(x, y);
-            case 2: return Brick.orangeBrick(x, y);
-            case 3: return Brick.lightRedBrick(x, y);
-            case 4: return Brick.redBrick(x, y);
-            case 5: return Brick.brownBrick(x, y);
-            case 6: return Brick.purpleBrick(x, y);
-            case 7: return Brick.blueBrick(x, y);
-            case 8: return Brick.limeBrick(x, y);
-            case 9: return Brick.paleGreenBrick(x, y);
+            case 1:
+                return Brick.lightOrangeBrick(x, y);
+            case 2:
+                return Brick.orangeBrick(x, y);
+            case 3:
+                return Brick.lightRedBrick(x, y);
+            case 4:
+                return Brick.redBrick(x, y);
+            case 5:
+                return Brick.brownBrick(x, y);
+            case 6:
+                return Brick.purpleBrick(x, y);
+            case 7:
+                return Brick.blueBrick(x, y);
+            case 8:
+                return Brick.limeBrick(x, y);
+            case 9:
+                return Brick.paleGreenBrick(x, y);
 
-            case 10: return Brick.earthBrick3(x, y);
-            case 11: return Brick.earthBrick2(x, y);
-            case 12: return Brick.earthBrick1(x, y);
+            case 10:
+                return Brick.earthBrick3(x, y);
+            case 11:
+                return Brick.earthBrick2(x, y);
+            case 12:
+                return Brick.earthBrick1(x, y);
 
-            case 13: return Brick.waterBrick3(x, y);
-            case 14: return Brick.waterBrick2(x, y);
-            case 15: return Brick.waterBrick1(x, y);
+            case 13:
+                return Brick.waterBrick3(x, y);
+            case 14:
+                return Brick.waterBrick2(x, y);
+            case 15:
+                return Brick.waterBrick1(x, y);
 
-            case 16: return Brick.windBrick3(x, y);
-            case 17: return Brick.windBrick2(x, y);
-            case 18: return Brick.windBrick1(x, y);
+            case 16:
+                return Brick.windBrick3(x, y);
+            case 17:
+                return Brick.windBrick2(x, y);
+            case 18:
+                return Brick.windBrick1(x, y);
 
-            case 19: return Brick.fireBrick3(x, y);
-            case 20: return Brick.fireBrick2(x, y);
-            case 21: return Brick.fireBrick1(x, y);
+            case 19:
+                return Brick.fireBrick3(x, y);
+            case 20:
+                return Brick.fireBrick2(x, y);
+            case 21:
+                return Brick.fireBrick1(x, y);
 
-            default: return null;
+            default:
+                return null;
         }
     }
 
@@ -333,6 +453,11 @@ public class Brick extends GameObject {
         return element;
     }
 
+    /**
+     * Đặt lại nguyên tố của gạch.
+     *
+     * @param element Tên nguyên tố (nếu rỗng sẽ tự chuyển thành "normal")
+     */
     public void setElement(String element) {
         if (element.isEmpty()) {
             this.element = "normal";
@@ -341,12 +466,22 @@ public class Brick extends GameObject {
         }
     }
 
+    /**
+     * Gạch chịu sát thương (giảm hitPoints).
+     *
+     * @param damage Sát thương nhận vào
+     */
     public void takeHit(int damage) {
         //if (hitPoints > 0) hitPoints--;
         int dd = Math.max(0, damage);
         hitPoints = Math.max(0, hitPoints - dd);
     }
 
+    /**
+     * Kiểm tra gạch đã bị phá hủy chưa.
+     *
+     * @return true nếu hitPoints = 0
+     */
     public boolean isDestroyed() {
         return hitPoints == 0;
     }
