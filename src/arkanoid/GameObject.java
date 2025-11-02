@@ -1,24 +1,55 @@
 package arkanoid;
+
 import javax.swing.*;
 import java.awt.*;
 
 public class GameObject {
+
+    /**
+     * Chiều rộng tổng thể của cửa sổ game (pixel).
+     */
     public static final int GAME_WIDTH = 1200;
+
+    /**
+     * Chiều cao tổng thể của cửa sổ game (pixel).
+     */
     public static final int GAME_HEIGHT = 700;
+
+    /**
+     * Chiều rộng của khu vực chơi (không tính viền hoặc UI).
+     */
     public static final int PLAYFRAME_WIDTH = 800;
+
+    /**
+     * Chiều cao của khu vực chơi (không tính viền hoặc UI).
+     */
     public static final int PLAYFRAME_HEIGHT = 700;
 
+    /**
+     * Tọa độ X, Y của đối tượng trên màn hình.
+     */
     protected int x, y;
+
+    /**
+     * Chiều rộng và chiều cao của đối tượng.
+     */
     private int width, height;
 
-    /* Dong nay co the xoa neu tao 2 lop extend GameObject
-     la MoveableObject va ImmobileObject
+    /**
+     * Tốc độ di chuyển theo trục X và Y
      */
     private int dx, dy;
-    private String imagePath;
-    /*Constructor
-     */
 
+    /**
+     * Đường dẫn đến hình ảnh (sprite) biểu diễn đối tượng.
+     */
+    private String imagePath;
+
+    /**
+     * Khởi tạo một {@code GameObject} mặc định.
+     * <p>
+     * Tất cả giá trị sẽ được gán là 0 hoặc {@code null}.
+     */
     public GameObject() {
         this.x = 0;
         this.y = 0;
@@ -29,6 +60,17 @@ public class GameObject {
         this.imagePath = null;
     }
 
+    /**
+     * Khởi tạo một {@code GameObject} với các thông số cụ thể.
+     *
+     * @param x       Tọa độ X ban đầu
+     * @param y       Tọa độ Y ban đầu
+     * @param width   Chiều rộng của đối tượng
+     * @param height  Chiều cao của đối tượng
+     * @param dx      Tốc độ di chuyển theo trục X
+     * @param dy      Tốc độ di chuyển theo trục Y
+     * @param imgPath Đường dẫn đến ảnh sprite của đối tượng
+     */
     public GameObject(int x, int y, int width, int height, int dx, int dy,
                       String imgPath) {
         this.x = x;
@@ -39,6 +81,7 @@ public class GameObject {
         this.dy = dy;
         this.imagePath = imgPath;
     }
+
     //setter va getter
     public void setX(int x) {
         this.x = x;

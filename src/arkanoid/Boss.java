@@ -1,18 +1,39 @@
 package arkanoid;
 
+/**
+ * Lớp Boss đại diện cho kẻ thù đặc biệt trong game Arkanoid.
+ * Mỗi Boss có nguyên tố (fire, water, wind, earth) và các kỹ năng riêng.
+ */
 public class Boss extends arkanoid.GameObject {
+
+    /**
+     * Kích thước mặc định của Boss
+     */
     private static final int BOSS_WIDTH = 160;
     private static final int BOSS_HEIGHT = 160;
+
+    /**
+     * Kích thước khung chơi (playframe)
+     */
     private static final int PLAYFRAME_WIDTH = 800;
     private static final int PLAYFRAME_HEIGHT = 700;
 
-    // Đường dẫn ảnh mặc định cho từng nguyên tố
+    /**
+     * Đường dẫn ảnh mặc định cho từng nguyên tố
+     */
     public static final String FIRE_IMG = "img/Boss/FireBoss3.png";
     public static final String WATER_IMG = "img/Boss/WaterBoss.png";
     public static final String WIND_IMG = "img/Boss/WindBoss.png";
     public static final String EARTH_IMG = "img/Boss/EarthBoss.png";
 
+    /**
+     * Nguyên tố của Boss
+     */
     private final String element;
+
+    /**
+     * Máu tối đa và máu hiện tại
+     */
     private int maxHp = 500;
     private int hp;
 
@@ -54,21 +75,39 @@ public class Boss extends arkanoid.GameObject {
     }
 
     // ==== HP API ====
+
+    /**
+     * Lấy máu hiện tại
+     */
     public int getHp() {
         return hp;
     }
 
+    /**
+     * Lấy máu tối đa
+     */
     public int getMaxHp() {
         return maxHp;
     }
 
+    /**
+     * Cập nhật máu tối đa và điều chỉnh máu hiện tại nếu cần.
+     *
+     * @param v giá trị máu tối đa mới
+     */
     public void setMaxHp(int v) {
         maxHp = Math.max(1, v);
         hp = Math.min(hp, maxHp);
     }
 
+    /**
+     * Thời gian bất tử giữa các lần bị tấn công
+     */
     private int iFrames = 0;
 
+    /**
+     * Cập nhật iFrames mỗi tick
+     */
     public void tick() {
         if (iFrames > 0) iFrames--;
     }
@@ -111,6 +150,9 @@ public class Boss extends arkanoid.GameObject {
     private int cooldown = 0;
     private int[] colOrder = null;
 
+    /**
+     * Kích hoạt skill Fire Rain
+     */
     public void activateFireRain() {
         if (!"fire".equals(element)) return;
         if (skillOn || cooldown > 0) return;
@@ -122,6 +164,12 @@ public class Boss extends arkanoid.GameObject {
         colOrder = shuffledCols();
     }
 
+    /**
+     * Cập nhật skill Fire Rain mỗi tick.
+     *
+     * @param playW chiều rộng khung chơi
+     * @param playH chiều cao khung chơi
+     */
     public void tickSkill(int playW, int playH) {
         // luôn cập nhật đạn đang tồn tại
         for (int i = 0; i < fireballs.size(); ) {
@@ -175,6 +223,9 @@ public class Boss extends arkanoid.GameObject {
         }
     }
 
+    /**
+     * Sinh thứ tự cột ngẫu nhiên
+     */
     private int[] shuffledCols() {
         int[] a = new int[COLS];
         for (int i = 0; i < COLS; i++) a[i] = i;
@@ -187,10 +238,17 @@ public class Boss extends arkanoid.GameObject {
         return a;
     }
 
+    /**
+     * Giới hạn giá trị giữa lo và hi
+     */
     private static int clamp(int v, int lo, int hi) {
         return v < lo ? lo : (v > hi ? hi : v);
     }
 
+    /**
+     * Lớp nội Fireball cho skill Fire Rain.
+     * Chỉ di chuyển theo trục Y (rơi xuống).
+     */
     private static final class Fireball extends arkanoid.GameObject {
         final int vy;
 
@@ -200,6 +258,9 @@ public class Boss extends arkanoid.GameObject {
         }
     }
 
+    /**
+     * Lấy danh sách fireballs hiện tại
+     */
     public java.util.List<? extends arkanoid.GameObject> getFireballs() {
         return fireballs;
     }
@@ -231,6 +292,9 @@ public class Boss extends arkanoid.GameObject {
         waveCooldown = WAVE_COOLDOWN_TICKS;
     }
 
+    /**
+     * Spawn batch wave water an toàn, tránh chồng nhau
+     */
     private void spawnWaveBatchSafe(int count, int playWidth, int brickW, int brickH) {
         // snapshot X để tránh dính nhau
         int n = waves.size();
@@ -293,11 +357,24 @@ public class Boss extends arkanoid.GameObject {
     private static final int EARTH_COOLDOWN_TICKS = 11 * 60; // ~11s nếu ~60 FPS
     private static final int EARTH_MIN = 4;                   // số gạch mỗi đợt
     private static final int EARTH_MAX = 6;                   // số gạch mỗi đợt
-    private static final int EARTH_HP  = 200;                // HP mỗi gạch
+    private static final int EARTH_HP = 200;                // HP mỗi gạch
 
-    public boolean isInvulnerable() { return invulnerable; }
+    /**
+     * Kiểm tra Boss có đang bất tử không
+     */
+    public boolean isInvulnerable() {
+        return invulnerable;
+    }
 
-    // Gọi để thử kích hoạt: chỉ có tác dụng khi element="earth", hết cooldown, và chưa có wave sống
+    /**
+     * Thử kích hoạt Earth Bulwark
+     * Chỉ kích hoạt nếu element = "earth", cooldown = 0, chưa có wave sống
+     *
+     * @param bricks    danh sách bricks hiện tại
+     * @param playWidth chiều rộng màn
+     * @param brickW    chiều rộng brick
+     * @param brickH    chiều cao brick
+     */
     public void maybeActivateEarthBulwark(java.util.List<arkanoid.Brick> bricks,
                                           int playWidth, int brickW, int brickH) {
         if (!"earth".equals(element)) return;
@@ -314,7 +391,12 @@ public class Boss extends arkanoid.GameObject {
         }
     }
 
-    // Gọi mỗi tick khi element="earth": giảm cooldown và theo dõi còn brick nào của wave không
+    /**
+     * Cập nhật Earth Bulwark mỗi tick
+     * Giảm cooldown và theo dõi còn brick nào sống
+     *
+     * @param bricks danh sách brick hiện tại
+     */
     public void tickEarth(java.util.List<arkanoid.Brick> bricks) {
         if (!"earth".equals(element)) return;
 
@@ -342,7 +424,16 @@ public class Boss extends arkanoid.GameObject {
         }
     }
 
-    // Spawn count viên, căn theo lưới, tránh overlap sơ bộ
+    /**
+     * Spawn các viên earth bricks, căn theo lưới, tránh overlap
+     *
+     * @param bricks    danh sách bricks hiện tại
+     * @param count     số viên cần spawn
+     * @param playWidth chiều rộng màn
+     * @param brickW    chiều rộng brick
+     * @param brickH    chiều cao brick
+     * @return số viên đã spawn thành công
+     */
     private int spawnEarthBricks(java.util.List<arkanoid.Brick> bricks, int count,
                                  int playWidth, int brickW, int brickH) {
         java.util.Random rnd = rng;  // dùng RNG có sẵn
@@ -363,7 +454,10 @@ public class Boss extends arkanoid.GameObject {
             for (arkanoid.Brick b : bricks) {
                 if (b == null) continue;
                 java.awt.Rectangle r2 = new java.awt.Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
-                if (rect.intersects(r2)) { overlap = true; break; }
+                if (rect.intersects(r2)) {
+                    overlap = true;
+                    break;
+                }
             }
             if (overlap) continue;
 
@@ -380,12 +474,24 @@ public class Boss extends arkanoid.GameObject {
     }
 
     // ===== WIND SHURIKEN =====
+
+    /**
+     * Danh sách Shuriken Wind hiện tại
+     */
     private final java.util.List<ShurikenWind> shurikens = new java.util.ArrayList<>();
 
+    /**
+     * Lấy danh sách shurikens hiện tại
+     */
     public java.util.List<ShurikenWind> getShurikens() {
         return shurikens;
     }
 
+    /**
+     * Kích hoạt Shuriken Wind, bám theo Paddle
+     *
+     * @param paddle đối tượng paddle để shuriken bám theo
+     */
     public void activateWindSeek(Paddle paddle) {
         if (!"wind".equals(element)) return;
 
@@ -394,7 +500,7 @@ public class Boss extends arkanoid.GameObject {
 
         for (int i = 0; i < n; i++) {
             int bossCenterX = getX() + getWidth() / 2;
-            int bossBottom  = getY() + getHeight();
+            int bossBottom = getY() + getHeight();
 
             double init = Math.atan2(
                     paddle.getCenterY() - bossBottom,
@@ -407,8 +513,13 @@ public class Boss extends arkanoid.GameObject {
         }
     }
 
-
-
+    /**
+     * Cập nhật shuriken mỗi tick
+     *
+     * @param playW  chiều rộng màn
+     * @param playH  chiều cao màn
+     * @param paddle paddle để shuriken bám theo
+     */
     public void tickWindShurikens(int playW, int playH, Paddle paddle) {
         for (int i = 0; i < shurikens.size(); ) {
             ShurikenWind s = shurikens.get(i);
@@ -435,11 +546,19 @@ public class Boss extends arkanoid.GameObject {
         }
     }
 
-
+    /**
+     * Lấy nguyên tố Boss
+     */
     public String getElement() {
         return element;
     }
 
+    /**
+     * Tạo Boss theo level
+     *
+     * @param level level trong game
+     * @return Boss hoặc null nếu level không có boss
+     */
     protected static Boss makeBossForLevel(int level) {
         switch (level) {
             case 15:

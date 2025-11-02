@@ -3,22 +3,60 @@ package arkanoid;
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+
 import arkanoid.*;
 
 import static arkanoid.GameObject.GAME_HEIGHT;
 import static arkanoid.GameObject.GAME_WIDTH;
 
+/**
+ * Giao diện quản lý bộ sưu tập bóng của người chơi.
+ * Hiển thị các bóng sở hữu, cho phép trang bị bóng mới và xem bóng hiện tại.
+ */
 public class BallUI extends JFrame {
 
+    /**
+     * Quản lý các bóng người chơi sở hữu
+     */
     private final OwnedManager ownedManager;
+
+    /**
+     * Âm thanh khi nhấn nút
+     */
     private Sound clickSound;
+
+    /**
+     * Hình nền danh sách bóng
+     */
     private Image ballListImg;
+
+    /**
+     * Danh sách tất cả các bóng
+     */
     private final List<Ball> ballList;
+
+    /**
+     * Nhãn hiển thị bóng đang trang bị
+     */
     private JLabel currentBallLabel;
+
+    /**
+     * Tham chiếu đến màn hình BaloUI cha
+     */
     private BaloUI parentBalo;
 
+    /**
+     * Kích thước hiển thị icon bóng
+     */
     private static final int BALL_SIZE = 100;
 
+    /**
+     * Constructor tạo giao diện BallUI.
+     *
+     * @param parentBalo   màn hình cha BaloUI
+     * @param ownedManager quản lý bóng sở hữu
+     * @param ballList     danh sách tất cả các bóng
+     */
     public BallUI(BaloUI parentBalo, OwnedManager ownedManager, List<Ball> ballList) {
         this.parentBalo = parentBalo;
         this.ownedManager = ownedManager;
@@ -26,6 +64,13 @@ public class BallUI extends JFrame {
         initUI();
     }
 
+    /**
+     * Khởi tạo giao diện chính, bao gồm:
+     * - Thiết lập cửa sổ
+     * - Tải âm thanh và hình nền
+     * - Hiển thị nút Back
+     * - Hiển thị bóng hiện tại và danh sách bóng
+     */
     private void initUI() {
         setTitle("Bộ Sưu Tập Bóng");
         setSize(GAME_WIDTH, GAME_HEIGHT);
@@ -61,6 +106,11 @@ public class BallUI extends JFrame {
         loadBallsToPanel(panel);
     }
 
+    /**
+     * Hiển thị bóng hiện tại đang được trang bị.
+     *
+     * @param panel panel chính để thêm nhãn bóng
+     */
     private void showCurrentBall(JPanel panel) {
         Ball currentBall = ownedManager.getCurrentBall();
         ImageIcon icon = new ImageIcon(currentBall.getImagePath());
@@ -71,6 +121,12 @@ public class BallUI extends JFrame {
         panel.add(currentBallLabel);
     }
 
+    /**
+     * Hiển thị tất cả bóng trong danh sách dưới dạng các nút bấm.
+     * Người chơi có thể chọn để trang bị bóng.
+     *
+     * @param panel panel chính để thêm các nút bóng
+     */
     private void loadBallsToPanel(JPanel panel) {
         List<Ball> balls = ballList;
         int startX = 320;
@@ -103,7 +159,7 @@ public class BallUI extends JFrame {
                     ownedManager.setCurrentBall(ball);
                     JOptionPane.showMessageDialog(this, "Đã trang bị bóng mới!");
 
-                    //cap nhat hinh anh qua bong moi
+                    // Cập nhật hình ảnh bóng mới
                     ImageIcon newIcon = new ImageIcon(ball.getImagePath());
                     Image newImg = newIcon.getImage().getScaledInstance(BALL_SIZE * 2, BALL_SIZE * 2, Image.SCALE_SMOOTH);
                     currentBallLabel.setIcon(new ImageIcon(newImg));
@@ -118,6 +174,11 @@ public class BallUI extends JFrame {
         panel.repaint();
     }
 
+    /**
+     * Hàm main để chạy thử giao diện BallUI.
+     *
+     * @param args tham số dòng lệnh
+     */
     public static void main(String[] args) {
         OwnedManager ownedManager = new OwnedManager();
         new BallUI(null, ownedManager, ownedManager.getBalls());

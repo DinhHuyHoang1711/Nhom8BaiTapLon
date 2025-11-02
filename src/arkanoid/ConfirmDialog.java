@@ -2,26 +2,50 @@ package arkanoid;
 
 import javax.swing.*;
 import java.awt.*;
-import arkanoid.Sound;
-import arkanoid.OwnedManager;
-import arkanoid.Ball;
-import arkanoid.Artifact;
-import arkanoid.ButtonManager;
 
 public class ConfirmDialog extends JFrame {
 
+    /**
+     * Chiều rộng mặc định của hộp thoại xác nhận.
+     */
     public static final int CONFIRM_WIDTH = 450;
+
+    /**
+     * Chiều cao mặc định của hộp thoại xác nhận.
+     */
     public static final int CONFIRM_HEIGHT = 200;
 
+    /**
+     * Âm thanh phát khi người dùng nhấn nút trong hộp thoại.
+     */
     private final Sound clickSound;
+
+    /**
+     * Ảnh nền của hộp thoại xác nhận.
+     */
     private final Image confirmImg;
+
+    /**
+     * Quả bóng được người chơi chọn để xác nhận.
+     */
     private final Ball selectedBall;
+
+    /**
+     * Quản lý thông tin vật phẩm mà người chơi sở hữu, bao gồm bóng hiện tại.
+     */
     private final OwnedManager ownedManager;
 
+    /**
+     * Khởi tạo một hộp thoại xác nhận cho phép người chơi quyết định có chọn quả bóng mới hay không.
+     *
+     * @param ownedManager Đối tượng {@link OwnedManager} quản lý bóng hiện tại của người chơi
+     * @param selectedBall Quả bóng mà người chơi vừa chọn để xác nhận
+     */
     public ConfirmDialog(OwnedManager ownedManager, Ball selectedBall) {
         this.ownedManager = ownedManager;
         this.selectedBall = selectedBall;
 
+        // === Cấu hình cửa sổ ===
         setTitle("Bạn có chắc muốn chọn bóng này không?");
         setSize(CONFIRM_WIDTH, CONFIRM_HEIGHT);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -29,6 +53,7 @@ public class ConfirmDialog extends JFrame {
         setResizable(false);
         setAlwaysOnTop(true);
 
+        // === Tải âm thanh click và ảnh nền ===
         clickSound = new Sound("sound/click.wav");
         confirmImg = new ImageIcon("img/confirm.png").getImage();
 
@@ -63,6 +88,7 @@ public class ConfirmDialog extends JFrame {
                 "img/No_button.png", null, 300, 100, clickSound, e -> dispose()
         ));
 
+        // === Gán panel vào nội dung chính của frame ===
         setContentPane(panel);
         setVisible(true);
     }

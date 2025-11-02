@@ -6,6 +6,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.Rectangle;
 import java.util.*;
+
 import arkanoid.GameObject;
 import arkanoid.Brick;
 import arkanoid.Paddle;
@@ -14,34 +15,45 @@ import arkanoid.Sound;
 import static arkanoid.Game.GAME_HEIGHT;
 import static arkanoid.Game.PLAYFRAME_WIDTH;
 
-public class Ball extends GameObject{
+public class Ball extends GameObject {
     // Kích thước bóng
     public static final int BALL_SIZE = 21;
 
-    //am thanh bong va vao cac vat the
-    public final Sound wallHit = new Sound("sound/wallHit.wav");
-    public final Sound paddleHit = new Sound("sound/paddleHit.wav");
-    public final Sound normalbrickHit = new Sound("sound/normalbrickHit.wav");
-    public final Sound firebirckHit = new Sound("sound/firebrickHit.wav");
-    public final Sound waterbrickHit = new Sound("sound/waterbrickHit.wav");
-    public final Sound earthbrickHit = new Sound("sound/earthbrickHit.wav");
-    public final Sound windbrickHit = new Sound("sound/windbrickHit.wav");
+    // Âm thanh va chạm các loại vật thể
+    public final Sound wallHit = new Sound("sound/wallHit.wav"); // Va vào tường
+    public final Sound paddleHit = new Sound("sound/paddleHit.wav"); // Va vào thanh đỡ (paddle)
+    public final Sound normalbrickHit = new Sound("sound/normalbrickHit.wav"); // Gạch thường
+    public final Sound firebirckHit = new Sound("sound/firebrickHit.wav");  // Gạch lửa
+    public final Sound waterbrickHit = new Sound("sound/waterbrickHit.wav"); // Gạch nước
+    public final Sound earthbrickHit = new Sound("sound/earthbrickHit.wav"); // Gạch đất
+    public final Sound windbrickHit = new Sound("sound/windbrickHit.wav");  // Gạch gió
 
     // Thuộc tính
-    private String element;
-    private int baseDamage;
-    private Random rand = new Random();
-    private int baseDx;
-    private int baseDy;
+    private String element; // Nguyên tố của bóng: normal, fire, water, wind, earth
+    private int baseDamage;  // Sát thương cơ bản gây ra
+    private Random rand = new Random(); // Dùng để random góc nảy
+    private int baseDx;   // Tốc độ gốc theo trục X
+    private int baseDy;   // Tốc độ gốc theo trục Y
 
-    // Ảnh
+    // Đường dẫn ảnh của bóng theo từng nguyên tố
     private static final String NORMAL_BALL_IMG = "img/ball/normal.png";
-    private static final String FIRE_BALL_IMG   = "img/ball/fire.png";
-    private static final String WATER_BALL_IMG  = "img/ball/water.png";
-    private static final String WIND_BALL_IMG   = "img/ball/wind.png";
-    private static final String EARTH_BALL_IMG  = "img/ball/earth.png";
+    private static final String FIRE_BALL_IMG = "img/ball/fire.png";
+    private static final String WATER_BALL_IMG = "img/ball/water.png";
+    private static final String WIND_BALL_IMG = "img/ball/wind.png";
+    private static final String EARTH_BALL_IMG = "img/ball/earth.png";
 
     // ==== CONSTRUCTOR ==== //
+
+    /**
+     * Constructor tạo bóng cơ bản.
+     *
+     * @param x       vị trí X
+     * @param y       vị trí Y
+     * @param size    kích thước chiều rộng & cao
+     * @param dx      vận tốc theo trục X
+     * @param dy      vận tốc theo trục Y
+     * @param imgPath đường dẫn ảnh bóng
+     */
     public Ball(int x, int y, int size, int dx, int dy, String imgPath) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName("normal");
@@ -49,6 +61,9 @@ public class Ball extends GameObject{
         this.baseDy = dy;
     }
 
+    /**
+     * Constructor có thêm damage.
+     */
     public Ball(int x, int y, int size, int dx, int dy, String imgPath, int damage) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName("normal", damage);
@@ -56,6 +71,9 @@ public class Ball extends GameObject{
         this.baseDy = dy;
     }
 
+    /**
+     * Constructor tạo bóng với nguyên tố cụ thể.
+     */
     public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName(element);
@@ -63,6 +81,9 @@ public class Ball extends GameObject{
         this.baseDy = dy;
     }
 
+    /**
+     * Constructor tạo bóng với nguyên tố + damage.
+     */
     public Ball(int x, int y, int size, int dx, int dy, String element, String imgPath, int damage) {
         super(x, y, size, size, dx, dy, imgPath);
         setElementFromName(element, damage);
@@ -70,11 +91,17 @@ public class Ball extends GameObject{
         this.baseDy = dy;
     }
 
+    /**
+     * Constructor tạo bóng đứng yên (chưa di chuyển).
+     */
     public Ball(int x, int y, int size, String imgPath) {
         super(x, y, size, size, 0, 0, imgPath);
         setElementFromName("normal");
     }
 
+    /**
+     * Constructor đầy đủ kích thước width & height khác nhau.
+     */
     public Ball(int x, int y, int width, int height, int dx, int dy, String imgPath) {
         super(x, y, width, height, dx, dy, imgPath);
         setElementFromName("normal");
@@ -82,7 +109,9 @@ public class Ball extends GameObject{
         this.baseDy = dy;
     }
 
-    //constructor copy
+    /**
+     * Constructor Copy (tạo bóng mới giống bóng cũ).
+     */
     public Ball(Ball other) {
         super(other.getX(), other.getY(), other.getWidth(), other.getHeight(),
                 other.getDx(), other.getDy(), other.getImagePath());
@@ -134,8 +163,7 @@ public class Ball extends GameObject{
                 -8, "wind", WIND_BALL_IMG, 100);
     }
 
-    public static Ball earthBall()
-    {
+    public static Ball earthBall() {
         return new Ball(PLAYFRAME_WIDTH / 2 - 30, GAME_HEIGHT - 120, BALL_SIZE, 6,
                 -8, "earth", EARTH_BALL_IMG, 100);
     }
@@ -163,20 +191,25 @@ public class Ball extends GameObject{
         this.baseDamage = baseDamage;
     }
 
+    // Cập nhật vị trí bóng mỗi frame dựa trên vận tốc
     public void step(Rectangle bounds) {
-        setX(getX() + getDx());
-        setY(getY() + getDy());
+        setX(getX() + getDx()); // Cộng vận tốc theo trục X
+        setY(getY() + getDy()); // Cộng vận tốc theo trục Y
 
+        // Va vào tường trái
         if (getX() < 0) {
             wallHit.play();
             setX(0);
             setDx(-getDx());
-        } else if (getX() + getWidth() > bounds.width) {
+        }
+        // Va vào tường phải
+        else if (getX() + getWidth() > bounds.width) {
             wallHit.play();
             setX(Math.max(0, bounds.width - getWidth()));
             setDx(-getDx());
         }
 
+        // Va vào trần trên
         if (getY() < 0) {
             wallHit.play();
             setY(0);
@@ -184,9 +217,9 @@ public class Ball extends GameObject{
         }
     }
 
-    //Xu li va cham voi gach sao cho muot
+    // Xử lý va chạm với gạch mượt mà
     public boolean collide(Brick b) {
-        if (b == null || b.isDestroyed()) return false;
+        if (b == null || b.isDestroyed()) return false; // Nếu brick null hoặc vỡ thì bỏ qua
 
         Rectangle br = new Rectangle(b.getX(), b.getY(), b.getWidth(), b.getHeight());
         Rectangle ba = new Rectangle(getX(), getY(), getWidth(), getHeight());
@@ -222,18 +255,18 @@ public class Ball extends GameObject{
             // Gây sát thương
             if (this.element.equals("normal")) {
                 b.takeHit(this.getBaseDamage());
-                if(b.getElement().equals("normal")) normalbrickHit.play();
-                if(b.getElement().equals("fire")) firebirckHit.play();
-                if(b.getElement().equals("water")) waterbrickHit.play();
-                if(b.getElement().equals("earth")) earthbrickHit.play();
-                if(b.getElement().equals("wind")) windbrickHit.play();
+                if (b.getElement().equals("normal")) normalbrickHit.play();
+                if (b.getElement().equals("fire")) firebirckHit.play();
+                if (b.getElement().equals("water")) waterbrickHit.play();
+                if (b.getElement().equals("earth")) earthbrickHit.play();
+                if (b.getElement().equals("wind")) windbrickHit.play();
             } else {
                 b.takeHit(this.element.equals(b.getElement()) ? this.getBaseDamage() * 2 : this.getBaseDamage());
-                if(b.getElement().equals("normal")) normalbrickHit.play();
-                if(b.getElement().equals("fire")) firebirckHit.play();
-                if(b.getElement().equals("water")) waterbrickHit.play();
-                if(b.getElement().equals("earth")) earthbrickHit.play();
-                if(b.getElement().equals("wind")) windbrickHit.play();
+                if (b.getElement().equals("normal")) normalbrickHit.play();
+                if (b.getElement().equals("fire")) firebirckHit.play();
+                if (b.getElement().equals("water")) waterbrickHit.play();
+                if (b.getElement().equals("earth")) earthbrickHit.play();
+                if (b.getElement().equals("wind")) windbrickHit.play();
             }
 
             return true;
@@ -247,19 +280,19 @@ public class Ball extends GameObject{
             return;
         } else {
             paddleHit.play();
-            if(paddle.isMovingLeft()) {
+            if (paddle.isMovingLeft()) {
                 //Paddle di sang trai thi bong di sang trai
                 this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
                 this.setDx(-1 * Math.abs((rand.nextInt(4) + Math.abs(this.baseDx))));
             } else {
                 //Paddle di sang phai thi bong di sang phai
-                if(paddle.isMovingRight()) {
+                if (paddle.isMovingRight()) {
                     this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
                     this.setDx(Math.abs((rand.nextInt(4) + Math.abs(this.baseDx))));
                 } else {
                     //Paddle dung yen thi bong tiep tuc di theo huong ban dau
                     this.setDy(-Math.abs(rand.nextInt(4) + Math.abs(this.baseDy)));
-                    if(this.getDx() != 0) {//De tranh truong hop Dx cua bong = 0
+                    if (this.getDx() != 0) {//De tranh truong hop Dx cua bong = 0
                         this.setDx(this.getDx() / Math.abs(this.getDx()) * (rand.nextInt(4) + Math.abs(this.baseDx)));
                     }
                 }
@@ -278,13 +311,13 @@ public class Ball extends GameObject{
         if (!ba.intersects(br)) return false;
 
         // --- MTV: chọn hướng đẩy ra ít nhất ---
-        int overlapLeft   = ba.x + ba.width  - br.x;
-        int overlapRight  = br.x + br.width  - ba.x;
-        int overlapTop    = ba.y + ba.height - br.y;
+        int overlapLeft = ba.x + ba.width - br.x;
+        int overlapRight = br.x + br.width - ba.x;
+        int overlapTop = ba.y + ba.height - br.y;
         int overlapBottom = br.y + br.height - ba.y;
 
         int minHoriz = Math.min(overlapLeft, overlapRight);
-        int minVert  = Math.min(overlapTop, overlapBottom);
+        int minVert = Math.min(overlapTop, overlapBottom);
 
         if (minHoriz < minVert) {
             // Va chạm trái/phải
@@ -316,6 +349,7 @@ public class Ball extends GameObject{
         return true; // đã va
     }
 
+    // Gán nguyên tố và damage cơ bản
     private void setElementFromName(String element) {
         this.element = (element.isEmpty() ? "normal" : element);
         this.baseDamage = this.element.equals("normal") ? 50 : 100;
