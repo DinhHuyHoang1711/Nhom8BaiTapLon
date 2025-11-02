@@ -413,7 +413,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             pauseButton.setIcon(new ImageIcon(new ImageIcon("img/pauseButton.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             timer.start();
-            artifactTimer.start();
+            if (artifactTimer != null) {
+                artifactTimer.start();
+            }
             isPause = false;
             this.requestFocusInWindow();
         } else {
@@ -421,7 +423,9 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             pauseButton.setIcon(new ImageIcon(new ImageIcon("img/pauseButton1.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             pauseButton.setRolloverIcon(new ImageIcon(new ImageIcon("img/pauseHover1.png").getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH)));
             timer.stop();
-            artifactTimer.stop();
+            if(artifactTimer != null) {
+                artifactTimer.stop();
+            }
             isPause = true;
         }
     }
