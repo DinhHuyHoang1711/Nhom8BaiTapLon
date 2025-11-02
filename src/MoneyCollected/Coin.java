@@ -3,20 +3,14 @@ package MoneyCollected;
 public class Coin {
     private int amount; // Số tiền hiện có
 
-<<<<<<< HEAD
-    // Tài sản
-=======
-    // Constructor mặc định, gán tiền ban đầu = 2200
->>>>>>> 3df1daac4675939fcddf088ad4827cd6b09283a8
+
     public Coin() {
         amount = 2200;
     }
 
-<<<<<<< HEAD
-    // Copy
-=======
+
     // Constructor sao chép (copy constructor)
->>>>>>> 3df1daac4675939fcddf088ad4827cd6b09283a8
+
     public Coin(Coin another) {
         this.amount = another.getAmount();
     }

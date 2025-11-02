@@ -9,11 +9,8 @@ import java.util.List;
  * Lớp Inventory (Túi đồ).
  */
 class Inventory {
-<<<<<<< HEAD
-    // danh sách Item đang sở hữu
-=======
+
     // Danh sách các vật phẩm mà người chơi đã trúng
->>>>>>> 3df1daac4675939fcddf088ad4827cd6b09283a8
     private List<Item> ownedItems = new ArrayList<>();
 
     // Danh sách toàn bộ vật phẩm có thể xuất hiẹn trong gacha
@@ -84,11 +81,7 @@ class Inventory {
                 listPanel.add(row);
                 listPanel.add(Box.createVerticalStrut(5));
 
-<<<<<<< HEAD
                 y += DISTANSE_ITEM; // khoảng cách giữa các item
-=======
-                y += 95; // Xuống dòng tiếp theo
->>>>>>> 3df1daac4675939fcddf088ad4827cd6b09283a8
             }
 
             // Điều chỉnh chiều cao panel theo số lượng item
