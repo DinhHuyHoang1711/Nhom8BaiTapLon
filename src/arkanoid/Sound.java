@@ -4,6 +4,9 @@ import javax.sound.sampled.*;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * Lớp Sound quản lý âm thanh
+ */
 public class Sound {
     private Clip clip;
 
@@ -20,7 +23,7 @@ public class Sound {
         }
     }
 
-    // phat 1 lan
+    // phát 1 lần
     public void play() {
         if (clip != null) {
             if (clip.isRunning()) {
@@ -31,21 +34,21 @@ public class Sound {
         }
     }
 
-    // phat lap lai
+    // phát lặp lại
     public void loop() {
         if (clip != null) {
             clip.loop(Clip.LOOP_CONTINUOUSLY);
         }
     }
 
-    // dung
+    // dừng phát
     public void stop() {
         if (clip != null && clip.isRunning()) {
             clip.stop();
         }
     }
 
-    //giai phong
+    // giải phóng
     public void close() {
         if (clip != null) {
             clip.close();

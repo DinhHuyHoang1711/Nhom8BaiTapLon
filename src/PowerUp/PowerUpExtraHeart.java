@@ -5,9 +5,13 @@ import java.awt.*;
 import javax.swing.*;
 import arkanoid.*;
 
+/**
+ * Tăng mạng
+ */
 public class PowerUpExtraHeart extends PowerUp {
-    private static final int MAX_HEARTS = 3;
+    private static final int MAX_HEARTS = 3;    // Mạng tối đa
 
+    // Constructor
     public PowerUpExtraHeart(int x, int y) {
         super(x, y, 40, 40, "img/powerup/heartPowerup.png", PowerUpType.EXTRA_HEART, 0);
     }
@@ -17,7 +21,7 @@ public class PowerUpExtraHeart extends PowerUp {
         Game game = getActiveGame();
         if (game.currentHeart >= MAX_HEARTS) return;
 
-        game.currentHeart++;
+        game.currentHeart++;        // Tăng mạng
         updateHeartIcon(game);
     }
 
@@ -26,6 +30,7 @@ public class PowerUpExtraHeart extends PowerUp {
         //hello.
     }
 
+    // Cập nhật hiển thị
     private void updateHeartIcon(Game game) {
         if (game.heart.size() > game.currentHeart - 1) {
             ImageIcon red = new ImageIcon("img/heart/redheart.png");
@@ -34,6 +39,7 @@ public class PowerUpExtraHeart extends PowerUp {
         }
     }
 
+    // Tìm đối tượng game để áp dụng hiệu ứng
     private Game getActiveGame() {
         for (Frame f : Frame.getFrames()) {
             if (f instanceof Game && f.isDisplayable()) {

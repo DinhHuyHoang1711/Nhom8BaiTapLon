@@ -101,14 +101,14 @@ public class DiamondSquareGacha extends JPanel {
      * Thiết lập các nút bấm
      */
     private void setupButtons() {
-        // 🔹 Nút QUAY
+        //  Nút QUAY
         spinBtn = new JButton("QUAY");
         spinBtn.setFont(new Font("Arial", Font.BOLD, 18));
         spinBtn.setBounds(240, 520, 120, 40);
         spinBtn.addActionListener(new SpinButtonListener());
         add(spinBtn);
 
-        // 🔹 Nút TÚI ĐỒ
+        // Nút TÚI ĐỒ
         bagBtn = new JButton(new ImageIcon("images/bag.png"));
         bagBtn.setBounds(400, 400, 200, 200);
         bagBtn.setToolTipText("Túi đồ");
@@ -132,10 +132,10 @@ public class DiamondSquareGacha extends JPanel {
         @Override
         public void actionPerformed(ActionEvent e) {
             int cost = 1000;
-            if(currentMoney.spend(cost)) {
+            if (currentMoney.spend(cost)) {
                 spinAnim.startSpin();
                 updateMoneyLabel();
-            }else{
+            } else {
                 JOptionPane.showMessageDialog(DiamondSquareGacha.this,
                         "Không đủ coin để quay!", "Thông báo", JOptionPane.WARNING_MESSAGE);
             }

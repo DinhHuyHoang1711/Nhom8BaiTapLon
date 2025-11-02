@@ -31,16 +31,17 @@ public class MapMenu extends JFrame {
     //item hien tai dang trang bi chinh la ownedManager.getCurrentItem()
 
     private java.util.List<Boolean> levelStatus = new java.util.ArrayList<>(java.util.Collections.nCopies(TOTAL_LEVEL, false));
-    private ArrayList <JButton> levelButton = new ArrayList <> ();
+    private ArrayList<JButton> levelButton = new ArrayList<>();
 
     //chuan bi bircks
-    private ArrayList <Brick> lv1Bricks = new ArrayList<>();
+    private ArrayList<Brick> lv1Bricks = new ArrayList<>();
 
     public MapMenu() {
-
+        // Add bricks vào level
         lv1Bricks.clear();
         lv1Bricks.addAll(Brick.buildLevel4Bricks());
 
+        // Panel chính
         setTitle("SELECT MAP");
         setSize(GAME_WIDTH, GAME_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,6 +55,7 @@ public class MapMenu extends JFrame {
         //khoi tao ban do the gioi
         mapImage = new ImageIcon("img/background.jpg").getImage();
 
+        // Vẽ MapMenu
         JPanel panel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
@@ -61,11 +63,11 @@ public class MapMenu extends JFrame {
                 g.drawImage(mapImage, 0, 0, getWidth(), getHeight(), this);
             }
         };
-        panel.setLayout(null);
+        panel.setLayout(null); //set vị trí tự do
 
         // Nút Back
         JButton exit = ButtonManager.createImageButton(
-                "img/exit.png","img/exithover.png" ,
+                "img/exit.png", "img/exithover.png",
                 10, 570, click, e -> {
                     this.dispose();
                     System.exit(0);
@@ -110,7 +112,7 @@ public class MapMenu extends JFrame {
         );
         panel.add(balo);
 
-        // Thêm các nút level
+        // Thêm các nút level và tọa độ của từng nút
         levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
                 630, 340, click, e -> showLevelPreview(1)));
         levelButton.add(ButtonManager.createImageButton("img/button/1.png", null,
@@ -142,8 +144,8 @@ public class MapMenu extends JFrame {
         levelButton.add(ButtonManager.createImageButton("img/button/3.png", null,
                 997, 302, click, e -> showLevelPreview(15)));
 
-        for(int i = 0; i < 15; i++) {
-            panel.add(levelButton.get(i));
+        for (int i = 0; i < 15; i++) {
+            panel.add(levelButton.get(i)); // Add vào panel
         }
 
         updateLevelStatus();
@@ -155,14 +157,14 @@ public class MapMenu extends JFrame {
     //Mo Popup gioi thieu ve level
     private void showLevelPreview(int level) {
 
-        //Dung Jdialog nhe
+        //Dung Jdialog
         JDialog dialog = new JDialog(this, "Level " + level, true);
         dialog.setSize(1100, 600);
         dialog.setLocationRelativeTo(this);
         dialog.setResizable(false);
         dialog.setLayout(null);
 
-        //Anh popup
+        //Anh powerup
         ImageIcon previewIcon = new ImageIcon("img/levelpreview/lv" + level + ".png");
         Image scaledImage = previewIcon.getImage().getScaledInstance(1100, 600, Image.SCALE_SMOOTH);
         JLabel backgroundLabel = new JLabel(new ImageIcon(scaledImage));
@@ -221,8 +223,8 @@ public class MapMenu extends JFrame {
     }
 
     public void updateLevelStatus() {
-        for(int i = 0; i < TOTAL_LEVEL; i++) {
-            if(levelStatus.get(i) == true) {
+        for (int i = 0; i < TOTAL_LEVEL; i++) {
+            if (levelStatus.get(i) == true) {
                 levelButton.get(i).setIcon(new ImageIcon("img/button/2.png"));
             }
         }

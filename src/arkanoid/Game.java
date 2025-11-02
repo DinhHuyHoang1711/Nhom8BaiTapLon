@@ -4,11 +4,8 @@ import javax.swing.*;
 import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.util.*;
 import java.util.List;
-
-import GraphicsEffect.ScreenShakeEffect;
 import arkanoid.ArtifactSlot;
 import arkanoid.LaserBeam;
 
@@ -85,7 +82,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private final Map<Brick, ObjectPrinter> brickPrinters = new HashMap<>();
     private final String gameScene;
     //timer
-    private final Timer timer = new Timer(TICK_MS, this);
+    private final javax.swing.Timer timer = new javax.swing.Timer(TICK_MS, this);
 
     // trang thai (fix delay)
     private boolean leftPressed = false;
@@ -132,12 +129,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private Boss boss = null;                         // chỉ spawn 1 lần ở cuối màn
     private boolean bossSpawned = false;
     private final ObjectPrinter1 bossPrinter = new ObjectPrinter1();
-    private final FireballLayer fireballLayer;              // 1 layer vẽ tất cả fireball
+    private final arkanoid.FireballLayer fireballLayer;              // 1 layer vẽ tất cả fireball
     private final Rectangle tmpR2 = new Rectangle();
     private int bossSpawnGrace = 0; // số tick miễn va chạm ngay sau khi spawn
 
     // ===== Water Waves =====
-    private final List<Brick> waveBricks = new ArrayList<>();
+    private final java.util.List<Brick> waveBricks = new ArrayList<>();
     private final Image waveSprite = new ImageIcon("img/Boss/WaterWave.png").getImage();
     private final WaterWaveLayer waterLayer = new WaterWaveLayer(waveSprite);
     // ===== Wind Shuriken =====
@@ -148,11 +145,11 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     // ==== Levels ====
     private int currentLevel;
-    private List<Boolean> levelStatus;
+    private java.util.List<Boolean> levelStatus;
     private final Boss bossForLevel; // null = level này không có boss
 
     public Game(Paddle currentPaddle, Ball currentBall, Item currentItem, Coin coin, String level, String currentGameScene,
-                int currentLevel, List<Boolean> levelStatus, Boss bossForLevel, MapMenu parentMenu) {
+                int currentLevel, java.util.List<Boolean> levelStatus, Boss bossForLevel, MapMenu parentMenu) {
         super("Arkanoid (Ball + Brick)");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(GAME_WIDTH, GAME_HEIGHT);
@@ -261,7 +258,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         int[][] grid;
         try {
             grid = Brick.readGrid(level);
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             throw new RuntimeException("load grid fail", e);
         }
         int rows = grid.length;
@@ -360,8 +357,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         // --- ARTIFACT INFO ---
         artifactTitle = new JLabel("Artifact");
         artifactTitle.setBounds(840, 385, 200, 25); // vi tri va kich thuoc
-        artifactTitle.setFont(new Font("Adobe Garamond Pro", 1, 25));
-        artifactTitle.setForeground(Color.YELLOW); // mau
+        artifactTitle.setFont(new java.awt.Font("Adobe Garamond Pro", 1, 25));
+        artifactTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(artifactTitle, Integer.valueOf(2));
 
         //hien thi hinh anh artifact co the cooldown nhu lien quan
@@ -372,8 +369,8 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         // COIN INFO
         coinTitle = new JLabel("Coin");
         coinTitle.setBounds(840, 485, 200, 25); // vi tri va kich thuoc
-        coinTitle.setFont(new Font("Adobe Garamond Pro", 1, 25));
-        coinTitle.setForeground(Color.YELLOW); // mau
+        coinTitle.setFont(new java.awt.Font("Adobe Garamond Pro", 1, 25));
+        coinTitle.setForeground(java.awt.Color.YELLOW); // mau
         layers.add(coinTitle, Integer.valueOf(2));
 
         amountLabel = new JLabel("Amount: " + amount.getAmount());
@@ -487,7 +484,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                 bossSpawned = true;
                 bossSpawnGrace = 12;
 
-                ScreenShakeEffect.shake(this,  1000, 8);
+                GraphicsEffect.ScreenShakeEffect.shake(this,  1000, 8);
                 bossSound.play();
 
                 if ("fire".equals(boss.getElement())) {
@@ -596,13 +593,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     PowerUp pu = null;
                     if (Math.random() < POWER_UP_DROP_CHANCE) {
                         double rand = Math.random();
-                        if(rand < 0.2) {
+                        if(rand < 0.1) {
                             pu = new PowerUpIncreaseDamage(b.getX() + 20, b.getY() + 10, new OwnedManager(ball));
                         }
-                        else if(rand < 0.4) {
+                        else if(rand < 0.2) {
                             pu = new PowerUpExtraHeart(b.getX() + 20, b.getY() + 10);
                         }
-                        else if(rand < 0.6){
+                        else if(rand < 0.3){
                             pu = new PowerUpExpandPaddle(b.getX() + 20, b.getY() + 10, paddle);
                         }
                         else if (rand < 0.8) {
@@ -620,6 +617,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                         powerUpPrinters.put(pu, pup);
                         layers.add(pup, Integer.valueOf(7));
                     }
+
                 } else {
                     ObjectPrinter p = brickPrinters.get(b);
                     if (p != null) p.startFlash();
@@ -783,12 +781,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
     private void cleanupBossSkills() {
         // Fire
-        fireballLayer.setProjectiles(Collections.emptyList());
+        fireballLayer.setProjectiles(java.util.Collections.emptyList());
         fireballLayer.repaint();
 
         // Water
         if (boss != null) {
-            waterLayer.setWaves(Collections.emptyList());
+            waterLayer.setWaves(java.util.Collections.emptyList());
             waterLayer.repaint();
         }
 
@@ -838,7 +836,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private static final boolean WAVE_ONE_WAY = false; // true: chỉ chặn từ trên xuống
 
     private void handleWaterWaveCollisions() {
-        List<? extends GameObject> ws = boss.getWaves();
+        java.util.List<? extends GameObject> ws = boss.getWaves();
 
         for (int i = 0; i < ws.size();) {
             GameObject w = ws.get(i);
@@ -861,7 +859,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
                     heart.get(currentHeart).setIcon(new ImageIcon(scaledH));
                 }
                 @SuppressWarnings("rawtypes")
-                List list = (List) ws;
+                java.util.List list = (java.util.List) ws;
                 int last = list.size() - 1;
                 list.set(i, list.get(last));
                 list.remove(last);
@@ -959,7 +957,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private void handleShurikenCollisions() {
         if (boss == null) return;
 
-        List<ShurikenWind> ss = boss.getShurikens();
+        java.util.List<ShurikenWind> ss = boss.getShurikens();
         for (int i = 0; i < ss.size(); ) {
             ShurikenWind s = ss.get(i);
 
@@ -976,7 +974,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
             // swap-remove nếu đã chết
             if (s.isDead()) {
                 @SuppressWarnings({"rawtypes","unchecked"})
-                List list = (List) ss;
+                java.util.List list = (java.util.List) ss;
                 int last = list.size() - 1;
                 list.set(i, list.get(last));
                 list.remove(last);
@@ -1184,7 +1182,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         Sound effect = new Sound("sound/boom.wav");
         effect.play();
-        ScreenShakeEffect.shake(this, 400, 6);
+        GraphicsEffect.ScreenShakeEffect.shake(this, 400, 6);
 
         isCoolingDown = true;
         int boomDamage = 100;
@@ -1402,7 +1400,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         Sound effect = new Sound("sound/lightning.wav");
         effect.play();
-        ScreenShakeEffect.shake(this,  300, 6);
+        GraphicsEffect.ScreenShakeEffect.shake(this,  300, 6);
 
         isCoolingDown = true;
 

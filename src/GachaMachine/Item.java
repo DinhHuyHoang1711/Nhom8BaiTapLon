@@ -7,10 +7,11 @@ import java.awt.*;
  * Đại diện cho một vật phẩm (item)
  */
 public class Item {
-    private String name;
-    private Image image;
-    private int cooldown;
+    private String name;    // Tên item
+    private Image image;    // Hình ảnh
+    private int cooldown;   // Thời gian hồi chiêu
 
+    // CONSTRUCTOR
     public Item(String name, String imagePath) {
         this.name = name;
         this.image = new ImageIcon(imagePath).getImage();
@@ -29,6 +30,7 @@ public class Item {
         this.cooldown = item.getCooldown();
     }
 
+    // GETTER | SETTER
     public String getName() {
         return name;
     }
@@ -49,7 +51,7 @@ public class Item {
                 "Treasure Chest", "Lightning", "Brick",
                 "Meat"
         };
-        //cho nay co magic number
+        // Danh sách item
         Item[] arr = new Item[12];
         /*for (int i = 0; i < count; i++) {
             arr[i] = new Item(names[i], "images/test" + (i + 1) + "-removebg-preview.png");
@@ -76,6 +78,7 @@ public class Item {
         return new Item("Heart", "images/test" + 1 + "-removebg-preview.png", 30000);
     }
 
+    // Tạo từng loại Item tương ứng với thời gian hồi chiêu
     public static Item sword() {
         return new Item("Sword", "images/test" + 2 + "-removebg-preview.png", 20000);
     }
@@ -117,9 +120,10 @@ public class Item {
     }
 
     public static Item meat() {
-        return new Item("Meat", "images/test" +12 + "-removebg-preview.png", 60000);
+        return new Item("Meat", "images/test" + 12 + "-removebg-preview.png", 60000);
     }
 
+    // Đối chiếu
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;

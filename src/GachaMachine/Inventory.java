@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 class Inventory {
+    // danh sách Item đang sở hữu
     private List<Item> ownedItems = new ArrayList<>();
     private Item[] allItems;
+    private static final int DISTANSE_ITEM = 95;
 
     public Inventory(Item[] allItems) {
         this.allItems = allItems;
@@ -66,7 +68,7 @@ class Inventory {
                 listPanel.add(row);
                 listPanel.add(Box.createVerticalStrut(5));
 
-                y += 95;
+                y += DISTANSE_ITEM; // khoảng cách giữa các item
             }
             listPanel.setPreferredSize(new Dimension(450, ownedItems.size() * 95));
 

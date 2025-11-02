@@ -2,20 +2,22 @@ package arkanoid;
 
 import java.util.ArrayList;
 import java.util.List;
-import arkanoid.Ball;
 
 import GachaMachine.Item;
 import MoneyCollected.Coin;
 
-
+/**
+ * Lớp quản lý các Bóng và Item.
+ */
 public class OwnedManager {
-    private List<Ball> balls = new ArrayList<>();
-    private List<Item> items = new ArrayList<>();
+    private List<Ball> balls = new ArrayList<>(); // List bóng
+    private List<Item> items = new ArrayList<>(); // List Item
 
-    private Ball currentBall;
-    private Item currentItem;
-    private Coin currentCoin;
+    private Ball currentBall; // Bóng hiện tại
+    private Item currentItem; // Item hiện tại
+    private Coin currentCoin; // Xu hiện tại
 
+    // Constructor
     public OwnedManager() {
         this.currentBall = Ball.bongnguhanh();
         this.currentItem = Item.lightning();
@@ -35,6 +37,7 @@ public class OwnedManager {
         this.currentItem = currentItem;
     }
 
+    // GETTER | SETTER
     public Ball getCurrentBall() {
         return currentBall;
     }
@@ -54,6 +57,7 @@ public class OwnedManager {
     public Coin getCurrentCoin() {
         return currentCoin;
     }
+
     public void setCurrentCoin(Coin amount) {
         this.currentCoin = amount;
     }
@@ -94,6 +98,7 @@ public class OwnedManager {
         return balls;
     }
 
+    // Add bóng vào danh sách
     private void loadBalls() {
         balls.add(Ball.normalBall());
         balls.add(Ball.fireBall());

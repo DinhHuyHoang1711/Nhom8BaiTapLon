@@ -1,15 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
+
 import arkanoid.*;
+
 import static arkanoid.GameObject.GAME_HEIGHT;
 import static arkanoid.GameObject.GAME_WIDTH;
 
 public class Menu extends JFrame {
 
-    private Sound clickSound;
-    //private Sound backgroundMusic;
+    private Sound clickSound; // Âm thanh
 
     public Menu() {
+        // Panel chính
         setTitle("ARKANOID");
         setSize(GAME_WIDTH, GAME_HEIGHT);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -19,8 +21,6 @@ public class Menu extends JFrame {
 
         // Âm thanh
         clickSound = new Sound("sound/click.wav");
-        //backgroundMusic = new Sound("sound/backgroundMusic.wav");
-        //backgroundMusic.loop();
 
         // Ảnh nền
         GameObject backgroundImg = new GameObject(0, 0, GAME_WIDTH, GAME_HEIGHT,
@@ -42,6 +42,7 @@ public class Menu extends JFrame {
         JLayeredPane layeredPane = new JLayeredPane();
         layeredPane.setBounds(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
+        // Thứ tự
         layeredPane.add(background, Integer.valueOf(0));
         layeredPane.add(startBtn, Integer.valueOf(1));
         layeredPane.add(exitBtn, Integer.valueOf(1));
@@ -59,8 +60,6 @@ public class Menu extends JFrame {
         clickSound.play();
         System.exit(0);
     }
-
-
 
     public static void main(String[] args) {
         new Menu();

@@ -1,11 +1,11 @@
 package arkanoid;
+
 import javax.swing.*;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import arkanoid.GameObject;
 
 public class ObjectPrinter extends JPanel {
 
@@ -18,7 +18,6 @@ public class ObjectPrinter extends JPanel {
     private boolean flashRed = false;
     private long flashStart = 0;
 
-
     //Constructor
     public ObjectPrinter() {
         this.x = 0;
@@ -27,6 +26,7 @@ public class ObjectPrinter extends JPanel {
         this.height = 0;
         this.imagePath = null;
     }
+
     public ObjectPrinter(GameObject obj) {
         this.imagePath = obj.getImagePath();
         this.x = obj.getX();
@@ -36,15 +36,15 @@ public class ObjectPrinter extends JPanel {
         loadImage();
     }
 
-    // ✅ Hàm đọc ảnh từ đường dẫn
+    // Hàm đọc ảnh từ đường dẫn
     private void loadImage() {
         try {
             image = ImageIO.read(new File(imagePath));
 
-            // 🧩 Xác định vùng có nội dung thực (bỏ nền trắng / trong suốt)
+            // Xác định vùng có nội dung thực
             Rectangle cropRect = getNonTransparentArea(image);
 
-            // ✂️ Cắt ảnh theo vùng đó
+            // Cắt ảnh theo vùng
             BufferedImage cropped = image.getSubimage(cropRect.x, cropRect.y,
                     cropRect.width, cropRect.height);
 
@@ -56,7 +56,7 @@ public class ObjectPrinter extends JPanel {
         }
     }
 
-    // ===== Xác định vùng không trong suốt / không trắng =====
+    //Xác định vùng không trong suốt / không trắng
     private Rectangle getNonTransparentArea(BufferedImage image) {
         int w = image.getWidth();
         int h = image.getHeight();
@@ -91,7 +91,7 @@ public class ObjectPrinter extends JPanel {
         return new Rectangle(minX, minY, maxX - minX + 1, maxY - minY + 1);
     }
 
-    // ✅ Hàm vẽ ảnh (Swing tự gọi khi cần)
+    // Hàm vẽ ảnh (Swing tự gọi khi cần)
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -130,6 +130,7 @@ public class ObjectPrinter extends JPanel {
         repaint();
         System.gc(); // Gợi ý dọn rác (tùy chọn)
     }
+
     //Thay the cai game object ma object printer muon in ra;
     public void setGameObject(GameObject obj) {
         clearImage();
@@ -152,4 +153,4 @@ public class ObjectPrinter extends JPanel {
             flashRed = false;
         }
     }
- }
+}

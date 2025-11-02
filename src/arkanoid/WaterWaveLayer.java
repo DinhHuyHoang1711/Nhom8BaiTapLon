@@ -6,37 +6,50 @@ import java.util.*;
 import java.util.List;
 
 public class WaterWaveLayer extends JComponent {
+    // danh sách sóng
     private List<? extends GameObject> waves = Collections.emptyList();
-    private Image sprite;                       // sprite chung (khuyến nghị)
-    private final Map<String, Image> cache = new HashMap<>(); // cache nếu vẽ theo imagePath
 
+    // sprite chung
+    private Image sprite;
+
+    // cache nếu vẽ theo imagePath
+    private final Map<String, Image> cache = new HashMap<>();
+
+    // Constructor
     public WaterWaveLayer(Image sprite) {
         this.sprite = sprite;
         setOpaque(false);
     }
 
-    /** Đổi sprite chung nếu cần. */
+    /**
+     * Đổi sprite chung nếu cần.
+     */
     public void setSprite(Image sprite) {
         this.sprite = sprite;
     }
 
-    /** Cập nhật danh sách wave để vẽ. Gọi mỗi tick trước repaint. */
+    /**
+     * Cập nhật danh sách wave để vẽ. Gọi mỗi tick trước repaint.
+     */
     public void setWaves(List<? extends GameObject> waves) {
         this.waves = (waves == null) ? Collections.emptyList() : waves;
     }
 
-    /** Xoá danh sách wave đang hiển thị. */
+    /**
+     * Xoá danh sách wave đang hiển thị.
+     */
     public void clear() {
         this.waves = Collections.emptyList();
         repaint();
     }
 
+    // Phương thức vẽ chính của layer
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         if (waves == null || waves.isEmpty()) return;
 
-        // Ưu tiên vẽ bằng sprite chung (nhanh nhất)
+        // Ưu tiên vẽ bằng sprite chung
         if (sprite != null) {
             for (GameObject w : waves) {
                 g.drawImage(sprite, w.getX(), w.getY(), w.getWidth(), w.getHeight(), null);

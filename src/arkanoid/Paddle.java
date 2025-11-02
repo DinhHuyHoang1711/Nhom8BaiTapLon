@@ -1,19 +1,26 @@
 package arkanoid;
 
 import java.awt.Rectangle;
+
 import arkanoid.GameObject;
 
+/**
+ * Lớp Paddle đại diên cho thanh chắn bóng.
+ */
 public class Paddle extends GameObject {
 
+    // Di chuyển trái phải
     public boolean movingLeft;
     public boolean movingRight;
 
+    // Constructor
     public Paddle(int x, int y, int width, int height,
                   int dx, int dy, String imagePath) {
         super(x, y, width, height, dx, dy, imagePath);
         this.movingLeft = false;
         this.movingRight = false;
     }
+
     //constructor copy
     public Paddle(Paddle other) {
         super(other.getX(), other.getY(), other.getWidth(), other.getHeight(),
@@ -22,6 +29,7 @@ public class Paddle extends GameObject {
         this.movingRight = other.movingRight;
     }
 
+    // GETTER | SETTER chuyển động
     public boolean isMovingLeft() {
         return this.movingLeft;
     }
@@ -30,36 +38,49 @@ public class Paddle extends GameObject {
         return this.movingRight;
     }
 
+    // Sang trái
     public void setMovingLeft() {
         movingLeft = true;
         movingRight = false;
     }
 
+    // Sang phải
     public void setMovingRight() {
         movingLeft = false;
         movingRight = true;
     }
 
+    // Dừng di chuyển
     public void setDefaultMoving() {
         movingLeft = false;
         movingRight = false;
     }
 
-    public int getCenterX() { return getX() + getWidth()/2; }
-    public int getCenterY() { return getY() + getHeight()/2; }
+    // Lấy tọa độ trung tâm
+    public int getCenterX() {
+        return getX() + getWidth() / 2;
+    }
 
+    public int getCenterY() {
+        return getY() + getHeight() / 2;
+    }
+
+    // Check va chạm giữa bóng và paddle
     public boolean collideFireball(arkanoid.GameObject fireball, float radiusScale) {
         int fx = fireball.getX();
         int fy = fireball.getY();
         int fw = fireball.getWidth();
         int fh = fireball.getHeight();
 
+        // tâm và bán kính của ball
         int cx = fx + fw / 2;
         int cy = fy + fh / 2;
-        int r  = Math.min(fw, fh) / 2;
+        int r = Math.min(fw, fh) / 2;
         if (radiusScale > 0f && radiusScale < 1.0f) {
-            r = Math.max(1, (int)(r * radiusScale));
+            r = Math.max(1, (int) (r * radiusScale));
         }
+
+        // Kiểm tra va chạm giữa hình tròn và hình chữ nhật
         return circleIntersectsRect(cx, cy, r, getX(), getY(), getWidth(), getHeight());
     }
 
@@ -67,15 +88,20 @@ public class Paddle extends GameObject {
         return collideFireball(fireball, 1.0f);
     }
 
+    // Hàm tĩnh check va chạm
     public static boolean circleIntersectsRect(int cx, int cy, int r,
                                                int rx, int ry, int rw, int rh) {
+        // Tìm điểm gần tâm nhất của hình tròn và hình chữ nhật
         int nearestX = clamp(cx, rx, rx + rw);
         int nearestY = clamp(cy, ry, ry + rh);
+
+        // Tính khoảng cách min
         int dx = nearestX - cx;
         int dy = nearestY - cy;
         return dx * dx + dy * dy <= r * r;
     }
 
+    // Giới hạn giá trị của v
     private static int clamp(int v, int lo, int hi) {
         return (v < lo) ? lo : (v > hi) ? hi : v;
     }
@@ -85,10 +111,11 @@ public class Paddle extends GameObject {
         return collideWave(wave, 8, 6); // inset mặc định: 8px ngang, 6px dọc
     }
 
+    // Check va chạm với sóng của Boss
     public boolean collideWave(arkanoid.GameObject wave, int insetX, int insetY) {
-        final int wx  = wave.getX() + Math.max(0, insetX);
-        final int wy  = wave.getY() + Math.max(0, insetY);
-        final int ww0 = wave.getWidth()  - 2 * Math.max(0, insetX);
+        final int wx = wave.getX() + Math.max(0, insetX);
+        final int wy = wave.getY() + Math.max(0, insetY);
+        final int ww0 = wave.getWidth() - 2 * Math.max(0, insetX);
         final int wh0 = wave.getHeight() - 2 * Math.max(0, insetY);
         if (ww0 <= 0 || wh0 <= 0) return false; // bị co quá mức
         final int ww = ww0, wh = wh0;
@@ -110,7 +137,7 @@ public class Paddle extends GameObject {
 
         final int sx = shuriken.getX() + Math.max(0, insetX);
         final int sy = shuriken.getY() + Math.max(0, insetY);
-        final int sw0 = shuriken.getWidth()  - 2 * Math.max(0, insetX);
+        final int sw0 = shuriken.getWidth() - 2 * Math.max(0, insetX);
         final int sh0 = shuriken.getHeight() - 2 * Math.max(0, insetY);
         if (sw0 <= 0 || sh0 <= 0) return false;
         final int sw = sw0, sh = sh0;
@@ -133,6 +160,4 @@ public class Paddle extends GameObject {
         s.markDead();
         return true;
     }
-
-
 }

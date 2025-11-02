@@ -5,15 +5,20 @@ import java.awt.image.BufferedImage;
 import javax.swing.*;
 import arkanoid.*;
 
+/**
+ * Lớp trừu tượng đại diện cho mỗi PowerUp trong game.
+ */
 public abstract class PowerUp extends GameObject {
-    protected final PowerUpType type;
-    protected final long duration;
-    protected BufferedImage image;
-    protected boolean isCaught = false;
-    protected boolean isActive = false;
-    protected long startTime;
-    protected Sound catchedSound;
+    protected final PowerUpType type;   // Loại PowerUp
+    protected final long duration;      // Thời gian tác dụng hiệu ứng
+    protected BufferedImage image;      // Hình ảnh
+    protected boolean isCaught = false;    // Trạng thái bị bắt hay chưa
+    protected boolean isActive = false;     // Trạng thái hoạt dộng
+    protected Sound catchedSound;       // Âm thanh khi bắt được
 
+    /**
+     * Các loại Power Up.
+     */
     public enum PowerUpType {
         INCREASE_DAMAGE,
         EXTRA_HEART,
@@ -22,6 +27,7 @@ public abstract class PowerUp extends GameObject {
         COIN
     }
 
+    // Constructor
     public PowerUp(int x, int y, int width, int height, String imagePath, PowerUpType type, long duration) {
         super(x, y, width, height, 0, 5, imagePath);
         this.type = type;
@@ -30,6 +36,7 @@ public abstract class PowerUp extends GameObject {
         catchedSound = new Sound("sound/click.wav");
     }
 
+    // Load hình ảnh từ đường dẫn và chuyển sang BufferedImage
     private void loadImage(String path) {
         try {
             Image img = new ImageIcon(path).getImage();
@@ -61,6 +68,7 @@ public abstract class PowerUp extends GameObject {
         }
     }
 
+    //GETTER
     public PowerUpType getType() { return type; }
     public long getDuration() { return duration; }
 

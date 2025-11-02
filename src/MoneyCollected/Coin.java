@@ -3,9 +3,12 @@ package MoneyCollected;
 public class Coin {
     private int amount;
 
+    // Tài sản
     public Coin() {
         amount = 2200;
     }
+
+    // Copy
     public Coin(Coin another) {
         this.amount = another.getAmount();
     }
