@@ -5,23 +5,34 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Lớp Inventory (Túi đồ).
+ */
 class Inventory {
+    // Danh sách các vật phẩm mà người chơi đã trúng
     private List<Item> ownedItems = new ArrayList<>();
+
+    // Danh sách toàn bộ vật phẩm có thể xuất hiẹn trong gacha
     private Item[] allItems;
 
+    /**
+     * Khởi tạo túi đồ.
+     *
+     * @param allItems mảng tất cả vật phẩm có trong vòng quay gacha
+     */
     public Inventory(Item[] allItems) {
         this.allItems = allItems;
     }
 
     /**
-     * Thêm vật phẩm vừa trúng vào túi
+     * Thêm vật phẩm vừa trúng vào túi đồ.
      */
     public void addItem(Item item) {
         ownedItems.add(item);
     }
 
     /**
-     * Hiển thị giao diện túi đồ
+     * Hiển thị giao diện túi đồ.
      */
     public void showInventory(Component parent) {
         JFrame frame = new JFrame("Túi đồ");
@@ -43,7 +54,9 @@ class Inventory {
             listPanel.setLayout(null);
             listPanel.setBackground(Color.WHITE);
 
-            int y = 10;
+            int y = 10; // Vị trí Y của từng hàng item
+
+            // Duyệt từng item trong túi
             for (Item item : ownedItems) {
                 // mỗi vật phẩm là 1 hàng (ảnh + tên)
                 JPanel row = new JPanel();
@@ -51,7 +64,7 @@ class Inventory {
                 row.setBackground(Color.WHITE);
                 row.setBounds(10, y, 460, 90);
 
-                // ảnh vật phẩm
+                // Ảnh vật phẩm thu nhỏ
                 Image img = item.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
                 JLabel imgLabel = new JLabel(new ImageIcon(img));
                 imgLabel.setBounds(10, 5, 80, 80);
@@ -66,8 +79,10 @@ class Inventory {
                 listPanel.add(row);
                 listPanel.add(Box.createVerticalStrut(5));
 
-                y += 95;
+                y += 95; // Xuống dòng tiếp theo
             }
+
+            // Điều chỉnh chiều cao panel theo số lượng item
             listPanel.setPreferredSize(new Dimension(450, ownedItems.size() * 95));
 
             // Nếu danh sách dài, cho vào ScrollPane
@@ -77,7 +92,7 @@ class Inventory {
             frame.add(scroll);
         }
 
-        // Nút đóng
+        // Nút đóng cửa sổ túi đồ
         JButton closeBtn = new JButton("Đóng");
         closeBtn.setBounds(200, 420, 100, 35);
         closeBtn.addActionListener(e -> frame.dispose());

@@ -4,31 +4,66 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Đại diện cho một vật phẩm (item)
+ * Đại diện cho một vật phẩm (Item) trong hệ thống Gacha.
+ * Mỗi vật phẩm có:
+ * - Tên (name)
+ * - Hình ảnh hiển thị (image)
+ * - Thời gian hồi chiêu (cooldown) - nếu vật phẩm có kỹ năng sử dụng.
  */
 public class Item {
+
+    /**
+     * Tên của vật phẩm
+     */
     private String name;
+
+    /**
+     * Hình ảnh đại diện cho vật phẩm
+     */
     private Image image;
+
+    /**
+     * Thời gian hồi chiêu
+     */
     private int cooldown;
 
+    /**
+     * Constructor khởi tạo vật phẩm với tên và đường dẫn ảnh.
+     *
+     * @param name      tên vật phẩm
+     * @param imagePath đường dẫn ảnh vật phẩm
+     */
     public Item(String name, String imagePath) {
         this.name = name;
         this.image = new ImageIcon(imagePath).getImage();
         this.cooldown = 0;
     }
 
+    /**
+     * Constructor khởi tạo vật phẩm có kèm cooldown.
+     *
+     * @param name      tên vật phẩm
+     * @param imagePath đường dẫn ảnh vật phẩm
+     * @param cooldown  thời gian hồi chiêu của vật phẩm (ms)
+     */
     public Item(String name, String imagePath, int cooldown) {
         this.name = name;
         this.image = new ImageIcon(imagePath).getImage();
         this.cooldown = cooldown;
     }
 
+    /**
+     * Constructor sao chép 1 vật phẩm (copy constructor).
+     *
+     * @param item vật phẩm cần sao chép
+     */
     public Item(Item item) {
         this.name = item.getName();
         this.image = item.getImage();
         this.cooldown = item.getCooldown();
     }
 
+    // getter.
     public String getName() {
         return name;
     }
@@ -41,7 +76,11 @@ public class Item {
         return this.cooldown;
     }
 
-    // Tạo danh sách item mẫu
+    /**
+     * Tải các vật phẩm có sẵn (12 vật phẩm mặc định trong vòng quay).
+     *
+     * @return mảng các vật phẩm
+     */
     public static Item[] loadItems(int count) {
         String[] names = {
                 "Heart", "Sword", "Bow", "Boom", "Helmet",
@@ -49,13 +88,9 @@ public class Item {
                 "Treasure Chest", "Lightning", "Brick",
                 "Meat"
         };
-        //cho nay co magic number
+        // 12 vật phẩm cố định
         Item[] arr = new Item[12];
-        /*for (int i = 0; i < count; i++) {
-            arr[i] = new Item(names[i], "images/test" + (i + 1) + "-removebg-preview.png");
-        }
 
-         */
         arr[0] = new Item(Item.heart());
         arr[1] = new Item(Item.sword());
         arr[2] = new Item(Item.bow());
@@ -72,6 +107,9 @@ public class Item {
         return arr;
     }
 
+    /**
+     * @return vật phẩm Heart kèm hình ảnh và thời gian hồi chiêu
+     */
     public static Item heart() {
         return new Item("Heart", "images/test" + 1 + "-removebg-preview.png", 30000);
     }
@@ -117,9 +155,12 @@ public class Item {
     }
 
     public static Item meat() {
-        return new Item("Meat", "images/test" +12 + "-removebg-preview.png", 60000);
+        return new Item("Meat", "images/test" + 12 + "-removebg-preview.png", 60000);
     }
 
+    /**
+     * Hai vật phẩm được coi là giống nhau nếu chúng có cùng tên.
+     */
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
