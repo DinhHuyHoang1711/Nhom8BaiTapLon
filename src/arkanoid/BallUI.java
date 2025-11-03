@@ -92,7 +92,7 @@ public class BallUI extends JFrame {
 
         // Nút Back
         JButton back = ButtonManager.createImageButton(
-                "img/back_button.png", "img/back_hover.png",
+                "img/back_button.png", null,
                 10, 550, clickSound, e -> {
                     this.dispose();
                     parentBalo.setVisible(true);

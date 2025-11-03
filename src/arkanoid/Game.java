@@ -23,7 +23,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     public static final int GAME_HEIGHT = 700;
     public static final int PLAYFRAME_WIDTH = 800;
     public static final int PLAYFRAME_HEIGHT = 700;
-    private static final int TICK_MS = 33;
+    private static final int TICK_MS = 40;
 
     //Cửa sổ cha
     MapMenu parentMenu;
@@ -74,7 +74,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     private static final int STEP_Y = 30;
     private static final int PLAY_LEFT = 0;
     private static final double COIN_DROP_CHANCE = 0.7;
-    private static final double POWER_UP_DROP_CHANCE = 0.3;
+    private static final double POWER_UP_DROP_CHANCE = 0.1;
 
     // Công cụ hỗ trợ in hình ảnh
     private final ObjectPrinter paddlePrinter = new ObjectPrinter();
@@ -1242,13 +1242,13 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
     }
 
     /**
-     * Kích hoạt kỹ năng **Boom Artifact**: gây 100 sát thương cho toàn bộ gạch trên màn hình.
+     * Kích hoạt kỹ năng **Boom Artifact**: gây 150 sát thương cho toàn bộ gạch trên màn hình.
      * <p>
      * Khi kích hoạt:
      * <ul>
      *   <li>Phát âm thanh nổ và hiệu ứng rung màn hình.</li>
-     *   <li>Mỗi viên gạch nhận 100 sát thương, gạch bị phá sẽ bị loại bỏ khỏi danh sách.</li>
-     *   <li>Nếu có boss đang xuất hiện, boss cũng chịu 100 sát thương (trừ khi ở trạng thái miễn nhiễm).</li>
+     *   <li>Mỗi viên gạch nhận 150 sát thương, gạch bị phá sẽ bị loại bỏ khỏi danh sách.</li>
+     *   <li>Nếu có boss đang xuất hiện, boss cũng chịu 150 sát thương (trừ khi ở trạng thái miễn nhiễm).</li>
      *   <li>Thời gian hồi chiêu: 60 giây.</li>
      * </ul>
      * Nếu đang trong thời gian hồi chiêu, kỹ năng sẽ không được kích hoạt.
@@ -1263,7 +1263,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         GraphicsEffect.ScreenShakeEffect.shake(this, 400, 6);
 
         isCoolingDown = true;
-        int boomDamage = 100;
+        int boomDamage = 150;
 
         for(Brick b : bricks) {
             b.takeHit(boomDamage);
@@ -1512,12 +1512,12 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         timer.start();
     }
     /**
-     * Kích hoạt kỹ năng **Lightning Artifact**: bắn tia sét thẳng đứng gây 30.000 sát thương cho tất cả gạch trên đường bắn.
+     * Kích hoạt kỹ năng **Lightning Artifact**: bắn tia sét thẳng đứng gây 500 sát thương cho tất cả gạch trên đường bắn.
      * <p>
      * Khi kích hoạt:
      * <ul>
      *   <li>Phát âm thanh sét và hiệu ứng rung màn hình.</li>
-     *   <li>Tạo tia laser dọc từ vị trí paddle hiện tại, gây 30.000 sát thương cho tất cả gạch bị chạm.</li>
+     *   <li>Tạo tia laser dọc từ vị trí paddle hiện tại, gây 500 sát thương cho tất cả gạch bị chạm.</li>
      *   <li>Nếu có boss trong vùng ảnh hưởng, boss cũng nhận sát thương tương ứng.</li>
      *   <li>Hiệu ứng tồn tại trong 0.2 giây, sau đó biến mất.</li>
      *   <li>Thời gian hồi chiêu: 10 giây.</li>
@@ -1536,7 +1536,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         isCoolingDown = true;
 
         //Vi tri cua laser phu thuoc vao vi tri paddle hien tai do
-        int laserDamage = 30000;
+        int laserDamage = 500;
         int laserWidth = 10;
         int laserHeight = GAME_HEIGHT;
         int laserX = paddle.getX() + paddle.getWidth() / 2 - laserWidth / 2;
