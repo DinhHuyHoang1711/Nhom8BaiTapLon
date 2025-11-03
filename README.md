@@ -1,7 +1,7 @@
 # Nhom8BaiTapLon
 # Ảnh : https://drive.google.com/file/u/1/d/16PWV1qX9IrLeFNUhoA2iNiqVSi3BhOfq/view?usp=drive_open
 
-# Link video demo : 
+# Link video demo : https://drive.google.com/drive/folders/1HPr28iUIxwKs-mqHHUd38ALEHZev_WCb?usp=sharing
 
 ## 1. Thành viên nhóm & phân công công việc
 
