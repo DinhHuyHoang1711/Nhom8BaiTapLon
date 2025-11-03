@@ -23,7 +23,6 @@ public class DiamondSquareGacha extends JPanel {
     // Dữ liệu chính
     private double tileX[];
     private double tileY[];
-    private Point[] tilePositions;
     private Image background;
     private Item[] items;   // Danh sách Item
     private Inventory inventory;    // Túi chứa Item đã quay được
