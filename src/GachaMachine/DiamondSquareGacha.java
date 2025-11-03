@@ -11,7 +11,7 @@ import java.awt.geom.AffineTransform;
 import arkanoid.OwnedManager;
 
 /**
- * 🎮 Game Vòng Quay 12 Ô - Hình Thoi
+ * Game Vòng Quay 12 Ô - Hình Thoi
  */
 public class DiamondSquareGacha extends JPanel {
     // Kích thước & cấu hình
@@ -25,13 +25,13 @@ public class DiamondSquareGacha extends JPanel {
     private double tileY[];
     private Point[] tilePositions;
     private Image background;
-    private Item[] items;
-    private Inventory inventory;
+    private Item[] items;   // Danh sách Item
+    private Inventory inventory;    // Túi chứa Item đã quay được
     private SpinAnimation spinAnim;
-    private Coin currentMoney;
-    private OwnedManager ownedManager;
+    private Coin currentMoney;  // Xu hiện tại
+    private OwnedManager ownedManager;  // Chứa các vật phẩm đã sở hữu
 
-    // Giao diện & nút
+    // Giao diện và nút
     private JLabel moneyLabel;
     private JPanel moneyPanel;
     private JButton spinBtn, bagBtn;
@@ -101,14 +101,14 @@ public class DiamondSquareGacha extends JPanel {
      * Thiết lập các nút bấm
      */
     private void setupButtons() {
-        // 🔹 Nút QUAY
+        // Nút QUAY
         spinBtn = new JButton("QUAY");
         spinBtn.setFont(new Font("Arial", Font.BOLD, 18));
         spinBtn.setBounds(240, 520, 120, 40);
         spinBtn.addActionListener(new SpinButtonListener());
         add(spinBtn);
 
-        // 🔹 Nút TÚI ĐỒ
+        // Nút TÚI ĐỒ
         bagBtn = new JButton(new ImageIcon("images/bag.png"));
         bagBtn.setBounds(400, 400, 200, 200);
         bagBtn.setToolTipText("Túi đồ");
@@ -160,6 +160,7 @@ public class DiamondSquareGacha extends JPanel {
         tileX = new double[NUM_TILES];
         tileY = new double[NUM_TILES];
         int gap = 90;
+        // Tọa độ giữa các ô
         int[][] offsets = {
                 {-3, 0}, {-2, 1}, {-1, 2},
                 {0, 3}, {1, 2}, {2, 1},
@@ -190,6 +191,7 @@ public class DiamondSquareGacha extends JPanel {
 
         int highlightIndex = spinAnim.getHighlightIndex();
 
+        // Duyệt qua danh sách
         for (int i = 0; i < NUM_TILES; i++) {
             AffineTransform old = g2.getTransform();
 
@@ -199,6 +201,7 @@ public class DiamondSquareGacha extends JPanel {
             g2.setColor(new Color(0, 0, 100, 100));
             g2.fillRect(-TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
 
+            // Hình ảnh từng Item
             Image img = items[i].getImage();
             AffineTransform at = new AffineTransform();
             at.translate(-TILE_SIZE / 2.0, -TILE_SIZE / 2.0);
@@ -207,6 +210,7 @@ public class DiamondSquareGacha extends JPanel {
                     (double) TILE_SIZE / img.getHeight(null));
             g2.drawImage(img, at, null);
 
+            // Highlight Item
             if (i == highlightIndex) {
                 g2.setColor(new Color(255, 215, 0, 120));
                 g2.fillRect(-TILE_SIZE / 2, -TILE_SIZE / 2, TILE_SIZE, TILE_SIZE);
@@ -220,7 +224,7 @@ public class DiamondSquareGacha extends JPanel {
      * Chạy chương trình
      */
     public static void main(String[] args) {
-        JFrame frame = new JFrame("🎮 Vòng Quay 12 Ô - Hình Thoi");
+        JFrame frame = new JFrame("Vòng Quay 12 Ô - Hình Thoi");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.getContentPane().add(new DiamondSquareGacha(new OwnedManager()));
         frame.pack();

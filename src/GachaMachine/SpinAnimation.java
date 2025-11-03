@@ -11,17 +11,18 @@ import arkanoid.OwnedManager;
  * Quản lý hoạt ảnh vòng quay và kết quả
  */
 public class SpinAnimation {
-    private DiamondSquareGacha panel;
-    private Timer timer;
+    private DiamondSquareGacha panel;   // Panel
+    private Timer timer;    // Bộ đếm thời gian
     private int highlightIndex = -1;
-    private boolean spinning = false;
-    private int stopIndex;
+    private boolean spinning = false;   // trạng thái có đang quay hay không
+    private int stopIndex;  // Tọa độ điểm dừng
     private Random random = new Random();
-    private int numTiles;
-    private Item[] items;
-    private Inventory inventory;
-    private OwnedManager ownedManager;
+    private int numTiles;   // Số lượng Item
+    private Item[] items;   // Danh sách Item
+    private Inventory inventory;    // Túi đồ chứa các Item đã quay
+    private OwnedManager ownedManager;  // chứa các Item có trong game
 
+    // Constructor
     public SpinAnimation(DiamondSquareGacha panel, int numTiles, Item[] items, Inventory inventory, OwnedManager ownedManager) {
         this.panel = panel;
         this.numTiles = numTiles;
@@ -30,11 +31,13 @@ public class SpinAnimation {
         this.ownedManager = ownedManager;
     }
 
+    // Highlight
     public void highlightNext() {
         highlightIndex = (highlightIndex + 1) % numTiles;
         panel.repaint();
     }
 
+    // Trạng thái dừng hay chưa
     public boolean isStopPosition() {
         return highlightIndex == stopIndex;
     }
@@ -49,6 +52,7 @@ public class SpinAnimation {
         return numTiles;
     }
 
+    // Bắt đầu quay
     public void startSpin() {
         if (spinning) return;
 
@@ -63,6 +67,7 @@ public class SpinAnimation {
         return highlightIndex;
     }
 
+    // Show kết quả
     private void showResult(Item item) {
         inventory.addItem(item);
         switch(item.getName()) {
@@ -106,6 +111,7 @@ public class SpinAnimation {
                 break;
         }
 
+        // thêm vào cửa sổ
         JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(panel)
                 , "Kết quả", true);
         dialog.setSize(200, 200);
@@ -119,6 +125,7 @@ public class SpinAnimation {
                 new ImageIcon(item.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH))
                 , SwingConstants.CENTER);
 
+        // Nút Đóng
         JButton ok = new JButton("Đóng");
         ok.addActionListener(e -> dialog.dispose());
 

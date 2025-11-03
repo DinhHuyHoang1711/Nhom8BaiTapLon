@@ -6,11 +6,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class ShakeAction implements ActionListener {
-    private final Window window;
-    private final Timer timer;
+    private final Window window;    // cửa sổ
+    private final Timer timer;  // Bộ đếm thời gian
     private final int delay;
-    private final int currentOfPosX;
-    private final int currentOfPosY;
+    private final int currentOfPosX;    // vị trí x hiện tại
+    private final int currentOfPosY;    // vị trí y hiện tại
     private final int strength;
     private int remaining ;
 
