@@ -440,7 +440,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
         timer.stop();
         bgm.close();
         bossSound.close();
-        JOptionPane.showMessageDialog(this, "Chua j da dau hang roi ga vcl");
+        JOptionPane.showMessageDialog(this, "Da dau hang");
         this.dispose();
         parentMenu.setVisible(true);
     }
@@ -556,7 +556,7 @@ public class Game extends JFrame implements ActionListener, KeyListener, WindowL
 
         if (currentHeart <= 0) {
             timer.stop();
-            JOptionPane.showMessageDialog(this, "Game over!, qua ngu");
+            JOptionPane.showMessageDialog(this, "Game over!");
             bgm.close();
             bossSound.close();
             this.dispose();
